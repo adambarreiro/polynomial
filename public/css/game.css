@@ -1,0 +1,276 @@
+* {
+    cursor: url(/assets/img/cursor.gif), pointer;
+}
+
+body, html {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: url(/assets/img/bg.png);
+    /* Thanks to http://subtlepatterns.com for the pattern */
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+}
+
+.container {
+    margin: 30px auto;
+}
+
+#logo {
+    background: url(/assets/img/logo.png) no-repeat;
+    height: 300px;
+    width: 632px;
+    top: 50%;
+    left: 50%;
+    margin: 25px auto;
+}
+
+/* Menus */
+
+.buttonext {
+    width: 94%;
+    padding: 8px 0px 8px 0px;
+    margin-bottom: 15px;
+    margin-left: 10px;
+    color: #EEEEEE;
+    background: #111111;
+    border: 0px;
+    text-align: center;
+}
+
+.buttonext:hover {
+    color: #EEEEEE;
+    background: #333333;
+}
+
+#lobutton {
+    width: 120px;
+    padding: 8px 0px 8px 0px;
+    margin-bottom: 15px;
+    color: #EEEEEE;
+    background: #551111;
+    border: 1px solid #000000;
+    box-shadow: 10px 10px 10px #111111;
+    text-align: center;
+}
+
+#lobutton:focus, #lobutton:hover {
+    color: #FFFFFF;
+    background: #991111;
+}
+
+#edbutton {
+    width: 120px;
+    padding: 8px 0px 8px 0px;
+    margin-bottom: 15px;
+    margin-left: 90px;
+    color: #EEEEEE;
+    background: #111155;
+    border: 1px solid #000000;
+    box-shadow: 10px 10px 10px #111111;
+    text-align: center;
+}
+
+#edbutton:focus, #edbutton:hover {
+    color: #FFFFFF;
+    background: #111199;
+}
+
+.menu {
+    text-align: center;
+    width: 300px;
+    padding: 15px 15px 5px 15px;
+    background: #999999;
+    box-shadow: 10px 10px 10px #111111;
+    margin: 5px auto;
+}
+
+.extra {
+    text-align: center;
+    width: 300px;
+    padding: 35px 15px 5px 15px;
+    margin: 0 auto;
+}
+
+/* Menu separators */
+
+.separator {
+    border-bottom: 1px solid #111111;
+    margin-bottom: 15px;
+    color: #111111;
+    text-align: left;
+    font-size: 8pt;
+}
+
+/* Scenario skeleton with the screen and sliders */
+#cr-stage {
+    margin: 30px auto;
+}
+
+/* Bottom menus */
+
+.bottom {
+    margin: 10px auto;
+}
+
+.lifebox {
+    float: left;
+    color: white;
+    clear: both;
+    font-family: Arial, sans;
+    line-height: 10px;
+}
+
+.lifebox > span {
+    float: left;
+}
+
+.bar {
+    width: 300px;
+    height: 8px;
+    z-index: 2;
+    box-shadow: -1px 1px 0px #999999;
+    margin-left: 65px;
+    margin-bottom: 20px;
+}
+
+#lifebar {
+    width: 300px;
+    background: rgb(50,200,50);
+    float: left;
+    border-radius: 0px 75% 0px 0;
+    z-index: 1;
+    height: 5px;
+    margin-top: 3px;
+}
+
+#enemybar {
+    width: 300px;
+    background: rgb(200,50,50);
+    float: left;
+    border-radius: 0px 75% 0px 0;
+    z-index: 5;
+    height: 5px;
+    margin-top: 3px;
+
+}
+
+.alert {
+    float: left;
+    color: #FFFFFF;
+    margin: -20px 100px;
+    width: 300px;
+    font-size: 20pt;
+}
+
+#timeout {
+    border: 1px dashed white;
+    padding: 5px 5px 5px 5px;
+    font-size: 8pt;
+}
+
+.inventory {
+    color: white;
+    float: left;
+    margin-top: -20px;
+}
+
+.element {
+    float: left;
+    width: 50px;
+    margin-right: 10px;
+    padding: 5px;
+    height: 50px;
+    font-size: 30pt;
+}
+
+#back {
+    position: absolute;
+    top: 30px;
+    left: 10px;
+    width: 50px;
+    padding: 8px 0px 8px 0px;
+    color: #EEEEEE;
+    background: #551111;
+    border: 1px solid #000000;
+    text-align: center;
+}
+
+#back:focus, #back:hover {
+    color: #FFFFFF;
+    background: #991111;
+}
+
+.popup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -140px;
+    margin-top: -125px;
+    z-index: 5;
+    width: 300px;
+    text-align: center;
+    padding: 15px 15px 5px 15px;
+    background: #999999;
+    box-shadow: 10px 10px 10px #111111;
+}
+
+.button {
+    width: 120px;
+    padding: 8px 0px 8px 0px;
+    margin-left: 10px;
+    color: #EEEEEE;
+    background: #111111;
+    border: 0px;
+    text-align: center;
+}
+
+.button:hover, .buttonext:hover {
+    color: #EEEEEE;
+    background: #333333;
+}
+
+.battle {
+    position: relative;
+    z-index: 10;
+    margin: 5% auto;
+    width: 70%;
+    height: 80%;
+    background: rgba(200,200,200,0.8);
+    box-shadow: 10px 10px 10px #111111;
+}
+
+.battle > h1 {
+   font-size: 200%;
+   padding: 20px;
+   border-bottom: 1px solid #000000;
+}
+
+.battle > table > h2 {
+   border-bottom: 1px solid #000000;
+}
+
+.battle > table {
+    font-size: 200%;
+    padding: 30px;
+    margin-left: 30px;
+    line-height: 200%;
+}
+
+.battle > table > tbody > tr > td {
+    padding: 5px;
+    letter-spacing: 2px;
+}
+
+#time {
+   float: right;
+   font-size: 110%;
+}
+
+#separator {
+    border-bottom: 1px solid #111111;
+    width: 100%;
+}

@@ -1,0 +1,220 @@
+/**
+ * -----------------------------------------------------------------------------
+ * Name: menu/style.css
+ * Author: Adam Barreiro Costa
+ * Description: Stylesheet applied in all the menu sections (login, register and
+ * administration)
+ * Updated: 23-10-2013
+ * -----------------------------------------------------------------------------
+ */
+
+/* Global */
+
+* {
+    cursor: url(/assets/img/cursor.gif), pointer;
+}
+
+body {
+    background-image: url(/assets/img/bg.png);
+    /* Thanks to http://subtlepatterns.com for the pattern */
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+}
+
+/* Skeletons */
+
+.header {
+    width: 100%;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    font-size: 20px;
+    color: #EEEEEE;
+}
+
+.content {
+    z-index: -1;
+    width: 100%;
+}
+
+/* Buttons */
+
+.button {
+    width: 120px;
+    padding: 8px 0px 8px 0px;
+    margin-bottom: 15px;
+    margin-left: 10px;
+    color: #EEEEEE;
+    background: #111111;
+    border: 0px;
+    text-align: center;
+}
+
+.buttonext {
+    width: 94%;
+    padding: 8px 0px 8px 0px;
+    margin-bottom: 15px;
+    margin-left: 10px;
+    color: #EEEEEE;
+    background: #111111;
+    border: 0px;
+    text-align: center;
+}
+
+.button:hover, .buttonext:hover {
+    color: #EEEEEE;
+    background: #333333;
+}
+
+#lobutton {
+    float: right;
+    width: 120px;
+    padding: 8px 0px 8px 0px;
+    margin-bottom: 15px;
+    margin-left: 10px;
+    color: #EEEEEE;
+    background: #551111;
+    border: 1px solid #000000;
+    box-shadow: 10px 10px 10px #111111;
+    text-align: center;
+}
+
+#lobutton:focus, #lobutton:hover {
+    color: #FFFFFF;
+    background: #991111;
+}
+
+#edbutton {
+    float: left;
+    width: 120px;
+    padding: 8px 0px 8px 0px;
+    margin-bottom: 15px;
+    margin-left: 10px;
+    color: #EEEEEE;
+    background: #111155;
+    border: 1px solid #000000;
+    box-shadow: 10px 10px 10px #111111;
+    text-align: center;
+}
+
+#edbutton:focus, #edbutton:hover {
+    color: #FFFFFF;
+    background: #111199;
+}
+
+/* Text fields */
+
+.field {
+    width: 300px;
+    padding: 8px 0px 8px 0px;
+    margin-bottom: 15px;
+    text-align: center;
+    border: 1px solid #FFFFFF;
+    color: #111111;
+    background: #EEEEEE;
+    font-size: 13px;
+}
+
+.field:focus, .field:hover {
+    color: #000000;
+    background: #FFFFFF;
+}
+
+/* Menu title */
+
+.title {
+    width: 300px;
+    margin: 20px auto;
+    font-size: 24px;
+    color: #EEEEEE;
+}
+
+/* Menu */
+
+.menu {
+    text-align: center;
+    width: 300px;
+    padding: 15px 15px 5px 15px;
+    background: #999999;
+    box-shadow: 10px 10px 10px #111111;
+    margin: 5px auto;
+}
+
+.extra {
+    text-align: center;
+    width: 300px;
+    padding: 35px 15px 5px 15px;
+    margin: 0 auto;
+}
+
+/* Menu separators */
+
+.separator {
+    border-bottom: 1px solid #111111;
+    margin-bottom: 15px;
+    color: #111111;
+    text-align: left;
+    font-size: 8pt;
+}
+
+/* Login form */
+
+#logo {
+    background: url(/assets/img/logo.png) no-repeat;
+    height: 300px;
+    width: 632px;
+    top: 50%;
+    left: 50%;
+    margin-top: -250px;
+    margin: 0 auto;
+}
+
+/* Register */
+
+#bottomline {
+    margin: 0 auto;
+    width: 200px;
+    padding: 8px;
+    color: #999999;
+    margin-top: 10px;
+    text-align: center;
+    font-size: 8pt;
+}
+
+/* Messages */
+
+.popup {
+    position: absolute;
+    margin-left: 350px;
+    width: 200px;
+    border: 1px solid #000000;
+    background: #FDFD7F;
+    padding: 8px;
+    color: #000000;
+    text-align: center;
+    font-size: 8pt;
+}
+
+.msg {
+    position: absolute;
+    top: 10%;
+    right: 5%;
+    width: 200px;
+    padding: 5px;
+    border: 1px solid #000000;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 8pt;
+}
+
+#warning {
+    background: #FF0000;
+    top: 15%;
+}
+
+#ok {
+    background: #009900;
+}
+
+#error {
+    background: #990000;
+}

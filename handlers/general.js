@@ -1,0 +1,72 @@
+// -----------------------------------------------------------------------------
+// Name: /handlers/general.js
+// Author: Adam Barreiro Costa
+// Description: Reunites all the server handlers in one file
+// Updated: 23-10-2013
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// Modules
+// ----------------------------------------------------------------------------- 
+var get = require('./get.js');
+var post = require('./post.js');
+var ajax = require('./ajax.js');
+
+// -----------------------------------------------------------------------------
+// Functions
+// -----------------------------------------------------------------------------
+/**
+ * Sets all the GET request handlers
+ */
+function setGetHandlers() {
+    get.getIndex();
+    get.getLogin();
+    get.getRegister();
+    get.getAdmin();
+    get.getEditor();
+    get.getGame();
+    get.getLogout();
+    get.initAdmin();
+}
+exports.setGetHandlers = setGetHandlers;
+
+/**
+ * Sets all the POST request handlers
+ */
+function setPostHandlers(){
+    post.postLogin();
+    post.postRegister();
+    post.postAdminCreateGroup();
+    post.postAdminEditGroup();
+    post.postAdminDeleteGroup();
+    post.postAdminAssignGroup();
+    post.postAdminDisposeGroup();
+    post.postAdminDeleteStudent();
+    post.postAdminEditAdmin();
+}
+exports.setPostHandlers = setPostHandlers;
+
+/**
+ * Sets all the AJAX handlers
+ */
+function setAjaxHandlers() {
+    ajax.ajaxGetGroups();
+    ajax.ajaxGetStudents();
+    ajax.ajaxGetStudent();
+    ajax.ajaxGetLevelList();
+    ajax.ajaxLevelCreate();
+    ajax.ajaxLevelUpdate();
+    ajax.ajaxLevelLoad();
+    ajax.ajaxLevelDelete();
+    ajax.ajaxLevelMove();
+    ajax.ajaxSaveGame();
+    ajax.ajaxGetQuestions();
+}
+exports.setAjaxHandlers = setAjaxHandlers;
+
+function csrf(req, res, next) {
+    res.locals.token = req.session._csrf;
+    res.cookie('token', res.locals.token);
+    next();
+}
+exports.csrf = csrf;

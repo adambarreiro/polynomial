@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <script src="/js/common/crafty.js"></script>
+    <script src="/js/common/jquery.js"></script>
+    <script type="text/javascript" data-main="/js/game/editor/main" src="/js/common/require.js"></script>
+    <link href="/css/editor.css" rel="stylesheet" type="text/css"/>
+    <title>Polynomial - Editor de niveles</title>
+</head>
+<body>
+    <div class="container">
+        <ul class="palette">
+        </ul>
+        <div class="scenario">
+            <div>
+                <div class="mover moverv" id="move_up"></div>
+                    <div class="mover moverh" id="move_left"></div>
+                    <div id="cr-stage"></div>
+                    <div class="mover moverh" id="move_right"></div>
+                <div class="mover moverv" id="move_down"></div>               
+            </div>
+        </div>
+        <div class="bottom">
+            <div id="position"></div>
+            <input class="name" type="field" placeholder="Ningun mapa cargado" disabled/>
+            <input class="button" type="button" name="back" value="Atr&aacute;s"/>
+            <input class="button" type="button" name="new" value="Nuevo"/>
+            <input class="button" type="button" name="load" value="Cargar..."/>
+            <input class="button" type="button" name="save" value="Guardar"/>
+            <input class="button" type="button" name="move" value="Mover..."/>
+            <input class="button" type="button" name="delete" value="Eliminar..."/>
+        </div>
+    </div>
+</body>
+</html>

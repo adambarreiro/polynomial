@@ -1,0 +1,190 @@
+* {
+    cursor: url(/assets/img/cursor.gif), pointer;
+}
+
+body, html {
+    -webkit-touch-callout: none;
+-webkit-user-select: none;
+-khtml-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+    background-image: url(/assets/img/bg.png);
+    /* Thanks to http://subtlepatterns.com for the pattern */
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+}
+
+.container {
+    margin: 40px auto;
+}
+
+/* Palette of tiles */
+.palette {
+    float: left;
+    overflow: auto;
+    width: 40px;
+    padding: 8px 4px 4px 4px;
+    background: #999999;
+    box-shadow: 5px 5px 5px #000000;
+}
+
+.palette > li{
+    list-style: none;
+    margin-left: 3px;
+    margin-bottom: 10px;
+    border: 1px solid #111111;
+    width: 32px;
+    height: 32px;
+    background-color: #EEEEEE;
+}
+
+.palette > li:hover{
+    border: 1px solid #EEEEEE;
+}
+
+/* Scenario skeleton with the screen and sliders */
+.scenario {
+    overflow: hidden;
+    float: right;
+    padding: 10px 20px 0px 0px;
+}
+
+.scenario > div {
+    padding-left: 30px;
+}
+
+#cr-stage {
+    float: left;
+    margin: 0 auto;
+}
+
+.mover {
+    background: #999999;
+    color: #000000;
+    font-weight: bolder;
+    text-align: center;
+}
+
+.moverv {
+    height: 20px;
+    margin-left: 20px;
+    text-align: center;
+}
+.moverh {
+    width: 20px;
+}
+#move_up {
+    border-top-left-radius: 100px;
+    border-top-right-radius: 100px;
+}
+#move_left {
+    float: left;
+    border-top-left-radius: 100px;
+    border-bottom-left-radius: 100px;
+}
+
+#move_right {
+    float: left;
+    border-top-right-radius: 100px;
+    border-bottom-right-radius: 100px;
+}
+#move_down {
+    clear: both;
+    border-bottom-right-radius: 100px;
+    border-bottom-left-radius: 100px;
+}
+
+/* Bottom menus */
+
+.bottom {
+    padding-top: 20px;
+    margin-bottom: 15px;
+    clear: both;
+    text-align: center;
+}
+
+.name {
+    width: 200px;
+    padding: 8px 0px 8px 0px;
+    text-align: center;
+    border: 1px solid #FFFFFF;
+    color: #111111;
+    background: #EEEEEE;
+    font-size: 13px;
+}
+
+.button {
+    width: 120px;
+    padding: 8px 0px 8px 0px;
+    margin-left: 10px;
+    color: #EEEEEE;
+    background: #111111;
+    border: 0px;
+    text-align: center;
+}
+
+.deactivated {
+    color: #999999;
+    background: #111111;
+}
+
+.button:hover, .buttonext:hover {
+    color: #EEEEEE;
+    background: #333333;
+}
+
+.deactivated:hover, .deactivated:hover {
+    color: #999999;
+    background: #111111;
+}
+
+.selector {
+    position: relative;
+    float: right;
+    border: 0px;
+    text-align: center;
+}
+
+.popup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -140px;
+    margin-top: -125px;
+    z-index: 5;
+    width: 300px;
+    text-align: center;
+    padding: 15px 15px 5px 15px;
+    background: #999999;
+    box-shadow: 10px 10px 10px #111111;
+}
+
+.popupelement {
+    width: 95%;
+    padding: 8px 0px 8px 0px;
+    margin-bottom: 15px;
+    border: 0px;
+}
+
+.separator {
+    border-bottom: 1px solid #111111;
+    margin-bottom: 15px;
+    color: #111111;
+    text-align: left;
+    font-size: 8pt;
+}
+
+#position {
+    padding: 4px;
+    width: 65px;
+    height: 40px;
+    border: 1px dashed #999999;
+    line-height: 150%;
+    text-align: center;
+    color: #999999;
+    margin-top: -8px;
+    margin-left: 15px;
+    float: left;
+    
+}
