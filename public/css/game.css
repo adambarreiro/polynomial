@@ -249,28 +249,70 @@ body, html {
    border-bottom: 1px solid #000000;
 }
 
-.battle > table > h2 {
-   border-bottom: 1px solid #000000;
+.battle > h2 {
+   margin-left: 20px;
 }
 
-.battle > table {
+.poly {
     font-size: 200%;
-    padding: 30px;
+    font-family: Courier;
+    width: 60%;
+    padding-top: 20px;
+    padding-left: 30px;
+    padding-right: 30px;
     margin-left: 30px;
-    line-height: 200%;
+    margin-top: -10px;
+    border-right: 1px solid #000000;
+    border-bottom: 1px solid #000000;
 }
 
-.battle > table > tbody > tr > td {
+.poly > tbody > tr > td {
     padding: 5px;
     letter-spacing: 2px;
 }
 
 #time {
    float: right;
-   font-size: 110%;
+   font-size: 300%;
 }
 
-#separator {
-    border-bottom: 1px solid #111111;
+.solutionbox {
+    font-size: 200%;
+    overflow: auto;
+    font-family: Courier;
+    width: 60%;
+    padding: 30px;
+    margin-top: 10px;
+    margin-left: 30px;
+    border: 1px dashed #000000;
+}
+
+.solutionbox > tbody > tr > td {
+    padding: -5px;
+    letter-spacing: 2px;
+}
+
+.help {
+    clear: both;
+    margin-left: 20px;
     width: 100%;
+}
+
+.help > div {
+    float: left;
+    margin-right: 10px;
+}
+
+.help > div > p {
+    float: right;
+    margin-left: 5px;
+}
+
+.help > p {
+    border-bottom: 1px solid #000000;
+    width: 50%;
+}
+
+.disabledhelp {
+    color: rgba(0,0,0,0.4);
 }

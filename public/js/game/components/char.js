@@ -204,13 +204,14 @@ function polynomialKeyboard() {
 }
 
 function dibujarAyuda() {
-    var html = '<li id="btn_number"><img src="/assets/img/keys/number.png"/><p>Colocar números</p></li>';
-    html += '<li id="btn_delete"><img src="/assets/img/keys/delete.png"/><p>Borrar</p></li>';
-    html += '<li id="btn_x"><img src="/assets/img/keys/x.png"/><p>Colocar x</p></li>';
-    html += '<li id="btn_plus"><img src="/assets/img/keys/plus.png"/><p>Colocar +</p></li>';
-    html += '<li id="btn_minus"><img src="/assets/img/keys/minus.png"/><p>Colocar -</p></li>';
-    html += '<li id="btn_enter"><img src="/assets/img/keys/enter.png"/><p>Resolver</p></li>';
-    return '<ul class="help"><p>Ayuda</p>' + html +'</ul>';
+    var html = "";
+    html += '<div id="btn_plus"><img src="/assets/img/keys/plus.png"/><p>Colocar +</p></div>';
+    html += '<div id="btn_minus"><img src="/assets/img/keys/minus.png"/><p>Colocar -</p></div>';
+    html += '<div id="btn_number"><img src="/assets/img/keys/number.png"/><p>Colocar números</p></div>';
+    html += '<div id="btn_x"><img src="/assets/img/keys/x.png"/><p>Colocar x</p></div>';
+    html += '<div id="btn_delete"><img src="/assets/img/keys/delete.png"/><p>Borrar</p></div>';
+    html += '<div id="btn_enter"><img src="/assets/img/keys/enter.png"/><p>Resolver</p></div>';
+    return '<div class="help"><p>Ayuda</p>' + html +'</div>';
 }
 
 
