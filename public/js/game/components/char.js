@@ -95,7 +95,7 @@ function buildPolynomial() {
 }
 
 function polynomialHtml(n) {
-    var html = "<table>";
+    var html = "<table class='poly'>";
     var polynomials = [];
     var tableLength = 0;
     for (var i=0; i<n; i++) {
@@ -201,6 +201,16 @@ function polynomialKeyboard() {
             console.log(cursor);
         }
     });
+}
+
+function dibujarAyuda() {
+    var html = '<li id="btn_number"><img src="/assets/img/keys/number.png"/><p>Colocar números</p></li>';
+    html += '<li id="btn_delete"><img src="/assets/img/keys/delete.png"/><p>Borrar</p></li>';
+    html += '<li id="btn_x"><img src="/assets/img/keys/x.png"/><p>Colocar x</p></li>';
+    html += '<li id="btn_plus"><img src="/assets/img/keys/plus.png"/><p>Colocar +</p></li>';
+    html += '<li id="btn_minus"><img src="/assets/img/keys/minus.png"/><p>Colocar -</p></li>';
+    html += '<li id="btn_enter"><img src="/assets/img/keys/enter.png"/><p>Resolver</p></li>';
+    return '<ul class="help"><p>Ayuda</p>' + html +'</ul>';
 }
 
 
@@ -474,11 +484,12 @@ return {
                 Crafty('Char').stopAll();
                 var html = ['<div class="battle">',
                             '<h1>Batalla</h1>',
+                            '<h2>Polinomios:</h2>',
                             polynomialHtml(2),
-                            '<div id="separator"></div>',
-                            '<table><tr id="solution">',
+                            '<table class="solutionbox"><tr id="solution">',
                             '</tr></table>',
                             '<div id="time">14.99</div>',
+                            dibujarAyuda(),
                             '</div>'].join('\n');
                 $("#cr-stage").append(html);
                 polynomialKeyboard();
