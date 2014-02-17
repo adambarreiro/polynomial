@@ -122,83 +122,116 @@ function polynomialHtml(n) {
 }
 
 function polynomialKeyboard() {
-    var beginning = true;
-    var signed = false;
+    var first = true;
+    var sign = false;
     var exponent = false;
     var solutionArray = [];
-    var cursor = 0;
+    var cursor = -1;
     $('body').on("keydown",function(e) {
+
         var key = e.keyCode || e.which;
+        $(".solutionbox").css({"border-color":"#000000"});
         // Numbers
-        if (key > 47 && key < 58) {
-            if (beginning === true) {
-                $('#solution').append("<td id='poly" + cursor +"'></td>");
-                if (!signed) $('#poly' + cursor).append("+");
-                signed = true;
-                $('#poly' + cursor).append(+key-48);
-                beginning = false;
-            } else if (exponent) {
-                $('#exp' + cursor).append(+key-48);
-                beginning = true;
-                exponent = false;
-                signed = false;
-                // Simplify
-                /*
-                var aux = cursor;
-                while (aux >= 0) {
-                    if ($('#exp' + aux).html() === $('#exp' + cursor).html()) {
-                        var number = $('#poly' + cursor).html();
-                        var ini1 = number.indexOf("+");
-                        if (ini1 < 0) {
-                            var ini2 = number.indexOf("-");
-                            number = number.substring(ini2,number.indexOf("x"));
-                        }
-
-                            
-                        
-                        $('#poly' + aux).html(number + );
-                        $('#poly' + cursor).remove();
+        if ($(".solutionbox").outerWidth() <= $(".poly").outerWidth()) {
+            if (key > 47 && key < 58) {
+                if (sign) {
+                    if (!exponent) {
+                        $('#poly' + cursor).append(+key-48);
+                    } else {
+                        $('#exp' + cursor).append(+key-48);
                     }
-                    aux--;
-                }*/
+                     /*   // Simplify
+                        var aux = cursor;
+                        while (aux >= 0) {
+                            // Equal exponents
+                            if ($('#exp' + aux).html() === $('#exp' + cursor).html()) {
+                                var number = $('#poly' + cursor).html();
+                                var ini1 = number.indexOf("+");
+                                if (ini1 < 0) {
+                                    var ini2 = number.indexOf("-");
+                                    number = number.substring(ini2,number.indexOf("x"));
+                                }
 
-                cursor++;
-            } else {
-                $('#poly' + cursor).append(+key-48);
+                                    
+                                
+                                $('#poly' + aux).html(number + );
+                                $('#poly' + cursor).remove();
+                            }
+                            aux--;
+                        }*/
+                } else {
+                    // Only enters here once
+                    if (first) {
+                        cursor++;
+                        $('#solution').append("<td id='poly" + cursor +"'>+" + (+key-48) + "</td>");
+                        first = false;
+                        sign = true;
+                    }
+                }
             }
-        }
-        // Signs
-        else if (key === 173 || key === 171) {
-            var op;
-            if (key === 173) op = "-";
-            else op = "+";
-            if (beginning === true) {
-                $('#solution').append("<td id='poly" + cursor +"'></td>");
-                $('#poly' + cursor).append(op);
-                beginning = false;
-            }
-        } // X 
-        else if (key === 88) {
-            if (exponent === false) {
-                $('#poly' + cursor).append("x<sup id='exp" + cursor +"'></sup>");
-                exponent = true;
-            }
-        } // Enter
-        else if (key === 13) {
-            $('.battle').remove();
-            $('body').unbind('keydown');
-            Crafty('Char').startAll();
-            Crafty('Enemy').each(function() {
-                this.startAll();
-            });
-        } // Backspace
-        else if (key === 8) {
-            e.preventDefault();
-            if (cursor >= 0) {
-                $('#poly' + cursor).remove();
-                cursor--;
-            }
-            console.log(cursor);
+            // Signs
+            else if (key === 173 || key === 171) {
+                if (exponent) {
+                    exponent = false;
+                    sign = false;
+                }
+                if (!sign) {
+                    cursor++;
+                    var op;
+                    if (key === 173) op = "-";
+                    else op = "+";
+                    $('#solution').append("<td id='poly" + cursor +"'>" + op + "</td>");
+                    sign = true;
+                }
+                
+            } // X 
+            else if (key === 88) {
+                if (exponent === false) {
+                    $('#poly' + cursor).append("x<sup id='exp" + cursor +"'></sup>");
+                    exponent = true;
+                }
+            } // Enter
+            else if (key === 13) {
+                $('.battle').remove();
+                $('body').unbind('keydown');
+                Crafty('Char').startAll();
+                Crafty('Enemy').each(function() {
+                    this.startAll();
+                });
+            } // Backspace
+            /*
+            else if (key === 8) {
+                e.preventDefault();
+                if (cursor >= 0) {
+                    var text = $('#poly' + cursor).text().substring(0,$('#poly' + cursor).text().length-1);
+                    if (text === "") {
+                        $('#poly' + cursor).remove();
+                        cursor--;
+                        beginning = true;
+                    } else {
+                        var x = text.lastIndexOf("x");
+                        if (x < 0) {
+                            exponent = false;
+                            signed = true;
+                        } else {
+                            // A la derecha de la x
+                            if $('#poly' + cursor).text().length > x) {
+                                exponent = true;
+                            } else {
+                                exponent = false;
+                            }
+                        }
+                        $('#poly' + cursor).text(text);
+                        if (text[text.length-1] === "x") {
+                            exponent = false;
+                        }
+                    }
+                    console.log(text);
+                    
+                }
+            }*/
+        } else {
+            $(".solutionbox").css({"border-color":"#FF0000"});
         }
     });
 }
@@ -485,7 +518,8 @@ return {
                 Crafty('Char').stopAll();
                 var html = ['<div class="battle">',
                             '<h1>Batalla</h1>',
-                            '<h2>Polinomios:</h2>',
+                            '<h2 class="left">Polinomios:</h2>',
+                            '<h2 class="right">Tiempo restante:</h2>',
                             polynomialHtml(2),
                             '<table class="solutionbox"><tr id="solution">',
                             '</tr></table>',
