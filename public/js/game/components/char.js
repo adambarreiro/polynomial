@@ -136,36 +136,27 @@ function polynomialKeyboard() {
             if (key > 47 && key < 58) {
                 if (sign) {
                     if (!exponent) {
-                        $('#poly' + cursor).append(+key-48);
-                    } else {
-                        $('#exp' + cursor).append(+key-48);
-                    }
-                     /*   // Simplify
-                        var aux = cursor;
-                        while (aux >= 0) {
-                            // Equal exponents
-                            if ($('#exp' + aux).html() === $('#exp' + cursor).html()) {
-                                var number = $('#poly' + cursor).html();
-                                var ini1 = number.indexOf("+");
-                                if (ini1 < 0) {
-                                    var ini2 = number.indexOf("-");
-                                    number = number.substring(ini2,number.indexOf("x"));
-                                }
-
-                                    
-                                
-                                $('#poly' + aux).html(number + );
-                                $('#poly' + cursor).remove();
+                        if (key === 48) {
+                            if ( ($('#poly' + cursor).text() !== "+") && ($('#poly' + cursor).text() !== "-") )  {
+                                $('#poly' + cursor).append(+key-48);
                             }
-                            aux--;
-                        }*/
+                        } else {
+                            $('#poly' + cursor).append(+key-48);
+                        }         
+                    } else {
+                        if (key !== 48) {
+                            $('#exp' + cursor).append(+key-48);
+                        }
+                    }
                 } else {
                     // Only enters here once
                     if (first) {
-                        cursor++;
-                        $('#solution').append("<td id='poly" + cursor +"'>+" + (+key-48) + "</td>");
-                        first = false;
-                        sign = true;
+                        if (key !== 48) {
+                            cursor++;
+                            $('#solution').append("<td id='poly" + cursor +"'>+" + (+key-48) + "</td>");
+                            first = false;
+                            sign = true;
+                        }
                     }
                 }
             }
@@ -174,6 +165,68 @@ function polynomialKeyboard() {
                 if (exponent) {
                     exponent = false;
                     sign = false;
+                    // See if exponent is 1 and delete it
+                    if ($('#exp' + cursor).text() === "1") {
+                        $('#exp' + cursor).text("");
+                    }
+                    // See if coeficient is 1 and delete it
+                    var number1 = $('#poly' + cursor).html();
+                    var ini1 = number1.indexOf("+");
+                    var ini2 = number1.indexOf("-");
+                    if (ini1 < 0) {
+                        number1 = number1.substring(ini2,number1.indexOf("x"));
+                    } else {
+                        number1 = number1.substring(ini1,number1.indexOf("x"));
+                    }
+                    if (number1 === "+1" || number1 === "-1") {
+                        $('#poly' + cursor).html(number1.substring(0,1) + $('#poly' + cursor).html().substring( $('#poly' + cursor).html().indexOf("x") , $('#poly' + cursor).html().length ));
+                    }
+                    // Simplify
+                    var aux = cursor-1;
+                    while (aux > -1) {
+                        // Equal exponents
+                        if ($('#exp' + aux).html() === $('#exp' + cursor).html()) {
+                            // Actual number
+                            number1 = $('#poly' + cursor).html();
+                            ini1 = number1.indexOf("+");
+                            ini2 = number1.indexOf("-");
+                            if (ini1 < 0) {
+                                number1 = number1.substring(ini2,number1.indexOf("x"));
+                            } else {
+                                number1 = number1.substring(ini1,number1.indexOf("x"));
+                            }
+                            // Last number
+                            number2 = $('#poly' + aux).html();
+                            ini1 = number2.indexOf("+");
+                            ini2 = number2.indexOf("-");
+                            var html = "";
+                            if (ini1 < 0) {
+                                number2 = number2.substring(ini2,number2.indexOf("x"));
+                                html = "-";
+                            } else {
+                                number2 = number2.substring(ini1,number2.indexOf("x"));
+                                html = "+";
+                            }
+                            if (number1 === "+" || number1 === "-") number1 += "1";
+                            if (number2 === "+" || number2 === "-") number2 += "1";
+                            var total = (+parseInt(number1,10) + parseInt(number2,10));
+                            if (total < 0) {
+                                html="";
+                            }
+                            $('#poly' + cursor).remove();
+
+                            if (total !== 0) {
+                                if (total !== 1) html += total;
+                                html += "x<sup id='exp" + aux+ "'>" + $('#exp' + aux).text() +"</sup>";
+                                $('#poly' + aux).html(html);
+                                $('#poly' + cursor).remove();
+                                cursor--;
+                            } else {
+                                $('#poly' + aux).remove();
+                            }
+                        }
+                        aux--;
+                    }
                 }
                 if (!sign) {
                     cursor++;
@@ -186,50 +239,33 @@ function polynomialKeyboard() {
                 
             } // X 
             else if (key === 88) {
+                // Only enters here once
+                if (first) {
+                    cursor++;
+                    $('#solution').append("<td id='poly" + cursor +"'>+</td>");
+                    first = false;
+                    sign = true;
+                }
                 if (exponent === false) {
                     $('#poly' + cursor).append("x<sup id='exp" + cursor +"'></sup>");
                     exponent = true;
                 }
             } // Enter
             else if (key === 13) {
-                $('.battle').remove();
-                $('body').unbind('keydown');
-                Crafty('Char').startAll();
-                Crafty('Enemy').each(function() {
-                    this.startAll();
-                });
+               // enterSolution();
             } // Backspace
-            /*
             else if (key === 8) {
                 e.preventDefault();
-                if (cursor >= 0) {
-                    var text = $('#poly' + cursor).text().substring(0,$('#poly' + cursor).text().length-1);
-                    if (text === "") {
-                        $('#poly' + cursor).remove();
-                        cursor--;
-                        beginning = true;
-                    } else {
-                        var x = text.lastIndexOf("x");
-                        if (x < 0) {
-                            exponent = false;
-                            signed = true;
-                        } else {
-                            // A la derecha de la x
-                            if $('#poly' + cursor).text().length > x) {
-                                exponent = true;
-                            } else {
-                                exponent = false;
-                            }
-                        }
-                        $('#poly' + cursor).text(text);
-                        if (text[text.length-1] === "x") {
-                            exponent = false;
-                        }
+                if (cursor > -1) {
+                    $('#poly' + cursor).remove();
+                    if ($('#solution').html() === "\n" || $('#solution').html() === "") {
+                        first = true;
                     }
-                    console.log(text);
-                    
+                    cursor--;
+                    exponent = false;
+                    sign = false;
                 }
-            }*/
+            }
         } else {
             $(".solutionbox").css({"border-color":"#FF0000"});
         }
@@ -245,6 +281,36 @@ function dibujarAyuda() {
     html += '<div id="btn_delete"><img src="/assets/img/keys/delete.png"/><p>Borrar</p></div>';
     html += '<div id="btn_enter"><img src="/assets/img/keys/enter.png"/><p>Resolver</p></div>';
     return '<div class="help"><p>Ayuda</p>' + html +'</div>';
+}
+
+
+function enterSolution() {
+    for (var i=0; i < $("#solution").children().length; i++) {
+        var coeficient = $($("#solution").children()[i]).text();
+        var degree = $($("#solution").children()[i]).html();
+
+        var x = coeficient.indexOf("x");
+        if (x < 1) {
+            coeficient = coeficient.substring(0,degree.indexOf("<"));
+        } else {
+
+        }
+
+
+        degree = degree.substring(degree.indexOf(">")+1,degree.lastIndexOf("<"));
+        if (degree === "") degree = 1;
+        
+        
+
+        console.log(coeficient + "x^" + degree);
+
+    }
+    $('.battle').remove();
+    $('body').unbind('keydown');
+    Crafty('Char').startAll();
+    Crafty('Enemy').each(function() {
+        this.startAll();
+    });
 }
 
 
