@@ -103,6 +103,7 @@ function polynomialHtml(n) {
         if (polynomials[i].length > tableLength) {
             tableLength = polynomials[i].length;
         }
+        Crafty("Char")._polinomios[i] = polynomials[i];
     }
     var j;
     for (i=0; i<n; i++) {
@@ -172,15 +173,13 @@ function polynomialKeyboard() {
                 if ( !( ($("#poly" + cursor).text() === "+") || ($("#poly" + cursor).text() === "-") ) ) {
                     if (exponent) {
                         exponent = false;
-                    } else {
-                        $('#poly' + cursor).append("<span hidden>x<sup id='exp" + cursor +"'>0</sup></span>");
                     }
                     sign = false;
-                    // See if exponent is 1 and delete it
+                    // See if exponent is 1 and remove it
                     if ($('#exp' + cursor).text() === "1") {
-                        $('#exp' + cursor).hide();
+                        $('#exp' + cursor).text("");
                     }
-                    // See if coeficient is 1 and delete it
+                    // See if coeficient is 1 and hide it
                     var number1 = $('#poly' + cursor).html();
                     var ini1 = number1.indexOf("+");
                     var ini2 = number1.indexOf("-");
@@ -229,9 +228,7 @@ function polynomialKeyboard() {
                             if (total !== 0) {
                                 if (total !== 1) html += total;
                                 var exponential = $('#exp' + aux).text();
-                                if (exponential === "0") {
-                                    html += "<span hidden>x<sup id='exp" + aux+ "'>0</sup></span>";
-                                } else {
+                                if (exponential !== "0") {
                                     html += "x<sup id='exp" + aux+ "'>" + exponential +"</sup>";
                                 }
                                 $('#poly' + aux).html(html);
@@ -268,7 +265,7 @@ function polynomialKeyboard() {
             } // Enter 
         }
         if (key === 13) {
-           // enterSolution();
+           enterSolution();
         } // Backspace
         else if (key === 8) {
             e.preventDefault();
@@ -305,32 +302,68 @@ function dibujarAyuda() {
 
 
 function enterSolution() {
+    solutionArray = [];
     for (var i=0; i < $("#solution").children().length; i++) {
-        var coeficient = $($("#solution").children()[i]).text();
-        var degree = $($("#solution").children()[i]).html();
-
-        var x = coeficient.indexOf("x");
+        var polystring = $($("#solution").children()[i]).text().split(/<.>/)[0];
+        var x = polystring.indexOf("x");
+        var coeficient;
+        var degree;
         if (x < 1) {
-            coeficient = coeficient.substring(0,degree.indexOf("<"));
+            coeficient = polystring;
+            degree = 0;
         } else {
-
+            coeficient = polystring.substring(0,x);
+            degree = polystring.substring(x+1,polystring.length);
+            if (degree === "") degree = 1;
         }
-
-
-        degree = degree.substring(degree.indexOf(">")+1,degree.lastIndexOf("<"));
-        if (degree === "") degree = 1;
-        
-        
-
-        console.log(coeficient + "x^" + degree);
-
+        solutionArray[degree] = coeficient;
     }
+    checkSolution("+",solutionArray);
     $('.battle').remove();
     $('body').unbind('keydown');
     Crafty('Char').startAll();
     Crafty('Enemy').each(function() {
         this.startAll();
     });
+}
+
+function checkSolution(operation, solutionEntered) {
+    var polynomials = Crafty("Char")._polinomios;
+    var size;
+    if (polynomials[0].length > polynomials[1].length) {
+        size = polynomials[0].length;
+    } else {
+        size = polynomials[1].length;
+    }
+    var i=0;
+    var ok = true;
+    switch(operation) {
+        case "+":
+            while (ok && i < size) {
+                var o1;
+                var o2;
+                var sol;
+                if (polynomials[0][i] === undefined) {
+                    o1 = 0;
+                } else {
+                    o1 = polynomials[0][i];
+                }
+                if (polynomials[1][i] === undefined) {
+                    o2 = 0;
+                } else {
+                    o2 = polynomials[1][i];
+                }
+                if (solutionEntered[i] === undefined) {
+                    sol = 0;
+                } else {
+                    sol = solutionEntered[i];
+                }
+                ok = (parseInt(o1,10) + parseInt(o2,10) === parseInt(sol,10));
+                console.log(o1 + "+" + o2 + "=" + sol);
+            }
+            break;
+        default: break;
+    }
 }
 
 
@@ -359,6 +392,8 @@ return {
             _detected: false,
             _canAttack: false,
             _enemy: undefined,
+            _battleTimer: undefined,
+            _polinomios: [],
             jump: function() {
                 if(this.isDown(Crafty.keys.UP_ARROW)) {
                     this._jumping = true;
@@ -613,6 +648,17 @@ return {
                             dibujarAyuda(),
                             '</div>'].join('\n');
                 $("#cr-stage").append(html);
+                var time = this._timeout;
+                $($(".lifebox").children()[2]).show();
+                $($(".lifebox").children()[3]).show();
+                this._battleTimer = setInterval( function() {
+                    time-=0.01;
+                    if (time <= 0.0) {
+                        Crafty("Char").damage("enemy");
+                        time = 14.99;
+                    }
+                    $("#time").text(time.toFixed(2));
+                }, 10);
                 polynomialKeyboard();
             },
             stopAll: function() {
