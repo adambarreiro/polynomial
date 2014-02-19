@@ -290,20 +290,21 @@ body, html {
 
 .solutionbox {
     font-size: 200%;
-    overflow: hidden;
+    overflow: visible;
     font-family: Courier;
     width: 60%;
-    height: 80px;
+    height: 68px;
+    line-height: 60px;
     max-width: 60%;
     margin-top: 10px;
     margin-left: 30px;
     padding-left: 10px;
     padding-right: 10px;
     border: 1px dashed #000000;
+
 }
 
 .solutionbox > tbody > tr > td {
-    width: 100%;
     letter-spacing: 2px;
 }
 

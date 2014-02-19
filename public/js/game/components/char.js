@@ -123,17 +123,16 @@ function polynomialHtml(n) {
 
 function polynomialKeyboard() {
     var first = true;
+    var full = false;
     var sign = false;
     var exponent = false;
     var solutionArray = [];
     var cursor = -1;
     $('body').on("keydown",function(e) {
-
         var key = e.keyCode || e.which;
-        $(".solutionbox").css({"border-color":"#000000"});
         // Numbers
-        if ($(".solutionbox").outerWidth() <= $(".poly").outerWidth()) {
-            if (key > 47 && key < 58) {
+        if (!full) {
+           if (key > 47 && key < 58) {
                 if (sign) {
                     if (!exponent) {
                         if (key === 48) {
@@ -142,7 +141,7 @@ function polynomialKeyboard() {
                             }
                         } else {
                             $('#poly' + cursor).append(+key-48);
-                        }         
+                        }
                     } else {
                         if (key !== 48) {
                             $('#exp' + cursor).append(+key-48);
@@ -162,12 +161,24 @@ function polynomialKeyboard() {
             }
             // Signs
             else if (key === 173 || key === 171) {
-                if (exponent) {
-                    exponent = false;
+                // Only enters here once
+                if (first) {
+                    cursor++;
+                    $('#solution').append("<td id='poly" + cursor +"'>+</td>");
+                    first = false;
+                    sign = true;
+                }
+                // If only has a + or -, doesn't do anything
+                if ( !( ($("#poly" + cursor).text() === "+") || ($("#poly" + cursor).text() === "-") ) ) {
+                    if (exponent) {
+                        exponent = false;
+                    } else {
+                        $('#poly' + cursor).append("<span hidden>x<sup id='exp" + cursor +"'>0</sup></span>");
+                    }
                     sign = false;
                     // See if exponent is 1 and delete it
                     if ($('#exp' + cursor).text() === "1") {
-                        $('#exp' + cursor).text("");
+                        $('#exp' + cursor).hide();
                     }
                     // See if coeficient is 1 and delete it
                     var number1 = $('#poly' + cursor).html();
@@ -217,7 +228,12 @@ function polynomialKeyboard() {
 
                             if (total !== 0) {
                                 if (total !== 1) html += total;
-                                html += "x<sup id='exp" + aux+ "'>" + $('#exp' + aux).text() +"</sup>";
+                                var exponential = $('#exp' + aux).text();
+                                if (exponential === "0") {
+                                    html += "<span hidden>x<sup id='exp" + aux+ "'>0</sup></span>";
+                                } else {
+                                    html += "x<sup id='exp" + aux+ "'>" + exponential +"</sup>";
+                                }
                                 $('#poly' + aux).html(html);
                                 $('#poly' + cursor).remove();
                                 cursor--;
@@ -227,16 +243,15 @@ function polynomialKeyboard() {
                         }
                         aux--;
                     }
+                    if (!sign) {
+                        cursor++;
+                        var op;
+                        if (key === 173) op = "-";
+                        else op = "+";
+                        $('#solution').append("<td id='poly" + cursor +"'>" + op + "</td>");
+                        sign = true;
+                    }
                 }
-                if (!sign) {
-                    cursor++;
-                    var op;
-                    if (key === 173) op = "-";
-                    else op = "+";
-                    $('#solution').append("<td id='poly" + cursor +"'>" + op + "</td>");
-                    sign = true;
-                }
-                
             } // X 
             else if (key === 88) {
                 // Only enters here once
@@ -250,24 +265,29 @@ function polynomialKeyboard() {
                     $('#poly' + cursor).append("x<sup id='exp" + cursor +"'></sup>");
                     exponent = true;
                 }
-            } // Enter
-            else if (key === 13) {
-               // enterSolution();
-            } // Backspace
-            else if (key === 8) {
-                e.preventDefault();
-                if (cursor > -1) {
-                    $('#poly' + cursor).remove();
-                    if ($('#solution').html() === "\n" || $('#solution').html() === "") {
-                        first = true;
-                    }
-                    cursor--;
-                    exponent = false;
-                    sign = false;
+            } // Enter 
+        }
+        if (key === 13) {
+           // enterSolution();
+        } // Backspace
+        else if (key === 8) {
+            e.preventDefault();
+            if (cursor > -1) {
+                $('#poly' + cursor).remove();
+                if ($('#solution').html() === "\n" || $('#solution').html() === "") {
+                    first = true;
                 }
+                cursor--;
+                exponent = false;
+                sign = false;
             }
+        }
+        if ($(".solutionbox").outerWidth() <= $(".poly").outerWidth()) {
+            $(".solutionbox").css({"border-color":"#000000"});
+            full = false;
         } else {
             $(".solutionbox").css({"border-color":"#FF0000"});
+            full = true;
         }
     });
 }
