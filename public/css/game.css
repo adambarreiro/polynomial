@@ -278,6 +278,7 @@ body, html {
 .poly > tbody > tr > td {
     padding: 5px;
     letter-spacing: 2px;
+    text-align: right;
 }
 
 #time {
@@ -306,6 +307,7 @@ body, html {
 
 .solutionbox > tbody > tr > td {
     letter-spacing: 2px;
+    text-align: right;
 }
 
 .help {

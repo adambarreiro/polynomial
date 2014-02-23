@@ -43,44 +43,215 @@ var drawLava = {
     jitter: 0
 };
 
-
-function arrayCoeficients() {
-    var sign = 0.49; // Sign probability
-    var degree = 6; // Max degree
-    var maxCoeficient = 9; // Max coeficient
-    var noTerm = 0.3; // Probability that the term doesn't appear
-    var polynomial = []; // The polynomial
-    
+function polynomialArray(maxDegree, maxElements) {
+    var maxCoeficient = 9;
+    var signProbability = 0.5;
+    var termProbability = 0.7;
+    var polynomial = [];
     while (polynomial.length === 0) {
-        for (var i=0; i<degree; i++) {
-            if (Math.random() > noTerm) {
+    var i=0;
+        while (i < maxDegree) {
+            if (polynomial.length >= maxElements) {
+                break;
+            }
+            if (Math.random() <= termProbability) {
                 polynomial[i] = Math.floor(Math.random()*(maxCoeficient)+1);
                 if (polynomial[i] !== 0) {
-                    if (Math.random() < sign) {
+                    if (Math.random() <= signProbability) {
                         polynomial[i] = -polynomial[i];
                     }
                 } else {
                     delete polynomial[i];
                 }
             }
+            i++;
         }
     }
     return polynomial;
 }
 
-function buildPolynomial() {
-    var coefs = arrayCoeficients();
+function polynomialCocientArray(poly, maxElements) {
+    var maxCoeficient = 9;
+    var toMultiply = polynomialArray(maxCoeficient, maxElements);
+    var result = [];
+    // Starts in 1 to avoid constants
+    delete Crafty("Char")._polinomios[1][0];
+    for (var i=1; i<maxCoeficient; i++) {
+        if (poly[i] !== undefined) {
+            for (var j=1; j<maxCoeficient; j++) {
+                if (toMultiply[j] !== undefined) {
+                    if (result[i+j] === undefined) result[i+j] = 0;
+                    result[i+j] = result[i+j] + poly[i]*toMultiply[j];
+                }
+            }
+        }
+    }
+    return result;
+}
+
+function polynomialNotableArray() {
+    var maxCoeficient = 9;
+    var notable = [];
+    var index1 = 1, index2 = 1;
+    while (index1 === index2) {
+        index1 = Math.floor(Math.random()*(maxCoeficient)+1);
+        index2 = Math.floor(Math.random()*(maxCoeficient)+1);
+    }
+    notable[index1] = Math.floor(Math.random()*(maxCoeficient)+1);
+    notable[index2] = Math.floor(Math.random()*(maxCoeficient)+1);
+    var p = Math.random();
+    var result = [];
+    var indexes = [];
+    var j=0;
+    if (p < 0.66) {
+        for (var i=0; i<maxCoeficient; i++) {
+            if (notable[i] !== undefined) {
+                result[i*2] = notable[i] * notable[i];
+                indexes[j] = i;
+                j++;
+            }
+        }
+        if (p < 0.33) {
+            result[indexes[0] + indexes[1]] = 2*(notable[indexes[0]] * notable[indexes[1]]);
+            Crafty("Char")._polinomios[3] = "+";
+        } else {
+            result[indexes[0] + indexes[1]] = -2*(notable[indexes[0]] * notable[indexes[1]]);
+            Crafty("Char")._polinomios[3] = "-";
+        }
+    } else {
+        var minDegree = 9999;
+        for (var k=0; k<maxCoeficient; k++) {
+            if (notable[k] !== undefined) {
+                result[k*2] = notable[k] * notable[k];
+                if (k < minDegree) minDegree = k;
+            }
+        }
+        if (result[minDegree] > 0) result[minDegree] = -result[minDegree];
+        Crafty("Char")._polinomios[3] = "*";
+    }
+    if (p >= 0.33 && p < 0.66) {
+        if (index1 > index2) {
+            if (notable[index2] > 0) notable[index2] = -notable[index2];
+        } else {
+            if (notable[index1] > 0) notable[index1] = -notable[index1];
+        }
+    } else {
+        if (index1 > index2) {
+            notable[index2] = Math.abs(notable[index2]);
+        } else {
+            notable[index1] = Math.abs(notable[index1]);
+        }
+    }
+    Crafty("Char")._polinomios[2] = notable;
+    return result;
+}
+
+function polynomialSolution(operation) {
+    var maxCoeficient = 9;
+    var i, j;
+    var poly1 = Crafty("Char")._polinomios[0];
+    var poly2 = Crafty("Char")._polinomios[1];
+    var solution = [];
+    switch(operation) {
+        case "*":
+            for (i=0; i<maxCoeficient; i++) {
+                if (poly1[i] !== undefined) {
+                    for (j=0; j<maxCoeficient; j++) {
+                        if (poly2[j] !== undefined) {
+                            if (solution[i+j] === undefined) solution[i+j] = 0;
+                            solution[i+j] = solution[i+j] + poly1[i]*poly2[j];
+                        }
+                    }
+                }
+            }
+            break;
+        case "**":
+            
+            break;
+        case "/":
+            for (i=0; i<maxCoeficient; i++) {
+                if (poly1[i] !== undefined) {
+                    for (j=0; j<maxCoeficient; j++) {
+                        if (poly2[j] !== undefined) {
+                            if (solution[i-j] === undefined) solution[i-j] = 0;
+                            solution[i-j] = solution[i-j] + poly1[i]*poly2[j];
+                        }
+                    }
+                }
+            }
+            break;
+        case "+":
+            for (i=0; i<maxCoeficient; i++) {
+                if (poly1[i] !== undefined && poly2[i] !== undefined) {
+                    solution[i] = poly1[i] + poly2[i];
+                }
+            }
+            break;
+        case "-":
+            for (i=0; i<maxCoeficient; i++) {
+                if (poly1[i] !== undefined && poly2[i] !== undefined) {
+                    solution[i] = poly1[i] - poly2[i];
+                }
+            }
+            break;
+    }
+}
+
+
+function polynomialBattle() {
+    //var operation = whichOperation();
+    Crafty("Char")._polinomios[0] = polynomialArray(6);
+    var operation = "**";
+    var operationString = "Operación: ";
+    switch (operation) {
+        case "*":
+            operationString += "MULTIPLICACIÓN";
+            Crafty("Char")._polinomios[1] = polynomialArray(9,3);
+            break;
+        case "**":
+            operationString += "FREGONAS GRATIS";
+            Crafty("Char")._polinomios[1] = polynomialNotableArray();
+            break;
+        case "/":
+            operationString += "DIVISIÓN";
+            Crafty("Char")._polinomios[1] = Crafty("Char")._polinomios[0];
+            Crafty("Char")._polinomios[0] = polynomialCocientArray(Crafty("Char")._polinomios[1], 2);
+            break;
+        case "+":
+            operationString += "SUMA";
+            Crafty("Char")._polinomios[1] = polynomialArray(9,6);
+            break;
+        case "-":
+            operationString += "RESTA";
+            Crafty("Char")._polinomios[1] = polynomialArray(9,6);
+            break;
+    }
+    var html = ['<div class="battle">',
+                            '<h1>Batalla</h1>',
+                            '<h2 class="left">' + operationString + "</h2>",
+                            '<h2 class="right">Tiempo restante:</h2>',
+                            polynomialHtml(operation),
+                            '<table class="solutionbox"><tr id="solution">',
+                            '</tr></table>',
+                            '<div id="time">' + Crafty("Char")._timeout +'</div>',
+                            dibujarAyuda(),
+                            '</div>'].join('\n');
+    return html;
+}
+
+
+function buildPolynomial(polyArray) {
     var poly = [];
-    var i = coefs.length;
+    var i = polyArray.length;
     while (i > 0) {
         i--;
-        if (coefs[i] !== undefined) {
+        if (polyArray[i] !== undefined) {
             poly[i] = "";
-            if (coefs[i] > 0) {
+            if (polyArray[i] > 0) {
                 poly[i] = "+";
             }
-            if (coefs[i] !== 1 || coefs[i] !== -1) {
-                poly[i] = poly[i] + coefs[i];
+            if (polyArray[i] !== 1 || polyArray[i] !== -1) {
+                poly[i] = poly[i] + polyArray[i];
             }
             if (i > 1) {
                 poly[i] = poly[i] + "x<sup>" + i + "</sup> ";
@@ -94,32 +265,111 @@ function buildPolynomial() {
     return poly;
 }
 
-function polynomialHtml(n) {
-    var html = "<table class='poly'>";
-    var polynomials = [];
-    var tableLength = 0;
-    for (var i=0; i<n; i++) {
-        polynomials[i] = buildPolynomial();
-        if (polynomials[i].length > tableLength) {
-            tableLength = polynomials[i].length;
-        }
-        Crafty("Char")._polinomios[i] = polynomials[i];
+function buildNotable(type, poly) {
+    var html = "(";
+    var aux = [];
+    var i;
+    switch(type) {
+        case "*":
+            var espejo = "";
+            for (i=poly.length; i>0; i--) {
+                if (poly[i] !== undefined) {
+                    if (poly[i] > 0) {
+                        espejo+= "+";
+                    }
+                    if (poly[i] !== -1 && poly[i] !== 1)  espejo+= poly[i];
+                    if (i > 0) {
+                        espejo+= "x";
+                        if (i > 1) {
+                            espejo+="<sup>" + i + "</sup>&nbsp;";
+                        } else {
+                            espejo+="&nbsp;";
+                        }
+                    }
+                    
+                }
+            }
+            html+=espejo + ")(+" + espejo.replace("+","-").replace("+","-").substring(1,espejo.length)  + ")";
+            break;
+        default:
+            for (i=poly.length; i>0; i--) {
+                if (poly[i] !== undefined) {
+                    if (poly[i] > 0) {
+                        html+= "+";
+                    }
+                    if (poly[i] !== -1 && poly[i] !== 1) html+= poly[i];
+                    if (poly[i] === -1) html+= "-";
+                    if (i > 0) {
+                        html+= "x";
+                        if (i > 1) {
+                            html+="<sup>" + i + "</sup>&nbsp;";
+                        } else {
+                            html+="&nbsp;";
+                        }
+                    }
+                }
+            }
+            html+=")<sup>2</sup>".replace(/\n/g, '');
+        break;
     }
-    var j;
-    for (i=0; i<n; i++) {
-        j = tableLength;
-        html = html + "<tr>";
-        while (j > 0) {
-            j--;
-            if (polynomials[i][j] !== undefined)
-                html = html + "<td>" + polynomials[i][j] + "</td>";
-            else
-                html = html + "<td></td>";
-        }
-        html = html + "</tr>";
-    }
-    html = html + "</table>";
     return html;
+}
+
+function polynomialHtml(operation) {
+    var polynomials = Crafty("Char")._polinomios;
+    var html = "<table class='poly'><tr>";
+    var i;
+    var poly1 = buildPolynomial(polynomials[0]);
+    var poly2;
+    var length = poly1.length;
+    switch (operation) {
+        case "**":
+            poly2 = buildNotable(polynomials[3], polynomials[2]);
+            break;
+        default:
+            poly2 = buildPolynomial(polynomials[1]);
+            if (length < poly2.length) length = poly2.length;
+            break;
+    }
+    for (i=length;i>0;i--) {
+        if (poly1[i] !== undefined) {
+            html += "<td>" + poly1[i] + "</td>";
+        } else {
+            html += "<td></td>";
+        }
+    }
+    html += "</tr><tr>";
+    switch (operation) {
+        case "**":
+            html += "<td colspan=" + length + ">" + poly2 + "</td>";
+            break;
+        default:
+            for (i=length;i>0;i--) {
+                if (poly2[i] !== undefined) {
+                    html += "<td>" + poly2[i] + "</td>";
+                } else {
+                    html += "<td></td>";
+                }
+            }
+            break;
+    }
+    html += "</tr></table>";
+    return html;
+}
+
+function whichOperation() {
+    if (Crafty("Char")._enemy.has("Enemy1")) {
+        return "+";
+    } else if (Crafty("Char")._enemy.has("Enemy2")) {
+        return "-";
+    }  else if (Crafty("Char")._enemy.has("Enemy2")) {
+        return "*";
+    }  else if (Crafty("Char")._enemy.has("Enemy2")) {
+        return "**";
+    }  else if (Crafty("Char")._enemy.has("Enemy2")) {
+        return "/";
+    } else return "";
+
 }
 
 function polynomialKeyboard() {
@@ -359,7 +609,6 @@ function checkSolution(operation, solutionEntered) {
                     sol = solutionEntered[i];
                 }
                 ok = (parseInt(o1,10) + parseInt(o2,10) === parseInt(sol,10));
-                console.log(o1 + "+" + o2 + "=" + sol);
             }
             break;
         default: break;
@@ -637,17 +886,7 @@ return {
                /* Crafty("Char")._enemy.destroy();
                 Crafty("Char")._enemy = undefined;*/
                 Crafty('Char').stopAll();
-                var html = ['<div class="battle">',
-                            '<h1>Batalla</h1>',
-                            '<h2 class="left">Polinomios:</h2>',
-                            '<h2 class="right">Tiempo restante:</h2>',
-                            polynomialHtml(2),
-                            '<table class="solutionbox"><tr id="solution">',
-                            '</tr></table>',
-                            '<div id="time">14.99</div>',
-                            dibujarAyuda(),
-                            '</div>'].join('\n');
-                $("#cr-stage").append(html);
+                $("#cr-stage").append(polynomialBattle());
                 var time = this._timeout;
                 $($(".lifebox").children()[2]).show();
                 $($(".lifebox").children()[3]).show();
