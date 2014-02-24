@@ -5,10 +5,8 @@
 // Updated: 28-10-2013
 // -----------------------------------------------------------------------------
 
-/**
- * Main file - RequireJS
- */
-define ([], function() {
+
+define (function() {
 
 function randOrientation() {
     if (Math.random() < 0.5) {
