@@ -291,7 +291,7 @@ body, html {
 
 .solutionbox {
     font-size: 200%;
-    overflow: visible;
+    overflow: auto;
     font-family: Courier;
     width: 60%;
     height: 68px;

@@ -59,6 +59,7 @@ function setComponents() {
         }
     });
     Crafty.c('Enemy', {
+        _health: 100,
         startAll: function() {
             this.gravity("Terrain").gravityConst(0.3);
             this.addComponent("Patrol");
@@ -69,7 +70,19 @@ function setComponents() {
             if (!getEditor()) {
                 this.startAll();
             }
-            
+        },
+        damage: function() {
+            this._health = this._health - Math.floor(Math.random()*(35-10+1)+10);
+            if (this._health > 0) {
+                $('#enemybar').css({"width": (this._health*3) + "px"});
+                return false;
+            } else {
+                $($(".lifebox").children()[2]).hide();
+                $($(".lifebox").children()[3]).hide();
+                $('#enemybar').css({"width": "300px"});
+                Crafty("Char")._enemy.destroy();
+                return true;
+            }
         }
     });
     Patrol.init(getEditor());
