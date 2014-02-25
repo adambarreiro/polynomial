@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// Name: /public/js/game/editor/engine.js
+// Name: /public/js/game/components/actor/character/battle.js
 // Author: Adam Barreiro
 // Description: 
 // Updated: 28-10-2013
@@ -621,8 +621,7 @@ function dibujarAyuda() {
 
 return {
     createComponent: function(editing) {
-        Crafty.c('Char', {
-            _old_x: undefined,
+        Crafty.c('Battle', {
             _timeout: 24.99,
             _operations: 5,
             _shield: 0,

@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// Name: /public/js/game/components/lava.js
+// Name: /public/js/game/components/actor/character/lava.js
 // Author: Adam Barreiro Costa
 // Description: 
 // Updated: 28-10-2013
@@ -51,10 +51,31 @@ return {
     createComponent: function(editing) {
         Crafty.c('Lava', {
             _lavaInterval: undefined,
-            _suelo:
+            _suelo: undefined,
             init: function() {
                 this.requires('2D, Canvas, SpriteAnimation, Collision, Grid, Gravity, Keyboard, Fourway, Damage, spr_char');
                 this.bind("EnterFrame", function () {
+                    var suelo = Crafty.map.search({_x: this.x+16, _y: this.y+32, _w: 1, _h: 1}, true);
+                    if (suelo.length > 0) {
+                        if (suelo[0].has("Abyss")) {
+                            if (this._cronoLava === undefined) {
+                                var particulas = 0;
+                                this._cronoLava = setInterval( function() {
+                                    Crafty.e("2D, Canvas, Particles").attr({"_x": Crafty("Char").x, "_y": Crafty("Char").y+16}).particles(drawLava);
+                                    particulas++;
+                                    Crafty("Char").damage("lava");                
+                                    if (particulas % 2 === 0) {
+                                        Crafty('Particles').each(function() { this.destroy(); });
+                                    }
+                                }, 100);
+
+                            }
+                        } else {
+                            this.clearLava();
+                        }
+                    }
+                });
+                this.bind('Moved', function(from) {
                     var suelo = Crafty.map.search({_x: this.x+16, _y: this.y+32, _w: 1, _h: 1}, true);
                     if (suelo.length > 0) {
                         if (suelo[0].has("Abyss")) {

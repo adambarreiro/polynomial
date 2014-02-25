@@ -5,7 +5,16 @@
 // Updated: 24-02-2014
 // -----------------------------------------------------------------------------
 
-define (function() {
+/**
+ * terrain.js
+ * @dependency /public/js/game/components/terrain/abyss.js
+ * @dependency /public/js/game/components/terrain/floor1.js
+ * @dependency /public/js/game/components/terrain/floor2.js
+ * @dependency /public/js/game/components/terrain/floor3.js
+ * @dependency /public/js/game/components/terrain/floor4.js
+ * @dependency /public/js/game/components/terrain/floor5.js
+ */
+define (["./terrain/abyss", "./terrain/floor1", "./terrain/floor2", "./terrain/floor3", "./terrain/floor4", "./terrain/floor5"], function(Abyss, Floor1, Floor2, Floor3, Floor4, Floor5) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -14,43 +23,19 @@ define (function() {
 /**
  * Registers all the child components.
  */
-function createChildComponents() {
+function createChildComponents(edition) {
     // Lava
-    Crafty.c('Abyss', {
-        init: function() {
-            this.requires('Terrain, spr_abyss');
-        }
-    });
+    Abyss.registerComponent(edition);
     // Floor 1
-    Crafty.c('Floor1', {
-        init: function() {
-            this.requires('Terrain, spr_floor1');
-        }
-    });
+    Floor1.registerComponent(edition);
     // Floor 2
-    Crafty.c('Floor2', {
-        init: function() {
-            this.requires('Terrain, spr_floor2');
-        }
-    });
+    Floor2.registerComponent(edition);
     // Floor 3
-    Crafty.c('Floor3', {
-        init: function() {
-            this.requires('Terrain, spr_floor3');
-        }
-    });
+    Floor3.registerComponent(edition);
     // Floor 4
-    Crafty.c('Floor4', {
-        init: function() {
-            this.requires('Terrain, spr_floor4');
-        }
-    });
+    Floor4.registerComponent(edition);
     // Floor 5
-    Crafty.c('Floor5', {
-        init: function() {
-            this.requires('Terrain, spr_floor5');
-        }
-    });
+    Floor5.registerComponent(edition);
 }
 
 // -----------------------------------------------------------------------------
@@ -60,7 +45,7 @@ return {
     /**
      * Registers the component into the game.
      */
-    registerComponents: function() {
+    registerComponent: function(edition) {
         Crafty.c('Terrain', {
             /**
              * Inits the component
@@ -69,7 +54,7 @@ return {
                 this.requires('2D, Canvas, Color, Grid');
             }
         });
-        createChildComponents();
+        createChildComponents(edition);
     }
 };
 });

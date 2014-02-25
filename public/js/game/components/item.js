@@ -6,10 +6,10 @@
 // -----------------------------------------------------------------------------
 
 /**
- * Item.js
+ * item.js
  * @dependency /public/js/game/components/exit.js
  */
-define (["./exit"],function(Exit) {
+define (["./item/exit"],function(Exit) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -17,24 +17,13 @@ define (["./exit"],function(Exit) {
 /**
  * Registers all the child components.
  */
-function createChildComponents(editing) {
+function createChildComponents(edition) {
     // The exit door
-    Exit.init(editing);
+    Exit.registerComponent(edition);
     // The hide to hide
-    Crafty.c('Hide', {
-        init: function() {
-            this.requires('Item, spr_hide');
-            this.z=4;
-        }
-    });
+    Hide.registerComponent(edition);
     // Chests
-    Crafty.c('Chest', {
-        _opened: false,
-        init: function() {
-            this.requires('Item, spr_chest');
-            this.z=1;
-        }
-    });
+    Chest.registerComponent(edition);
 }
 
 // -----------------------------------------------------------------------------
@@ -44,7 +33,7 @@ return {
     /**
      * Registers the component into the game.
      */
-    registerComponents: function(editing) {
+    registerComponent: function(editing) {
         Crafty.c('Item', {
             /**
              * Inits the component

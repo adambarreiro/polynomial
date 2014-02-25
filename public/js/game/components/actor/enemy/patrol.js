@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// Name: /public/js/game/editor/engine.js
+// Name: /public/js/game/components/patrol.js
 // Author: Adam Barreiro
 // Description: 
 // Updated: 28-10-2013
@@ -30,7 +30,7 @@ return {
             _speed: 1,
             init: function() {
                 if (!editing) {
-                    this.requires('2D, Canvas, Grid');
+                    this.requires('Enemy');
                     this.bind("EnterFrame", function(e) {
                         var pared;
                         var suelo;

@@ -5,7 +5,22 @@
 // Updated: 24-02-2014
 // -----------------------------------------------------------------------------
 
-define (function() {
+/**
+ * grid.js
+ * @dependency /public/js/game/components/terrain/terrain.js
+ * @dependency /public/js/game/components/item/item.js
+ * @dependency /public/js/game/components/actor/actor.js
+ */
+define (["./terrain", "./item", "./actor"], function(Terrain, Item, Actor) {
+
+/**
+ * Registers all the child components.
+ */
+function createChildComponents(edition) {
+    Terrain.registerComponent(edition);
+    Item.registerComponent(edition);
+    Actor.registerComponent(edition);
+}
 
 // -----------------------------------------------------------------------------
 // Public
@@ -14,7 +29,7 @@ return {
     /**
      * Registers the component into the game.
      */
-    registerComponents: function() {
+    registerComponent: function(edition) {
         Crafty.c('Grid', {
             /**
              * Inits the component
@@ -44,6 +59,7 @@ return {
                 }
             }
         });
+        createChildComponents(edition);
     }
 };
 });

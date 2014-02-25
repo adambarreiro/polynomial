@@ -1,39 +1,31 @@
 // -----------------------------------------------------------------------------
-// Name: /public/js/game/editor/engine.js
+// Name: /public/js/game/components.js
 // Author: Adam Barreiro
-// Description: 
-// Updated: 28-10-2013
+// Description: Loads the sprites and starts the god component Grid.
+// Updated: 25-02-2014
 // -----------------------------------------------------------------------------
 
 /**
- * Main file - RequireJS
+ * components.js
+ * @dependency /public/js/game/components/grid.js
  */
-define (["./constants", "./components/grid","./components/terrain", "./components/actor","./components/item"], function(Constants, Grid, Terrain, Actor, Item) {
+define (["./components/grid"], function(Grid) {
 
 var EDITOR = false;
+
 function getEditor() {
     return EDITOR;
 }
 
-// -----------------------------------------------------------------------------
-// Private
-// -----------------------------------------------------------------------------
-function setComponents() {
-    Grid.registerComponents();
-    Terrain.registerComponents();
-    Item.registerComponents(getEditor());
-    Actor.registerComponents(getEditor());
-}
-
-function setSprites() {
+function loadEditorGraphics() {
     Crafty.load(['/assets/img/char.png',
-                 '/assets/img/floor1.jpg', '/assets/img/floor2.jpg',
-                 '/assets/img/floor3.jpg','/assets/img/floor4.jpg',
-                 '/assets/img/floor5.jpg','/assets/img/abyss.png',
-                 '/assets/img/hide.png', '/assets/img/chest.png',
-                 '/assets/img/enemy1.png', '/assets/img/enemy2.png',
-                 '/assets/img/enemy3.png', '/assets/img/enemy4.png',
-                 '/assets/img/enemy5.png', '/assets/img/exit.jpg'], function(){
+             '/assets/img/floor1.jpg', '/assets/img/floor2.jpg',
+             '/assets/img/floor3.jpg','/assets/img/floor4.jpg',
+             '/assets/img/floor5.jpg','/assets/img/abyss.png',
+             '/assets/img/hide.png', '/assets/img/chest.png',
+             '/assets/img/enemy1.png', '/assets/img/enemy2.png',
+             '/assets/img/enemy3.png', '/assets/img/enemy4.png',
+             '/assets/img/enemy5.png', '/assets/img/exit.jpg'], function(){
         Crafty.sprite(28, 32, '/assets/img/char.png', {
             spr_char: [0, 0]
         });
@@ -83,6 +75,15 @@ function setSprites() {
 }
 
 // -----------------------------------------------------------------------------
+// Private
+// -----------------------------------------------------------------------------
+function setComponents(edition) {
+    if (edition) loadEditorGraphics();
+    else loadEditorGraphics();
+    Grid.registerComponent(mode);
+}
+
+// -----------------------------------------------------------------------------
 // Public
 // -----------------------------------------------------------------------------
 
@@ -91,8 +92,7 @@ return {
      * Initiates the engine.
      */
     init: function() {
-        setSprites();
-        setComponents();
+        setComponents(getEditor());
     },
 
     setEditor: function(editing){

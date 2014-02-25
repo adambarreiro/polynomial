@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// Name: /public/js/game/components/jump.js
+// Name: /public/js/game/components/actor/character/jump.js
 // Author: Adam Barreiro
 // Description: Component for giving the character the ability to jump.
 // Updated: 24-02-2013

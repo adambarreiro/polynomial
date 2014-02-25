@@ -6,11 +6,11 @@
 // -----------------------------------------------------------------------------
 
 /**
- * Actor.js
- * @dependency /public/js/game/components/actor/enemy.js
+ * actor.js
+ * @dependency /public/js/game/components/actor/patrol.js
  * @dependency /public/js/game/components/actor/character.js
  */
-define (["./actor/enemy", "./actor/character"], function(Enemy, Character) {
+define (["./enemy", "./character"], function(Enemy, Character) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -39,7 +39,7 @@ return {
              * Inits the component
              */
             init: function() {
-                this.requires('2D, Canvas, Color, Grid');
+                this.requires('2D, Canvas, Color, SpriteAnimation, Grid');
             }
         });
         createChildComponents(edition);
