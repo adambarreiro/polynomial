@@ -11,7 +11,7 @@
 // ----------------------------------------------------------------------------- 
 var express = require('express');
 var http = require('http');
-var https = require('https');
+// var https = require('https');
 var fs = require('fs');
 var mongoose = require('mongoose');
 var handlers = require('./handlers/general.js');
@@ -44,10 +44,17 @@ function start(port, securePort) {
         key: fs.readFileSync(paths.keyPath()),
         cert: fs.readFileSync(paths.certPath())
     };
-    var secure = https.createServer(options, app);
     var unsecure = http.createServer(app);
     unsecure.listen(port);
-    secure.listen(securePort);
+    //var secure = https.createServer(options, app);
+    //secure.listen(securePort);
+    var io = require('socket.io').listen(unsecure);
+    io.on('connection', function (socket) {
+        console.log("Connection");
+        socket.on("send", function (data) {
+            socket.broadcast.emit("receive", data);
+        });
+     });
     mongoose.connect('mongodb://localhost/polynomial');
 }
 

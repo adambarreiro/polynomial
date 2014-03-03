@@ -50,8 +50,9 @@ return {
             _battleTimed: false, // If has a timeout
             _battleTimeout: undefined, // The timeout
             _battleTimer: undefined, // The setInterval variable
-            _battlePolynomials: [], // Array of polynomials
-            _battleNotables: [], // Array of notable products. 0 should be the poly. 1 the operation. 2 the type.
+            _battlePolynomials: [[],[]], // Array of 2 polynomials
+            _battleNotables: [[],"",""], // Array of notable products. 0 should be the poly. 1 the operation. 2 the type.
+            _battleQuotient: [], //  The quotient if it's a quotient operation
             _battleInput: [], // User input
             /**
              * Generates the polynomials and HTML and inserts it into the
@@ -65,9 +66,9 @@ return {
                     case "*":
                         operationString = "MULTIPLICACIÓN"; this.polynomialArray(1,9,3); break;
                     case "**":
-                        polynomialNotableArray(1); break;
+                        this.polynomialNotableArray(1); break;
                     case "/":
-                        operationString = "DIVISIÓN"; polynomialCocientArray(0,2); break;
+                        operationString = "DIVISIÓN"; this.polynomialCocientArray(0,2); break;
                     case "+":
                         operationString = "SUMA"; this.polynomialArray(1,9,6); break;
                     case "-":
@@ -631,10 +632,11 @@ return {
                             solution[i] = this._battlePolynomials[0][i] - this._battlePolynomials[1][i];
                             correct = (solution[i] === this._battleInput[i]);
                             if (!correct) break;
-                            
                         }
                         break;
                 }
+                console.log(solution);
+                console.log(this._battleInput);
                 this.clearBattle();
                 if (correct) {
                     if (this.getEnemy().damage()) {
@@ -671,6 +673,11 @@ return {
              */
             init: function() {
                 this.requires('Character');
+                for (var i=0; i<MAX_COEFICIENT; i++) {
+                    this._battlePolynomials[0][i] = "";
+                    this._battlePolynomials[1][i] = "";
+                    this._battleInput[i] = "";
+                }
             }
         });
     }

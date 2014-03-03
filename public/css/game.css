@@ -334,3 +334,22 @@ body, html {
 .disabledhelp {
     color: rgba(0,0,0,0.4);
 }
+
+
+/* Text fields */
+
+.field {
+    width: 300px;
+    padding: 8px 0px 8px 0px;
+    margin-bottom: 15px;
+    text-align: center;
+    border: 1px solid #FFFFFF;
+    color: #111111;
+    background: #EEEEEE;
+    font-size: 13px;
+}
+
+.field:focus, .field:hover {
+    color: #000000;
+    background: #FFFFFF;
+}

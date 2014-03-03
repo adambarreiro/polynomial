@@ -1,26 +1,15 @@
 // -----------------------------------------------------------------------------
-// Name: /public/js/game/editor/engine.js
+// Name: /public/js/game/menu.js
 // Author: Adam Barreiro
-// Description: 
+// Description: Draws the game menu with single and multi player options.
 // Updated: 28-10-2013
 // -----------------------------------------------------------------------------
 
 /**
- * Main file - RequireJS
+ * menu.js
+ * @dependency /public/js/game/scenes.js
  */
-define (["./constants","./components", "./scenes", "require", "./menu"], function(Constants, Components, Scenes, Require, Menu) {
-
-var CHARACTER;
-var QUESTIONS;
-var ANSWERS;
-
-function setCharacter(entity) {
-    CHARACTER = entity;
-}
-
-function getCharacter() {
-    return CHARACTER;
-}
+define (["./scenes", "./network", "require", "./menu"], function(Scenes, Network, Require) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -62,7 +51,7 @@ function getOnePlayerPanel() {
                 '<div class="separator">En solitario</div>',
                 '<div class="buttonext" id="new">Nuevo juego</div>',
                 cont,
-                '</div>',
+            '</div>',
             '<div class="extra">',
                 '<div id="edbutton">Atr&aacute;s</div>',
             '</div>'].join('\n');
@@ -73,10 +62,65 @@ function getTwoPlayerPanel() {
                 '<div class="separator">Cooperativo</div>',
                 '<div class="buttonext" id="wait">Esperar partida</div>',
                 '<div class="buttonext" id="connect">Conectar a jugador</div>',
-                '</div>',
+            '</div>',
             '<div class="extra">',
                 '<div id="edbutton">Atr&aacute;s</div>',
             '</div>'].join('\n');
+}
+
+function waitingPanel() {
+   return ['<div class="menu">',
+                '<div class="separator">Esperando...</div>',
+                '<p>Esperando jugador...</p>',
+            '</div>',
+            '<div class="extra">',
+                '<div id="edbutton">Atr&aacute;s</div>',
+            '</div>'].join('\n');
+}
+
+function connectPanel() {
+   return ['<div class="menu">',
+                '<div class="separator">Conectar</div>',
+                '<input class="field" type="text" name="ip" placeholder="Dirección IP"/>',
+                '<div class="buttonext" id="net">Conectar</div>',
+            '</div>',
+            '<div class="extra">',
+                '<div id="edbutton">Atr&aacute;s</div>',
+            '</div>'].join('\n');
+}
+
+function twoPlayerMenuHandler() {
+    var Menu = Require("menu");
+    // Wait for player
+    $('#wait').bind('click', function() {
+        $('.container').empty();
+        $('.container').append(waitingPanel());
+        Network.createServer('http://localhost');
+        $('#edbutton').bind('click',function() {
+           $('.container').empty();
+           $('.container').append(getTwoPlayerPanel());
+           twoPlayerMenuHandler();
+        });
+    });
+    // Connect to a player
+    $('#connect').bind('click', function() {
+        $('.container').empty();
+        $('.container').append(connectPanel());
+        $('#net').bind('click', function() {
+            var ip = $("input[name='ip']").val();
+            Network.createClient('http://localhost');
+        });
+        $('#edbutton').bind('click',function() {
+           $('.container').empty();
+           $('.container').append(getTwoPlayerPanel());
+           twoPlayerMenuHandler();
+        });
+    });
+    $('#edbutton').bind('click',function() {
+    $('.container').empty();
+    $('.container').append(Menu.getGamePanel());
+        Menu.menuHandler();
+    });
 }
 
 
@@ -87,7 +131,6 @@ function getTwoPlayerPanel() {
 return {
 
     getGamePanel: function() {
-        var Menu = Require("menu");
         return ['<div class="menu">',
                     '<div class="separator">Modo de juego</div>',
                     '<div class="buttonext" id="one">Un jugador</div>',
@@ -122,32 +165,12 @@ return {
             });
             Menu.menuHandler();
         });
-       /* $('#two').bind('click',function() {
+       $('#two').bind('click',function() {
             $('.container').empty();
             $('.container').append(getTwoPlayerPanel());
-            $('#wait').bind('click', function() {
-                $('body').empty();
-            });
-            $('#connect').bind('click', function() {
-                $('body').empty();
-            });
-            Menu.menuHandler();
-        });*/
-    },
-
-    getQuestions: function() {
-        return QUESTIONS;
-    },
-    setQuestions: function(questions) {
-        QUESTIONS = questions;
-    },
-    getAnswers: function() {
-        return ANSWERS;
-    },
-    setAnswers: function(answers) {
-        ANSWERS = answers;
+            twoPlayerMenuHandler();
+        });
     }
-
 };
 
 });
