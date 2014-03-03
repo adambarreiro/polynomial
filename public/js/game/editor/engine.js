@@ -88,7 +88,7 @@ return {
         switch(type) {
             case 1:
                 if (getCharacterPos() === null) {
-                    removeEntity(x,y); addEntity("Char",x,y);
+                    removeEntity(x,y); addEntity("Character",x,y);
                     setCharacterPos(x+y*Constants.getLevelSize('tiles').width);
                 }
                 break;

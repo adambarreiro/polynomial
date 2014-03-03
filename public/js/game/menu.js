@@ -52,26 +52,6 @@ function readStudentCookie() {
     return document.cookie.substring(pri,fin);
 }
 
-function getQuestions(callback) {
-    $.ajax({
-        url: '/getQuestionsFile',
-        type: 'POST',
-        dataType: 'html',
-        success: function(data) {
-            var all = data.split("#");
-            var q = [], a = [];
-            for (var i = 0; i<all.length-1; i++) {
-                if (i % 2 === 0) {
-                    q.push(all[i]);
-                } else {
-                    a.push(all[i]);
-                }
-            }
-            callback(q,a);
-        }
-    });
-}
-
 
 function getOnePlayerPanel() {
     var cont = '';
@@ -108,10 +88,6 @@ return {
 
     getGamePanel: function() {
         var Menu = Require("menu");
-        getQuestions(function(q,a) {
-            Menu.setQuestions(q);
-            Menu.setAnswers(a);
-        });
         return ['<div class="menu">',
                     '<div class="separator">Modo de juego</div>',
                     '<div class="buttonext" id="one">Un jugador</div>',

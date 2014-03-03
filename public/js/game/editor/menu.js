@@ -97,7 +97,7 @@ function drawLevel(level) {
         Engine.drawTile(x,y,level.map[i]);
         LOADEDLEVEL.map[(x+y*Constants.getLevelSize('tiles').width).toString()] = type;
     }
-    var character = Crafty("Char");
+    var character = Crafty("Character");
     if ( character.length > 0) {
         console.log(character);
         Crafty.viewport.centerOn(character,0);

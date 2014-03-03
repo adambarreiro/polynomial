@@ -219,7 +219,7 @@ exports.deleteStudent = deleteStudent;
  * @param callback(students) - Function to call when the query finishes
  */
 function setLevelStudent(e, l, callback) {
-    var stud = unescape(e); console.log(e); console.log(l);
+    var stud = unescape(e);
     Student.update({email: stud}, { $set: {savegame: l}}, function(error) {
         if (!error) callback({ok: true});
         else callback({ok: false});
