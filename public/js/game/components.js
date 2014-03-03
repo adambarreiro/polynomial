@@ -17,15 +17,22 @@ function getEditor() {
     return EDITOR;
 }
 
-function loadEditorGraphics() {
-    Crafty.load(['/assets/img/char.png',
+var EDITOR_ICONS = ['/assets/img/char.png',
              '/assets/img/floor1.jpg', '/assets/img/floor2.jpg',
              '/assets/img/floor3.jpg','/assets/img/floor4.jpg',
              '/assets/img/floor5.jpg','/assets/img/abyss.png',
              '/assets/img/hide.png', '/assets/img/chest.png',
              '/assets/img/enemy1.png', '/assets/img/enemy2.png',
              '/assets/img/enemy3.png', '/assets/img/enemy4.png',
-             '/assets/img/enemy5.png', '/assets/img/exit.jpg'], function(){
+             '/assets/img/enemy5.png', '/assets/img/exit.jpg'];
+var GAME_ICONS = ['/assets/img/keys/delete.png','/assets/img/keys/minus.png',
+            '/assets/img/keys/enter.png', '/assets/img/keys/number.png',
+            '/assets/img/keys/x.png', '/assets/img/keys/plus.png'];
+var SPRITES = [];
+
+
+function loadEditorGraphics() {
+    Crafty.load(EDITOR_ICONS.concat(GAME_ICONS).concat(SPRITES), function(){
         Crafty.sprite(28, 32, '/assets/img/char.png', {
             spr_char: [0, 0]
         });
@@ -80,7 +87,7 @@ function loadEditorGraphics() {
 function setComponents(edition) {
     if (edition) loadEditorGraphics();
     else loadEditorGraphics();
-    Grid.registerComponent(mode);
+    Grid.registerComponent(edition);
 }
 
 // -----------------------------------------------------------------------------

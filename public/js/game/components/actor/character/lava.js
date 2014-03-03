@@ -42,65 +42,65 @@ var drawLava = {
     jitter: 0
 };
 
+var LAVA_MAX = 2; // CAUTION: Incresing this parameter means CPU usage to the max.
+
 
 // -----------------------------------------------------------------------------
 // Public
 // -----------------------------------------------------------------------------
 
 return {
+    /**
+     * Creates the component.
+     */
     createComponent: function(editing) {
         Crafty.c('Lava', {
             _lavaInterval: undefined,
-            _suelo: undefined,
-            init: function() {
-                this.requires('2D, Canvas, SpriteAnimation, Collision, Grid, Gravity, Keyboard, Fourway, Damage, spr_char');
-                this.bind("EnterFrame", function () {
-                    var suelo = Crafty.map.search({_x: this.x+16, _y: this.y+32, _w: 1, _h: 1}, true);
-                    if (suelo.length > 0) {
-                        if (suelo[0].has("Abyss")) {
-                            if (this._cronoLava === undefined) {
-                                var particulas = 0;
-                                this._cronoLava = setInterval( function() {
-                                    Crafty.e("2D, Canvas, Particles").attr({"_x": Crafty("Char").x, "_y": Crafty("Char").y+16}).particles(drawLava);
-                                    particulas++;
-                                    Crafty("Char").damage("lava");                
-                                    if (particulas % 2 === 0) {
-                                        Crafty('Particles').each(function() { this.destroy(); });
-                                    }
-                                }, 100);
+            _lavaFloor: undefined,
+            _lavaParticles: 0,
+            /**
+             * Draws the lava and controls the damage.
+             */
+            lava: function() {
+                this._lavaFloor = Crafty.map.search({_x: this.x+16, _y: this.y+32, _w: 1, _h: 1}, true);
+                if (this._lavaFloor.length > 0) {
+                    if (this._lavaFloor[0].has("Abyss")) {
+                        if (this._lavaInterval === undefined) {
+                            this._lavaParticles = 0;
+                            this._lavaInterval = setInterval( function() {
+                                Crafty.e("2D, Canvas, Particles").attr({"_x": Crafty("Character").x, "_y": Crafty("Character").y+16}).particles(drawLava);
+                                Crafty("Character")._lavaParticles++;
+                                Crafty("Character").damage("lava");
+                                if (Crafty("Character")._lavaParticles % LAVA_MAX === 0) {
+                                    Crafty('Particles').each(function() { this.destroy(); });
+                                }
+                            }, 100);
 
-                            }
-                        } else {
-                            this.clearLava();
                         }
+                    } else {
+                        this.clearLava();
                     }
-                });
-                this.bind('Moved', function(from) {
-                    var suelo = Crafty.map.search({_x: this.x+16, _y: this.y+32, _w: 1, _h: 1}, true);
-                    if (suelo.length > 0) {
-                        if (suelo[0].has("Abyss")) {
-                            if (this._cronoLava === undefined) {
-                                var particulas = 0;
-                                this._cronoLava = setInterval( function() {
-                                    Crafty.e("2D, Canvas, Particles").attr({"_x": Crafty("Char").x, "_y": Crafty("Char").y+16}).particles(drawLava);
-                                    particulas++;
-                                    Crafty("Char").damage("lava");                               
-                                    if (particulas % 2 === 0) {
-                                        Crafty('Particles').each(function() { this.destroy(); });
-                                    }
-                                }, 100);
-
-                            }
-                        } else {
-                            this.clearLava();
-                        }
-                    }
-                });
+                }
             },
+            /**
+             * Clear the lava effects.
+             */
             clearLava: function() {
-                clearInterval(this._cronoLava);
+                clearInterval(this._lavaInterval);
                 Crafty('Particles').each(function() { this.destroy(); });
-                this._cronoLava = undefined;
+                this._lavaInterval = undefined;
+            },
+            /**
+             * Inits the component
+             */
+            init: function() {
+                this.requires('Damage');
+                this.bind("EnterFrame", function () {
+                    this.lava();
+                });
+                this.bind('Moved', function() {
+                    this.lava();
+                });
             }
         });
     }

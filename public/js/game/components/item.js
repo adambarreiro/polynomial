@@ -8,8 +8,10 @@
 /**
  * item.js
  * @dependency /public/js/game/components/exit.js
+ * @dependency /public/js/game/components/hide.js
+ * @dependency /public/js/game/components/chest.js
  */
-define (["./item/exit"],function(Exit) {
+define (["./item/exit", "./item/hide", "./item/chest", ],function(Exit, Hide, Chest) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -39,7 +41,7 @@ return {
              * Inits the component
              */
             init: function() {
-                this.requires('2D, Canvas, Color, Grid');
+                this.requires('Grid');
             }
         });
         createChildComponents(editing);

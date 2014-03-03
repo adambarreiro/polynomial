@@ -39,7 +39,7 @@ return {
              * Inits the component
              */
             init: function() {
-                this.requires('2D, Canvas, Color, Grid');
+                this.requires('Grid, SpriteAnimation, Gravity, Collision');
             }
         });
         createChildComponents(edition);

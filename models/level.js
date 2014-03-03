@@ -100,11 +100,8 @@ exports.getLevel = getLevel;
 function deleteLevel(number, callback) {
     Level.findOneAndRemove({number: number}, function(error) {
         if (!error) {
-            console.log("buscar y borrar");
             Level.find({number: {$gt: number}}, function(error, toUpdate) {
-                console.log("bucle");
                 for (i=0; i<toUpdate.length; i++) {
-                    console.log(i);
                     Level.update({number: toUpdate[i].number}, { $set: {number: toUpdate[i].number-1}}, function() {
                         return;
                     });

@@ -5,47 +5,50 @@
 // Updated: 28-10-2013
 // -----------------------------------------------------------------------------
 
-define (function() {
+/**
+ * damage.js
+ * @dependency /public/js/game/scenes.js
+ */
+define (["../../../scenes"], function(Scenes) {
 
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
+var MAX_DAMAGE_SHIELD = 55;
+var MIN_DAMAGE_SHIELD = 30;
+var MAX_DAMAGE_HEALTH = 10;
+var MIN_DAMAGE_HEALTH = 15;
 
 // -----------------------------------------------------------------------------
 // Public
 // -----------------------------------------------------------------------------
 
 return {
-    createComponent: function(editing) {
-        Crafty.c('Char', {
-            _old_x: undefined,
-            _range: undefined,
-            _health: 100,
-            _timeout: 24.99,
-            _operations: 5,
-            _shield: 0,
-            _invisible: false,
-            _detected: false,
-            _canAttack: false,
-            _enemy: undefined,
-            _battleTimer: undefined,
-            _polinomios: [],
-            init: function(item) {
-                var shield = Crafty("Char")._shield;
-                var health = Crafty("Char")._health;
-                switch(item) {
+    /**
+     * Creates the component
+     */
+    createComponent: function() {
+        Crafty.c('Damage', {
+            /**
+             * Hurts the character by some random amount.
+             * @param cause - The cause of damage (lava or enemy)
+             */
+            damage: function(cause) {
+                var shield = this._shield;
+                var health = this._health;
+                switch(cause) {
                     case "lava":
                         if (shield > 0) {
-                            shield=shield-2;
+                            shield = shield-2;
                         } else {
                             health--;
                         }
                         break;
                     case "enemy":
                         if (shield > 0) {
-                            shield = shield - Math.floor(Math.random()*(55-30+1)+30);
+                            shield = shield - Math.floor(Math.random()*(MAX_DAMAGE_SHIELD-MIN_DAMAGE_SHIELD+1)+MIN_DAMAGE_SHIELD);
                         } else {
-                            health = health - Math.floor(Math.random()*(15-10+1)+10);
+                            health = health - Math.floor(Math.random()*(MAX_DAMAGE_HEALTH-MIN_DAMAGE_HEALTH+1)+MIN_DAMAGE_HEALTH);
                         }
                         break;
                 }
@@ -60,20 +63,32 @@ return {
                     if (health > 0) {
                         $('#lifebar').css({"width": (health*3) + "px"});
                     } else {
-                        if (item === "lava") clearInterval(Crafty("Char")._cronoLava);
-                        if (item === "enemy") {
-                            Crafty("Char").stopAll();
-                            Crafty('obj').each(function() { this.destroy(); });
-                            clearInterval(Crafty("Char")._battleTimer);
-                            $(".battle").remove();
-                            $("body").unbind("keydown");
-                        }
-                        Scenes.restartLevel();
+                        this.die(cause);
                     }
                 }
-                Crafty("Char")._shield = shield;
-                Crafty("Char")._health = health;
-
+                this._shield = shield;
+                this._health = health;
+            },
+            /**
+             * Kills the character, restarting the game
+             * @param cause - The cause of death (lava or enemy)
+             */
+            die: function(cause) {
+                if (cause === "lava") {
+                    this.clearLava();
+                }
+                if (cause === "enemy") {
+                    this.stopAll();
+                    this.clearBattle();
+                }
+                Crafty('obj').each(function() { this.destroy(); });
+                Scenes.restartLevel();
+            },
+            /**
+             * Inits component
+             */
+            init: function() {
+                this.requires("Lava, Battle");
             }
         });
     }

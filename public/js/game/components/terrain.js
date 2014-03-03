@@ -51,7 +51,7 @@ return {
              * Inits the component
              */
             init: function() {
-                this.requires('2D, Canvas, Color, Grid');
+                this.requires('Grid');
             }
         });
         createChildComponents(edition);

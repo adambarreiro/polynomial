@@ -86,7 +86,7 @@ function updateSavegameCookie(level) {
 function drawTile(x,y,type) {
     switch (type) {
         default: break;
-        case 1: setCharacter(Crafty.e("Char").at(x,y)); break;
+        case 1: setCharacter(Crafty.e("Character").at(x,y)); break;
         case 2: Crafty.e("Floor1").at(x,y);  break;
         case 3: Crafty.e("Floor2").at(x,y);  break;
         case 4: Crafty.e("Floor3").at(x,y);  break;

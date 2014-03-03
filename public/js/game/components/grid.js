@@ -7,11 +7,12 @@
 
 /**
  * grid.js
- * @dependency /public/js/game/components/terrain/terrain.js
- * @dependency /public/js/game/components/item/item.js
- * @dependency /public/js/game/components/actor/actor.js
+ * @dependency /public/js/game/constants.js
+ * @dependency /public/js/game/components/terrain.js
+ * @dependency /public/js/game/components/item.js
+ * @dependency /public/js/game/components/actor.js
  */
-define (["./terrain", "./item", "./actor"], function(Terrain, Item, Actor) {
+define (["../constants", "./terrain", "./item", "./actor"], function(Constants, Terrain, Item, Actor) {
 
 /**
  * Registers all the child components.
@@ -35,6 +36,7 @@ return {
              * Inits the component
              */
             init: function() {
+                this.requires('2D, Canvas');
                 this.attr({
                     w: Constants.getTileSize('px').width,
                     h: Constants.getTileSize('px').height

@@ -1,8 +1,8 @@
 // -----------------------------------------------------------------------------
 // Name: /public/js/game/components/actor/character/bonus.js
 // Author: Adam Barreiro
-// Description: 
-// Updated: 28-10-2013
+// Description: Bonus component
+// Updated: 01-03-2014
 // -----------------------------------------------------------------------------
 
 define (function() {
@@ -10,6 +10,47 @@ define (function() {
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
+var QUESTIONS = [];
+var ANSWERS = [];
+
+/**
+ * Ajax call to retrieve the questions and answers.
+ */
+function getQuestions(callback) {
+    $.ajax({
+        url: '/getQuestionsFile',
+        type: 'POST',
+        dataType: 'html',
+        success: function(data) {
+            var all = data.split("#");
+            var q = [], a = [];
+            for (var i = 0; i<all.length-1; i++) {
+                if (i % 2 === 0) {
+                    q.push(all[i]);
+                } else {
+                    a.push(all[i]);
+                }
+            }
+            callback(q,a);
+        }
+    });
+}
+
+/**
+ * Draws a popup explaining that the question was not answered correctly
+ */
+function mistakePopup() {
+    var html = ['<div class="popup">',
+                    '<div class="separator">Perdiste el tesoro...</div>',
+                    '<p>La afirmación era falsa...</p>',
+                    '<input class="button" type="button" name="true" value="Maldición"/>',
+                '</div>'].join('\n');
+    $("#cr-stage").append(html);
+    $('input').on("click",function() {
+        Crafty('Character').startAll();
+        $('.popup').remove();
+    });
+}
 
 // -----------------------------------------------------------------------------
 // Public
@@ -17,24 +58,14 @@ define (function() {
 
 return {
     /**
-     * Initiates the engine.
+     * Creates the component.
      */
-    init: function(editing) {
-        Crafty.c('Char', {
-            _old_x: undefined,
-            _range: undefined,
-            _health: 100,
-            _timeout: 24.99,
-            _operations: 5,
-            _shield: 0,
-            _invisible: false,
-            _detected: false,
-            _canAttack: false,
-            _enemy: undefined,
-            _battleTimer: undefined,
-            _polinomios: [],
+    createComponent: function() {
+        Crafty.c('Bonus', {
+            /**
+             * Obtains an item randomly
+             */
             item: function() {
-
                 var bonus;
                 var icon;
                 var description;
@@ -65,10 +96,7 @@ return {
                                 '</div>'].join('\n');
                 $("#cr-stage").append(html);
                 $('input').on("click",function() {
-                    Crafty('Char').startAll();
-                    Crafty('Enemy').each(function() {
-                        this.startAll();
-                    });
+                    Crafty("Character").startAll();
                     $('.popup').remove();
                     if (bonus !== "SALUD") {
                         $('.inventory').append('<div class="element"></div>');
@@ -77,19 +105,78 @@ return {
                     }
                     switch(bonus) {
                         case "SALUD":
-                            var salud = Crafty("Char")._health;
+                            var salud = this._health;
                             salud=salud + Math.floor(Math.random()*(100-70+1)+70);
                             if (salud > 100) salud = 100;
-                            Crafty("Char")._health = salud;
+                            this._health = salud;
                             $('#lifebar').css({"width": (salud*3) + "px"});
                             break;
                         case "ESCUDO":
-                            Crafty("Char")._shield=100;
+                            this._shield=100;
                             $('#lifebar').css({"width": "300px", "background" : "rgb(50,50,200)"});
                             $('#vidatext').html("Escudo: ");
                             break;
-                        case "POTENCIA": Crafty("Char")._operations=3; break;
-                        case "TIEMPO EXTRA": Crafty("Char")._timeout=25.99; break;
+                        case "POTENCIA": break;
+                        case "TIEMPO EXTRA": break;
+                    }
+                });
+            },
+            /**
+             * Draws a popup with a random question from the questions text file.
+             */
+            treasure: function() {
+                var p = Crafty.map.search({_x: this.x+15, _y: this.y, _w: 1, _h: 32}, true);
+                if (p.length > 1) {
+                    var chest;
+                    for (var i=0; i<p.length; i++) {
+                        if (p[i].has("Chest")) {
+                            chest = p[i];
+                            break;
+                        }
+                    }
+                    if (chest !== undefined) {
+                        if (!chest._opened) {
+                            this.stopAll();
+                            chest._opened = true;
+                            if (QUESTIONS.length === 0 || ANSWERS.length === 0) return;
+                            var index = (Math.floor(Math.random()*(QUESTIONS.length-1))+1);
+                            var html = ['<div class="popup">',
+                                    '<div class="separator">¡TESORO ENCONTRADO!</div>',
+                                    '<p>' + QUESTIONS[index] +'</p>',
+                                    '<input class="button" type="button" name="true" value="Verdadero"/>',
+                                    '<input class="button" type="button" name="false" value="Falso"/>',
+                                '</div>'].join('\n');
+                            $("#cr-stage").append(html);
+                            var fallo = false;
+                            $('input[name=true]').on("click",function() {
+                                if (ANSWERS[index] == "V") {
+                                    Crafty("Character").item();
+                                } else {
+                                    mistakePopup();
+                                }
+                            });
+                            $('input[name=false]').on("click",function() {
+                                if (ANSWERS[index] == "F") {
+                                    Crafty("Character").item();
+                                } else {
+                                    mistakePopup();
+                                }
+                            });        
+                        }
+                    }
+                }
+            },
+            /**
+             * Inits the component
+             */
+            init: function() {
+                getQuestions(function(q,a) {
+                    QUESTIONS = q;
+                    ANSWERS = a;
+                });
+                this.bind("KeyDown", function () {
+                    if (this.isDown("S")) {
+                        this.treasure();
                     }
                 });
             }

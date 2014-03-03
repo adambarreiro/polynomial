@@ -12,11 +12,10 @@
  * @dependency /public/js/game/components/actor/character/camera.js
  * @dependency /public/js/game/components/actor/character/damage.js
  * @dependency /public/js/game/components/actor/character/detection.js
- * @dependency /public/js/game/components/actor/character/jump.js
+ * @dependency /public/js/game/components/actor/character/movement.js
  * @dependency /public/js/game/components/actor/character/lava.js
- * @dependency /public/js/game/components/actor/character/treasure.js
  */
-define (["./character/battle","./character/bonus","./character/camera","./character/damage","./character/detection","./character/jump","./character/lava","./character/treasure"], function(Battle, Bonus, Camera, Damage, Detection, Jump, Lava, Treasure) {
+define (["./character/battle","./character/bonus","./character/camera","./character/damage","./character/detection","./character/movement","./character/lava"], function(Battle, Bonus, Camera, Damage, Detection, Movement, Lava) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -25,15 +24,16 @@ define (["./character/battle","./character/bonus","./character/camera","./charac
 /**
  * Registers all the child components.
  */
-function createChildComponents(edition) {
-    Battle.createComponent();
-    Bonus.createComponent();
-    Camera.createComponent();
-    Damage.createComponent();
+function createChildComponents() {
+    // Each component have some dependencies on another, so the order
+    // is important and should not be changed.
+    Camera.createComponent(); // No
+    Bonus.createComponent(); // No
+    Battle.createComponent(); // No
+    Damage.createComponent(); // Lava
+    Lava.createComponent(); // Damage, Battle
+    Movement.createComponent(); // Lava
     Detection.createComponent();
-    Jump.createComponent();
-    Lava.createComponent();
-    Treasure.createComponent();
 }
 
 // -----------------------------------------------------------------------------
@@ -46,45 +46,50 @@ return {
      */
     registerComponent: function(edition) {
         Crafty.c('Character', {
+            _health: 100, // Health of the character
+            _shield: 0,
             stopAll: function() {
+                // Kills components
+                this.removeComponent("Camera");
+                this.removeComponent("Detection");
+                this.removeComponent("Movement");
+                // Kills events
                 this.unbind("EnterFrame");
                 this.unbind("Moved");
                 this.unbind("KeyDown");
+                // Kills enemy events
                 Crafty("Enemy").each(function(){
-                    this.unbind("Patrol");
-                    this.unbind("EnterFrame");
+                    this.stopEnemy();
                 });
             },
             startAll: function() {
-                this.gravity("Terrain").gravityConst(0.3);
-                this.multiway(3, {
-                    RIGHT_ARROW: 0,
-                    LEFT_ARROW: 180
-                });
-                this.bind("KeyDown", function () {
-                    if (this.isDown("A")) {
-                        if (this._canAttack) {
-                            if (!this._invisible) {
-                                this.battle(true);
-                            } else {
-                                this.battle(false);
-                            }
-                        }
-                    }
-                    else if (this.isDown("S")) {
-                        this.treasure();
-                    }
+                // Restarts components
+                this.addComponent("Camera");
+                this.addComponent("Detection");
+                this.addComponent("Movement");
+                // Restarts enemy events
+                Crafty('Enemy').each(function() {
+                    this.startEnemy();
                 });
             },
+            startCharacter: function() {
+                this.addComponent("Camera");
+                this.addComponent("Bonus");
+                this.addComponent("Damage");
+                this.addComponent("Lava");
+                this.addComponent("Movement");
+                this.addComponent("Detection");
+                this.addComponent("Battle");
+            },
             init: function() {
-                this.requires('Actor, Collision, Gravity, Keyboard, Fourway, spr_char');
+                this.requires('Actor, Keyboard, Multiway, spr_char');
                 this.z=2;
-                if (!editing) {
-                    this.startAll();
+                if (!edition) {
+                    this.startCharacter();
                 }
             }
         });
-        createChildComponents(edition);
+        createChildComponents();
     }
 };
 

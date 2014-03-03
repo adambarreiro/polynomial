@@ -134,7 +134,6 @@ exports.ajaxLevelMove = ajaxLevelMove;
 function ajaxSaveGame() {
     app.post('/saveGame', function (req, res) {
         modelStudent.setLevelStudent(req.body.student, req.body.level, function(ok) {
-            console.log(ok);
             res.send(ok);
         });
     });

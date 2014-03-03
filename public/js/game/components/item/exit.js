@@ -9,7 +9,7 @@
  * exit.js
  * @dependency /public/js/game/scenes.js
  */
-define (["../../../scenes"], function(Scenes) {
+define (["../../scenes"], function(Scenes) {
 
 // -----------------------------------------------------------------------------
 // Public
@@ -24,7 +24,7 @@ return {
             /**
              * Starts all the components attached and events.
              */
-            startAll: function() {
+            startExit: function() {
                 this.addComponent("Collision");
                 this.bind("EnterFrame", function(e) {
                     if(this.hit('Character')){
@@ -38,7 +38,7 @@ return {
              */
             init: function() {
                 this.requires('Item, spr_exit');
-                if (!edition) this.startAll();
+                if (!edition) this.startExit();
             }
         });
     }
