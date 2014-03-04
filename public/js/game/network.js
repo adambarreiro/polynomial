@@ -1,19 +1,23 @@
 // -----------------------------------------------------------------------------
 // Name: /public/js/game/network.js
 // Author: Adam Barreiro
-// Description: 
-// Updated: 28-10-2013
+// Description: Networking module for the multiplayer mode.
+// Updated: 03-03-2014
 // -----------------------------------------------------------------------------
 
-define (function() {
+/**
+ * network.js
+ * @dependency /public/js/game/network/connector.js
+ * @dependency /public/js/game/network/creator.js
+ */
+define (["./network/connector", "./network/creator"], function(Connector, Creator) {
 
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
 
-var SOCKET;
-var SOCKET2;
-
+var SOCKET; // The socket for the connection
+var IP;
 
 // -----------------------------------------------------------------------------
 // Public
@@ -21,21 +25,32 @@ var SOCKET2;
 
 return {
 
-    createServer: function(address) {
-        SOCKET = io.connect(address);
+    createCreator: function(address) {
+        IP = address;
+        SOCKET = io.connect(IP);
         SOCKET.on("connect", function () {
-            SOCKET.on('receive', function (data) {
-                alert(data);
-            });
+            Creator.startCreator(IP);
+
         });
     },
-    createClient: function(address) {
-        SOCKET2 = io.connect(address);
-        SOCKET2.on("connect", function () {
-            SOCKET2.emit("send", {
-                caca: "caca2"
+    createConnector: function(address) {
+        var Menu = Require("menu");
+        var Creator = Require("creator");
+        SOCKET = io.connect(address);
+        SOCKET.on("connect", function () {
+            Menu.connectionMenu();
+            connectorOnCreatorRetrieved(function() {
+                connectorEngage(address);
+                Menu.startGame(Menu.readStudentCookie(), Menu.readSavegameCookie());
             });
+            connectorAskForCreator(address);
         });
+    },
+    getSocket: function() {
+        return SOCKET;
+    },
+    getIp: function() {
+        return IP;
     }
 };
 

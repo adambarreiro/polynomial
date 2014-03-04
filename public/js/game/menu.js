@@ -23,25 +23,6 @@ function csrf() {
     return '<input type="hidden" value="' + document.cookie.substring(pri,fin) + '" name="_csrf" />';
 }
 
-function readSavegameCookie() {
-    var pri = document.cookie.indexOf("savegame=")+"savegame=".length;
-    var fin = document.cookie.indexOf(";", pri);
-    if (fin < 0) {
-        fin = document.cookie.length;
-    }
-    return parseInt(document.cookie.substring(pri,fin),10);
-}
-
-function readStudentCookie() {
-    var pri = document.cookie.indexOf("student=")+"student=".length;
-    var fin = document.cookie.indexOf(";", pri);
-    if (fin < 0) {
-        fin = document.cookie.length;
-    }
-    return document.cookie.substring(pri,fin);
-}
-
-
 function getOnePlayerPanel() {
     var cont = '';
     if (readSavegameCookie() > 1) {
@@ -59,19 +40,20 @@ function getOnePlayerPanel() {
 
 function getTwoPlayerPanel() {
     return ['<div class="menu">',
-                '<div class="separator">Cooperativo</div>',
-                '<div class="buttonext" id="wait">Esperar partida</div>',
-                '<div class="buttonext" id="connect">Conectar a jugador</div>',
+                '<div class="separator">Con un amigo</div>',
+                '<div class="buttonext" id="create">Crear partida</div>',
+                '<div class="buttonext" id="connect">Entrar en una partida</div>',
             '</div>',
             '<div class="extra">',
                 '<div id="edbutton">Atr&aacute;s</div>',
             '</div>'].join('\n');
 }
 
-function waitingPanel() {
+function createPanel() {
    return ['<div class="menu">',
-                '<div class="separator">Esperando...</div>',
-                '<p>Esperando jugador...</p>',
+                '<div class="separator">Crear partida</div>',
+                '<input class="field" type="text" name="ip" placeholder="IP de tu PC"/>',
+                '<div class="buttonext" id="create">Crear</div>',
             '</div>',
             '<div class="extra">',
                 '<div id="edbutton">Atr&aacute;s</div>',
@@ -81,8 +63,8 @@ function waitingPanel() {
 function connectPanel() {
    return ['<div class="menu">',
                 '<div class="separator">Conectar</div>',
-                '<input class="field" type="text" name="ip" placeholder="Dirección IP"/>',
-                '<div class="buttonext" id="net">Conectar</div>',
+                '<input class="field" type="text" name="ip" placeholder="IP del PC de tu amigo"/>',
+                '<div class="buttonext" id="connect">Conectar</div>',
             '</div>',
             '<div class="extra">',
                 '<div id="edbutton">Atr&aacute;s</div>',
@@ -92,10 +74,14 @@ function connectPanel() {
 function twoPlayerMenuHandler() {
     var Menu = Require("menu");
     // Wait for player
-    $('#wait').bind('click', function() {
+    // Connect to a player
+    $('#create').bind('click', function() {
         $('.container').empty();
-        $('.container').append(waitingPanel());
-        Network.createServer('http://localhost');
+        $('.container').append(createPanel());
+        $('#create').bind('click', function() {
+            var ip = $("input[name='ip']").val();
+            Network.createCreator('http://localhost');
+        });
         $('#edbutton').bind('click',function() {
            $('.container').empty();
            $('.container').append(getTwoPlayerPanel());
@@ -106,9 +92,9 @@ function twoPlayerMenuHandler() {
     $('#connect').bind('click', function() {
         $('.container').empty();
         $('.container').append(connectPanel());
-        $('#net').bind('click', function() {
+        $('#connect').bind('click', function() {
             var ip = $("input[name='ip']").val();
-            Network.createClient('http://localhost');
+            Network.createConnector('http://localhost');
         });
         $('#edbutton').bind('click',function() {
            $('.container').empty();
@@ -143,8 +129,6 @@ return {
                     '</form>',
                 '</div>'].join('\n');
     },
-
-
     menuHandler: function() {
         var Menu = Require("menu");
         $('#edbutton').bind('click',function() {
@@ -156,12 +140,10 @@ return {
             $('.container').empty();
             $('.container').append(getOnePlayerPanel());
             $('#new').bind('click', function() {
-                $('body').empty();
-                Scenes.loadGame(readStudentCookie(), 1);
+                Menu.startGame(Menu.readStudentCookie(), 1);
             });
             $('#continue').bind('click', function() {
-                $('body').empty();
-                Scenes.loadGame(readStudentCookie(), readSavegameCookie());
+                Menu.startGame(Menu.readStudentCookie(), Menu.readSavegameCookie());
             });
             Menu.menuHandler();
         });
@@ -170,6 +152,59 @@ return {
             $('.container').append(getTwoPlayerPanel());
             twoPlayerMenuHandler();
         });
+    },
+    waitingMenu: function() {
+       var html = ['<div class="menu">',
+                    '<div class="separator">Esperando...</div>',
+                    '<p>Esperando a que tu amigo se conecte...</p>',
+                '</div>',
+                '<div class="extra">',
+                    '<div id="edbutton">Atr&aacute;s</div>',
+                '</div>'].join('\n');
+        $('.container').empty();
+        $('.container').append(html);
+        $('#edbutton').bind('click',function() {
+            $('.container').empty();
+            $('.container').append(getTwoPlayerPanel());
+            twoPlayerMenuHandler();
+        });
+
+    },
+    connectionMenu: function() {
+       var html = ['<div class="menu">',
+                    '<div class="separator">Conectando...</div>',
+                    '<p>Conectando al PC de tu amigo...</p>',
+                '</div>',
+                '<div class="extra">',
+                    '<div id="edbutton">Atr&aacute;s</div>',
+                '</div>'].join('\n');
+        $('.container').empty();
+        $('.container').append(html);
+        $('#edbutton').bind('click',function() {
+            $('.container').empty();
+            $('.container').append(getTwoPlayerPanel());
+            twoPlayerMenuHandler();
+        });
+    },
+    startGame: function(student, level) {
+        $('body').empty();
+        Scenes.loadGame(student, level);
+    },
+    readSavegameCookie: function() {
+        var pri = document.cookie.indexOf("savegame=")+"savegame=".length;
+        var fin = document.cookie.indexOf(";", pri);
+        if (fin < 0) {
+            fin = document.cookie.length;
+        }
+        return parseInt(document.cookie.substring(pri,fin),10);
+    },
+    readStudentCookie: function() {
+        var pri = document.cookie.indexOf("student=")+"student=".length;
+        var fin = document.cookie.indexOf(";", pri);
+        if (fin < 0) {
+            fin = document.cookie.length;
+        }
+        return document.cookie.substring(pri,fin);
     }
 };
 

@@ -37,6 +37,7 @@ var Student = mongoose.model('Student', studentSchema);
  * @param callback(students) - Function to call when the query finishes
  */
 function getAllStudents(withGroup, callback) {
+    console.log("$ Obtener todos los estudiantes.");
     if (withGroup !== null) {
         Student.find({ assigned: withGroup }, function (error, students) {
             if (!error) callback(students);
@@ -57,6 +58,7 @@ exports.getAllStudents = getAllStudents;
  * @param callback(student) - Function to call when the query finishes
  */
 function searchStudent(e, callback) {
+    console.log("$ Buscar al estudiante " + e + ".");
     Student.findOne({
         email: e
     }, function (error, student) {
@@ -73,6 +75,7 @@ exports.searchStudent = searchStudent;
  * @param callback(ok, student) - Function to call when the query finishes
  */
 function loginStudent(e, p, callback) {
+    console.log("$ Login de estudiante " + e + ".");
     var sha256 = crypto.createHash("sha256");
     sha256.update(p, "utf8");
     Student.findOne({
@@ -98,6 +101,7 @@ exports.loginStudent = loginStudent;
  * @param callback(ok) - Function to call when the query finishes
  */
 function addStudent(e, p, n, s1, s2, g, callback) {
+    console.log("$ Añadir un estudiante " + e + ".");
     groupModel.searchGroup({name: g}, function(group) {
         searchStudent(e, function(student){
             if (!student) {
@@ -129,6 +133,7 @@ exports.addStudent = addStudent;
  * @param callback(students) - Function to call when the query finishes
  */
 function searchStudentsByGroup(n, callback) {
+    console.log("$ Buscar un estudiante con grupo " + n + ".");
     Student.find({
         group: n
     }, function (error, students) {
@@ -144,6 +149,7 @@ exports.searchStudentsByGroup = searchStudentsByGroup;
  * @param callback(ok) - Function to call when the query finishes
  */
 function assignGroup(e, g, callback) {
+    console.log("$ Asignar un grupo " + g + " al estudiante " + e + ".");
     Student.update({email: e}, { $set: { group: g, assigned: true}}, function(error, numberAffected) {
         if (numberAffected === 1) {
             Student.findOne({email: e}, function(error, student){
@@ -165,6 +171,7 @@ exports.assignGroup = assignGroup;
  * @param callback(ok) - Function to call when the query finishes
  */
 function disposeGroup(e, callback) {
+    console.log("$ Borrarle el grupo a " + e + ".");
     Student.findOne({email: e}, function(error, student){
         if (!error) {
             groupModel.popStudent(student, function(ok) {
@@ -189,6 +196,7 @@ exports.disposeGroup = disposeGroup;
  * @param callback(students) - Function to call when the query finishes
  */
 function deleteStudent(e, callback) {
+    console.log("$ Borrar el estudiante " + e + ".");
     Student.findOne({email: e}, function(error, student){
         if (!error) {
             if (student.assigned) {
@@ -219,6 +227,7 @@ exports.deleteStudent = deleteStudent;
  * @param callback(students) - Function to call when the query finishes
  */
 function setLevelStudent(e, l, callback) {
+    console.log("$ Asignarle el nivel " + l + " al estudiante " + e + ".");
     var stud = unescape(e);
     Student.update({email: stud}, { $set: {savegame: l}}, function(error) {
         if (!error) callback({ok: true});

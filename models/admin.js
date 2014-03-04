@@ -31,6 +31,7 @@ var Admin = mongoose.model('Admin', adminSchema);
  * @param callback(ok, admin) - Function to call when the query finishes
  */
 function loginAdmin(u, p, callback) {
+    console.log("$ Login de administrador.");
     // Encrypt password
     var sha256 = crypto.createHash("sha256");
     sha256.update(p, "utf8");
@@ -52,6 +53,7 @@ exports.loginAdmin = loginAdmin;
  * @param callback(exists) - Function to call when the query finishes
  */
 function editAdmin(u, p, callback) {
+    console.log("$ Edición de administrador.");
     Admin.findOne(function (error, old) {
         if (!error) {
             var sha256 = crypto.createHash("sha256");
@@ -67,6 +69,7 @@ function editAdmin(u, p, callback) {
 exports.editAdmin = editAdmin;
 
 function initAdmin(callback) {
+    console.log("$ Inicialización de administrador.");
     var sha256 = crypto.createHash("sha256");
     sha256.update("1234567890", "utf8");
     admin = Admin({

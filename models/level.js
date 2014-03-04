@@ -28,6 +28,7 @@ var Level = mongoose.model('Level', levelSchema);
  * @param callback(levelList) - Function to call when the query finishes
  */
 function getLevelSequence(callback) {
+    console.log("$ Obtención de niveles.");
     Level.find({}, 'number', { sort: { number: 1 } }, function (error, levelList) {
         if (!error) callback(levelList);
         else callback({});
@@ -40,6 +41,7 @@ exports.getLevelSequence = getLevelSequence;
  * @param callback(number) - Function to call when the query finishes
  */
 function addLevel(callback) {
+    console.log("$ Añadir un nivel.");
     Level.count({}, function(error, amount) {
         if (!error) {
             level = Level({
@@ -60,6 +62,7 @@ exports.addLevel = addLevel;
  * @param callback(number) - Function to call when the query finishes
  */
 function updateLevel(n, m, callback) {
+    console.log("$ Actualizar el nivel " + n + ".");
     Level.findOne({number: n}, function(error, level) {
         for (var i in m) {
             if (m[i] === 0) {
@@ -83,6 +86,7 @@ exports.updateLevel = updateLevel;
  * @param callback(number) - Function to call when the query finishes
  */
 function getLevel(number, callback) {
+    console.log("$ Obtener el nivel " + number + ".");
     Level.findOne({number: number}, function(error, level) {
         if (!error) {
             if (level) callback(level);
@@ -98,6 +102,7 @@ exports.getLevel = getLevel;
  * @param callback(ok) - Function to call when the query finishes
  */
 function deleteLevel(number, callback) {
+    console.log("$ Borrar el nivel " + number + ".");
     Level.findOneAndRemove({number: number}, function(error) {
         if (!error) {
             Level.find({number: {$gt: number}}, function(error, toUpdate) {
@@ -120,6 +125,7 @@ exports.deleteLevel = deleteLevel;
  * @param callback(ok) - Function to call when the query finishes
  */
 function moveLevel(from, to, callback) {
+    console.log("$ Mover el nivel " + from + " a  la posición " + to +".");
     Level.update({number: from}, { $set: {number: -1}}, function() {
         Level.update({number: to}, { $set: {number: from}}, function(error) {
             if (!error) {

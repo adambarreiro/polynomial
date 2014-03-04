@@ -12,7 +12,7 @@ var mongoose = require('mongoose');
 var studentModel = require('./student.js');
 
 // -----------------------------------------------------------------------------
-// Public
+// Private
 // -----------------------------------------------------------------------------
 var groupSchema = new mongoose.Schema({
         name: String,
@@ -29,6 +29,7 @@ var Group = mongoose.model('Group', groupSchema);
  * @param callback(groups) - Function to call when the query finishes
  */
 function getAllGroups(callback) {
+    console.log("$ Petición de todos los grupos de alumnos.");
     Group.find(function (error, groups) {
         if (!error) callback(groups);
         else callback({});
@@ -43,6 +44,7 @@ exports.getAllGroups = getAllGroups;
  * @param callback(group) - Function to call when the query finishes
  */
 function searchGroup(data, callback) {
+    console.log("$ Búsqueda de grupo " + data.name + ".");
     Group.findOne({
         name: data.name
     }, function (error, group) {
@@ -58,6 +60,7 @@ exports.searchGroup = searchGroup;
  * @param callback(ok) - Function to call when the query finishes.
  */
 function addGroup(n, callback) {
+    console.log("$ Añadir el grupo " + n + ".");
     searchGroup({name: n}, function(group) {
         if (!group) {
             var g = Group({ name: n, students: [] });
@@ -76,6 +79,7 @@ exports.addGroup = addGroup;
  * @param callback(ok) - Function to call when the query finishes
  */
 function editGroup(o, n, callback) {
+    console.log("$ Editar grupo " + o + " y llamarlo " + n + ".");
     Group.update({name: o}, { $set: { name: n }}, function(error, numberAffected) {
         if (numberAffected === 1) callback(true);
         else callback(false);
@@ -89,6 +93,7 @@ exports.editGroup = editGroup;
  * @param callback(ok) - Function to call when the query finishes
  */
 function deleteGroup(n, callback) {
+    console.log("$ Borrar grupo " + n + ".");
     // First, update references.
     studentModel.searchStudentsByGroup(n, function(students) {
         if (students) {
