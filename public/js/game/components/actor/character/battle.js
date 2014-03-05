@@ -673,11 +673,6 @@ return {
              */
             init: function() {
                 this.requires('Character');
-                for (var i=0; i<MAX_COEFICIENT; i++) {
-                    this._battlePolynomials[0][i] = "";
-                    this._battlePolynomials[1][i] = "";
-                    this._battleInput[i] = "";
-                }
             }
         });
     }

@@ -8,41 +8,98 @@
 /**
  * connector.js
  * @dependency /public/js/game/menu.js
- * @dependency /public/js/game/network.js
  */
-define (["../menu", "require", "../network"], function(Menu, Require) {
+define (["require","../menu"], function(Require) {
 
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
+var STARTED = false;
+var SOCKET;
+var CREATOR;
+var CONNECTOR;
 
+/**
+ * Prepares the handler to the join emit response.
+ * @param ourAddress - Our IP address
+ * @param address - The IP address of the other player
+ */
+function onJoin() {
+    var Menu = Require("menu");
+    SOCKET.on("joinACK", function(data) {
+        Menu.startGame(data.student, data.level,{online: true, mode: "creator"});
+    });
+    SOCKET.on("joinERROR", function() {
+        alert("ERROR: Parece que tu IP ya está siendo usada.");
+    });
+    emitJoin();
+}
 
+/**
+ * Tells the server we want to join a game
+ */
+function emitJoin() {
+    SOCKET.emit("join", {
+        id: SOCKET.socket.sessionid,
+        address: CONNECTOR,
+        player: CREATOR
+    });
+}
 
 // -----------------------------------------------------------------------------
 // Public
 // -----------------------------------------------------------------------------
 
 return {
+
     /**
-     * Tells the server the waiter is ready, asking for an identifier for the IP.
-     * @param  address - The IP address of the game creator
+     * Creates the socket and controls all the events.
+     * @param ourAddress - Our IP address
+     * @param address - The IP address of the other player
      */
-    connectorAskForCreator: function(address) {
-        SOCKET.emit("enter", {ip: address});
+    startConnector: function(ourAddress, address) {
+        if (!STARTED) {
+            CONNECTOR = ourAddress;
+            CREATOR = address;
+            SOCKET = io.connect(CONNECTOR);
+            SOCKET.on("connect", function () {
+                onJoin();
+                STARTED = true;
+            });
+        } else {
+            emitJoin();
+        }
     },
     /**
-     * Tells the server the waiter is ready, asking for an identifier for the IP.
-     * @param  address - The IP address of the game creator
+     * Sends the creator the connector position
+     * @param x,y - The position of the character in the game
      */
-    connectorOnCreatorRetrieved: function(callback) {
-        SOCKET.on("enter", callback());
+    sendPosition: function(x,y) {
+        SOCKET.emit("posConnectorToCreator", {
+            address: CREATOR,
+            x: x,
+            y: y
+        });
     },
     /**
-     * Tells the server to ask the creator to load the game.
+     * Receives the position from the creator
      */
-    connectorEngage: function(address) {
-        var Menu = Require("menu");
-        SOCKET.emit("load");
+    onReceivePosition: function(callback) {
+        SOCKET.on("posCreatorToConnector", function(data) {
+            callback(data);
+        });
+    },
+    /**
+     * 
+     */
+    getSocket: function() {
+        return SOCKET;
+    },
+    /**
+     * Closes the socket.
+     */
+    closeConnector: function() {
+        SOCKET.emit("close");
     }
 };
 

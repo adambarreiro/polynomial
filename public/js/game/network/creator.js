@@ -8,45 +8,103 @@
 /**
  * creator.js
  * @dependency /public/js/game/menu.js
- * @dependency /public/js/game/network.js
  */
-define (["../menu", "require", "../network"], function(Menu, Require) {
+define (["require","../menu"], function(Require) {
 
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
+var STARTED = false;
+var SOCKET;
+var CREATOR;
+var CONNECTOR;
 
-var SOCKET_INSTANCE;
+// -----------------------------------------------------------------------------
+// Public
+// -----------------------------------------------------------------------------
 
 /**
- * Tells the server the waiter is ready, asking for an registration of its IP.
- * @param  address - The IP address of the game creator
+ * Prepares the handler to the ready emit response.
+ * @param  address - Our IP address
  */
-function creatorAskForRegistration(address) {
-    SOCKET_INSTANCE.emit("ready", {ip: address});
+function onRegister() {
+    var Menu = Require("menu");
+    SOCKET.on("readyACK", function() {
+        Menu.waitingMenu(CREATOR);
+    });
+    SOCKET.on("readyERROR", function() {
+        alert("ERROR: Parece que tu IP ya está siendo usada.");
+    });
+    emitRegister();
 }
+
 /**
- * Waits for the answer to the "ready" emit.
+ * Tells the server that we want to create a new game, sending our game data.
+ * @param  address - Our IP address
  */
-function creatorOnRegistration(callback) {
-    SOCKET_INSTANCE.on("ready", callback());
+function emitRegister() {
+    var Menu = Require("menu");
+    SOCKET.emit("ready", {
+        address: CREATOR,
+        student: Menu.readStudentCookie(),
+        level: Menu.readSavegameCookie()
+    });
 }
+
 /**
- * Starts the game
+ * Makes our client wait for a player to join us
  */
-function creatorOnStart() {
-    SOCKET_INSTANCE.on("start", function(data) {
-        SOCKET_INSTANCE.emit("load", {ip: address});
+function wait() {
+    var Menu = Require("menu");
+    SOCKET.on("join", function(data) {
+        CONNECTOR = data.player;
+        Menu.startGame(Menu.readStudentCookie(), Menu.readSavegameCookie(),{online: true, mode: "creator"});
     });
 }
 
 return {
+    /**
+     * Starts the socket and all the events.
+     * @param  address - Our IP address
+     */
     startCreator: function(address) {
-        var Network = Require("network");
-        SOCKET_INSTANCE = Network.getSocket();
-        Menu.waitingMenu();
-        creatorAskForRegistration(address);
+        if (!STARTED) {
+            CREATOR = address;
+            SOCKET = io.connect(CREATOR);
+            SOCKET.on("connect", function () {
+                onRegister();
+                wait();
+                STARTED = true;
+            });
+        } else {
+            emitRegister();
+        }
     },
+    /**
+     * Sends the connector the creator position
+     * @param x,y - The position of the character in the game.
+     */
+    sendPosition: function(x,y) {
+        SOCKET.emit("posCreatorToConnector", {
+            address: CONNECTOR,
+            x: x,
+            y: y
+        });
+    },
+    /**
+     * Receives the position from the connector
+     */
+    onReceivePosition: function(callback) {
+        SOCKET.on("posConnectorToCreator", function(data) {
+            callback(data);
+        });
+    },
+    /**
+     * Closes the socket
+     */
+    closeCreator: function() {
+        SOCKET.emit("close");
+    }
 };
 
 });

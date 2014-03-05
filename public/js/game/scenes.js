@@ -110,12 +110,20 @@ function clean(background) {
     Crafty.background(background || "url('/assets/img/backgrounds/wall" + (Math.floor(Math.random()*5)+1) + ".jpg') no-repeat");
 }
 
-function drawLevel(level) {
+function drawLevel(level, mode) {
     for (var i in level.map) {
         x = Math.floor(parseInt(i,10) % Constants.getLevelSize('tiles').width);
         y = Math.floor(parseInt(i,10) / Constants.getLevelSize('tiles').width);
         type = level.map[i];
-        drawTile(x,y,level.map[i]);
+        drawTile(x,y,level.map[i],mode);
+    }
+    if (mode.online) {
+        Crafty.e("Multiplayer").at(Crafty("Character").x/32,Crafty("Character").y/32);
+        if (mode.mode === "connector") {
+            Crafty("Multiplayer").connectorMode();
+        } else {
+            Crafty("Multiplayer").creatorMode();
+        }
     }
     Crafty.viewport.centerOn(getCharacter(),0);
     resizeController();
@@ -139,9 +147,9 @@ function resizeController() {
     };
 }
 
-function gameScene(name, level) {
+function gameScene(name, level, mode) {
     Crafty.scene(name, function(){
-        drawLevel(level);
+        drawLevel(level,mode);
         drawElements();
     });
 }
@@ -301,7 +309,7 @@ function drawElements() {
 
 return {
 
-    loadGame: function(student, level) {
+    loadGame: function(student, level, mode) {
         loadLevel(level, function(data) {
             if (data.map) {
                 saveGame(student, level, function(ok) {
@@ -310,12 +318,12 @@ return {
                     updateSavegameCookie(level);
                     initCrafty();
                     if (level === 1) {
-                        gameScene('Game', data);
+                        gameScene('Game', data, mode);
                         explanationScene('Explanation', 'Game');
                         loadingScene('Loading','Explanation');
                         Crafty.scene('Loading');
                     } else {
-                        gameScene('Game', data);
+                        gameScene('Game', data, mode);
                         loadingScene('Loading','Game');
                         Crafty.scene('Loading');
                     }

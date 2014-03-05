@@ -9,8 +9,9 @@
  * Actor.js
  * @dependency /public/js/game/components/actor/enemy.js
  * @dependency /public/js/game/components/actor/character.js
+ * @dependency /public/js/game/components/actor/multiplayer.js
  */
-define (["./actor/enemy", "./actor/character"], function(Enemy, Character) {
+define (["./actor/enemy", "./actor/character", "./actor/multiplayer"], function(Enemy, Character, Multiplayer) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -24,6 +25,8 @@ function createChildComponents(edition) {
     Enemy.registerComponent(edition);
     // Character component
     Character.registerComponent(edition);
+    // Multiplayer component
+    Multiplayer.registerComponent(edition);
 }
 
 // -----------------------------------------------------------------------------

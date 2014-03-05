@@ -13,36 +13,102 @@ var io = require('socket.io');
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
-var connections = [];
+var connections = []; // Array of connection data indexed by IP address.
+
+/**
+ * Searches for an id in the entire connections array and returns its
+ * address.
+ * @param address - The address to search
+ * @return -1 if the address doesn't exist. Socket id in other case.
+ */
+function checkConnection(id) {
+    for (var i in connections) {
+        if (connections[i] !== undefined) {
+            if (connections[i].id === id) {
+                return i;
+            }
+        }
+    }
+    return undefined;
+}
 
 /**
  * Receive a "ready" request from the creator player. We store it
  * in the connections variable.
  */
-function responseReady() {
+function responseReady(socket) {
     socket.on("ready", function (data) {
-        connections[data.ip] = socket.id;
-        socket.emit("ready");
+        if (connections[data.address] === undefined) {
+            connections[data.address] = {
+                id: socket.id,
+                game: {
+                    student: data.student,
+                    level: data.level
+                },
+                creator: true
+            };
+            socket.emit("readyACK");
+        } else {
+            socket.emit("readyERROR");
+        }
     });
 }
 
 /**
- *  Receive a "start" request from the connector player. We send the
- *  creator the response.
+ *  Receive a "join" request from the creator player. 
  */
-function responseStart() {
-    socket.on("start", function (data) {
-        io.sockets.socket(connections[data.ip]).emit("enter");
+function responseJoin(socket) {
+    socket.on("join", function (data) {
+        if (connections[data.address] === undefined) {
+            connections[data.id] = {
+                address: data.address,
+                player: data.player,
+                connector: true
+            };
+            // Response to the connector with the game of the creator game
+            socket.emit("joinACK", connections[data.player].game);
+            // Response to the creator for starting his game and the IP of the connector
+            io.sockets.socket(connections[data.player].id).emit("join", {player: data.address});
+        } else {
+            socket.emit("joinERROR");
+        }
     });
 }
 
 /**
- *  Receive a "enter" request from the connector player. We send the
- *  creator the response.
+ *  Handles the position events
  */
-function responseLoad() {
-    socket.on("load", function (data) {
-        io.sockets.socket(connections[data.ip]).emit("load", data);
+function responseSender(socket) {
+    socket.on("posCreatorToConnector", function (data) {
+        io.sockets.socket(connections[data.address]).volatile.emit("posCreatorToConnector", {x: data.x, y: data.y});
+    });
+    socket.on("posConnectorToCreator", function (data) {
+       io.sockets.socket(connections[data.address]).volatile.emit("posConnectorToCreator", {x: data.x, y: data.y});
+    });
+}
+
+/**
+ *  The client disconnects for some reason.
+ */
+function responseDisconnect(socket) {
+    socket.on("disconnect", function () {
+        var address = checkConnection(socket.id);
+        if (address !== undefined) {
+            delete connections[address];
+        }
+    });
+}
+
+/**
+ *  Receive a "close" request to close the socket. So we do.
+ */
+function responseClose(socket) {
+    socket.on("close", function () {
+        var address = checkConnection(socket.id);
+        if (address !== undefined) {
+            delete connections[address];
+        }
+        
     });
 }
 
@@ -56,11 +122,15 @@ function responseLoad() {
 function createRouter(server) {
     // Creates the socket
     io = io.listen(server);
+    io.set('log level', 1);
     // Connection events
     io.on('connection', function (socket) {
-        responseReady();
-        responseStart();
-        responseLoad();
+        responseReady(socket);
+        responseJoin(socket);
+        responseClose(socket);
+        responseDisconnect(socket);
+        responseSender(socket);
     });
+
 }
 exports.createRouter = createRouter;

@@ -27,13 +27,13 @@ define (["./character/battle","./character/bonus","./character/camera","./charac
 function createChildComponents() {
     // Each component have some dependencies on another, so the order
     // is important and should not be changed.
-    Camera.createComponent(); // No
-    Bonus.createComponent(); // No
-    Battle.createComponent(); // No
+    Camera.createComponent();
+    Bonus.createComponent();
+    Battle.createComponent();
     Damage.createComponent(); // Lava
     Lava.createComponent(); // Damage, Battle
     Movement.createComponent(); // Lava
-    Detection.createComponent();
+    Detection.createComponent(); // Battle
 }
 
 // -----------------------------------------------------------------------------

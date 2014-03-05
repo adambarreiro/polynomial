@@ -10,8 +10,8 @@ function handle403(err, req, res, next) {
         return next();
     } else {
         var html = ["<h1>Oooops :(</h1>",
-                    "<p>Parece ser que has vuelto atrás en vez de recargar o el servidor no se ha fiado de tu petición al revisarla y la ha rechazado.</p>",
-                    "<p>No pasa nada, vuelve a intentarlo. Recarga la página, que esto no se ha roto.</p>",
+                    "<p>Parece ser que has hecho algo que no debías o el servidor no se ha fiado de tu petición al revisarla y la ha rechazado.</p>",
+                    "<p>No pasa nada, vuelve a intentarlo. <u>Vuelve atrás y recarga la página</u>, que esto no se ha roto.</p>",
             ].join("\n");
         res.send(html);
     }

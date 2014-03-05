@@ -8,8 +8,12 @@
 /**
  * menu.js
  * @dependency /public/js/game/scenes.js
+ * @dependency /public/js/game/network/connector.js
+ * @dependency /public/js/game/network/creator.js
  */
-define (["./scenes", "./network", "require", "./menu"], function(Scenes, Network, Require) {
+define (["./scenes", "./network/connector", "./network/creator", "require", "./menu"], function(Scenes, Connector, Creator, Require) {
+
+
 
 // -----------------------------------------------------------------------------
 // Private
@@ -25,7 +29,8 @@ function csrf() {
 
 function getOnePlayerPanel() {
     var cont = '';
-    if (readSavegameCookie() > 1) {
+    var Menu = Require("menu");
+    if (Menu.readSavegameCookie() > 1) {
         cont = '<div class="buttonext" id="continue">Continuar</div>';
     }
     return ['<div class="menu">',
@@ -63,6 +68,7 @@ function createPanel() {
 function connectPanel() {
    return ['<div class="menu">',
                 '<div class="separator">Conectar</div>',
+                '<input class="field" type="text" name="ourip" placeholder="IP de tu PC"/>',
                 '<input class="field" type="text" name="ip" placeholder="IP del PC de tu amigo"/>',
                 '<div class="buttonext" id="connect">Conectar</div>',
             '</div>',
@@ -73,14 +79,12 @@ function connectPanel() {
 
 function twoPlayerMenuHandler() {
     var Menu = Require("menu");
-    // Wait for player
-    // Connect to a player
     $('#create').bind('click', function() {
         $('.container').empty();
         $('.container').append(createPanel());
         $('#create').bind('click', function() {
             var ip = $("input[name='ip']").val();
-            Network.createCreator('http://localhost');
+            Creator.startCreator('http://localhost');
         });
         $('#edbutton').bind('click',function() {
            $('.container').empty();
@@ -93,8 +97,9 @@ function twoPlayerMenuHandler() {
         $('.container').empty();
         $('.container').append(connectPanel());
         $('#connect').bind('click', function() {
-            var ip = $("input[name='ip']").val();
-            Network.createConnector('http://localhost');
+            var ip1 = $("input[name='ourip']").val();
+            var ip2 = $("input[name='ip']").val();
+            Connector.startConnector('http://127.0.0.1','http://localhost');
         });
         $('#edbutton').bind('click',function() {
            $('.container').empty();
@@ -153,10 +158,10 @@ return {
             twoPlayerMenuHandler();
         });
     },
-    waitingMenu: function() {
-       var html = ['<div class="menu">',
+    waitingMenu: function(address) {
+        var html = ['<div class="menu">',
                     '<div class="separator">Esperando...</div>',
-                    '<p>Esperando a que tu amigo se conecte...</p>',
+                    '<p>Esperando a que tu amigo se conecte a '+ address +' ...</p>',
                 '</div>',
                 '<div class="extra">',
                     '<div id="edbutton">Atr&aacute;s</div>',
@@ -166,14 +171,15 @@ return {
         $('#edbutton').bind('click',function() {
             $('.container').empty();
             $('.container').append(getTwoPlayerPanel());
+            Creator.closeCreator(address);
             twoPlayerMenuHandler();
         });
 
     },
-    connectionMenu: function() {
-       var html = ['<div class="menu">',
+    connectionMenu: function(address) {
+        var html = ['<div class="menu">',
                     '<div class="separator">Conectando...</div>',
-                    '<p>Conectando al PC de tu amigo...</p>',
+                    '<p>Conectando al PC de tu amigo ('+ address +')...</p>',
                 '</div>',
                 '<div class="extra">',
                     '<div id="edbutton">Atr&aacute;s</div>',
@@ -183,12 +189,13 @@ return {
         $('#edbutton').bind('click',function() {
             $('.container').empty();
             $('.container').append(getTwoPlayerPanel());
+            Connector.closeConnector(address);
             twoPlayerMenuHandler();
         });
     },
-    startGame: function(student, level) {
+    startGame: function(student, level, mode) {
         $('body').empty();
-        Scenes.loadGame(student, level);
+        Scenes.loadGame(student, level, mode);
     },
     readSavegameCookie: function() {
         var pri = document.cookie.indexOf("savegame=")+"savegame=".length;
