@@ -1,7 +1,7 @@
 {
     "name": "polynomial",
     "description": "Educational videogame",
-    "version": "0.0.3",
+    "version": "0.4.1",
     "repository": "https://github.com/adambarreiro/Polynomial",
     "author": "Adam Barreiro <adambarreiro@gmail.com>",
     "main": "./main.js",
@@ -10,7 +10,6 @@
         "mongodb": "latest",
         "mongoose": "latest",
         "socket.io": "latest",
-        "forever": "latest"
     },
     "engines": {
         "node": "0.10.x",
