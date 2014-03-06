@@ -21,6 +21,9 @@ var MUL_TIMEOUT = 69.99;
 var NOT_TIMEOUT = 69.99;
 var DIV_TIMEOUT = 99.99;
 
+// Timeout bonus
+var BONUS_TIMEOUT = 30.00;
+
 /**
  * Draws the help panel that shows during battles
  * @returns String - The html code.
@@ -119,6 +122,9 @@ return {
                 }  else if (enemy.has("Enemy5")) {
                     this._battleTimeout = DIV_TIMEOUT;
                     this._battleOperation = "/";
+                }
+                if (this._extraTime > 0) {
+                    this._battleTimeout += BONUS_TIMEOUT;
                 }
             },
             /**
@@ -640,6 +646,12 @@ return {
                 this.clearBattle();
                 if (correct) {
                     if (this.getEnemy().damage()) {
+                        if (this._extraTime > 0) {
+                            this._extraTime--;
+                            if (this._extraTime === 0) {
+                                this.removeBonus("time");
+                            }
+                        }
                         this.startAll();
                     }
                 }

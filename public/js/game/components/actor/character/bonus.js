@@ -62,6 +62,8 @@ return {
      */
     createComponent: function() {
         Crafty.c('Bonus', {
+            _power: 0, // Power up bonus
+            _extraTime: 0, // Extra time bonus
             /**
              * Obtains an item randomly
              */
@@ -72,19 +74,19 @@ return {
                 var p = Math.random();
                 if (p < 0.70) {
                     bonus = "SALUD";
-                    icon = "health.png";
+                    icon = "health";
                     description = "¡Notas como tu vida se restablece!";
                 } else if (p > 0.70 && p < 0.8) {
                     bonus = "POTENCIA";
-                    icon = "power.png";
+                    icon = "power";
                     description = "¡Puedes derrotar a tus enemigos más fácilmente!";
                 } else if (p > 0.8 && p < 0.9) {
                     bonus = "ESCUDO";
-                    icon = "shield.png";
+                    icon = "shield";
                     description = "¡Puedes soportar más daño!";
                 } else {
                     bonus = "TIEMPO EXTRA";
-                    icon = "time.png";
+                    icon = "time";
                     description = "¡Tienes más tiempo para realizar operaciones!";
                 }
                 $('.popup').remove();
@@ -96,12 +98,12 @@ return {
                                 '</div>'].join('\n');
                 $("#cr-stage").append(html);
                 $('input').on("click",function() {
-                    Crafty("Character").startAll();
                     $('.popup').remove();
-                    if (bonus !== "SALUD") {
-                        $('.inventory').append('<div class="element"></div>');
-                        var elements = $('.element');
-                        $(elements[elements.length-1]).css({"background" : "url('/assets/img/items/" + icon +"') no-repeat"});
+                    if (bonus !== health) {
+                        if ($("#" + icon).length < 0) {
+                            $('.inventory').append('<div class="element" id="'+icon+'"></div>');
+                            $('#' +icon).css({"background" : "url('/assets/img/items/" + icon +".png') no-repeat"});
+                        }
                     }
                     switch(bonus) {
                         case "SALUD":
@@ -116,9 +118,14 @@ return {
                             $('#lifebar').css({"width": "300px", "background" : "rgb(50,50,200)"});
                             $('#vidatext').html("Escudo: ");
                             break;
-                        case "POTENCIA": break;
-                        case "TIEMPO EXTRA": break;
+                        case "POTENCIA":
+                            this._power=this._power+5;
+                            break;
+                        case "TIEMPO EXTRA":
+                            this._extraTime = this._extraTime++;
+                            break;
                     }
+                    Crafty("Character").startAll();
                 });
             },
             /**
@@ -161,10 +168,17 @@ return {
                                 } else {
                                     mistakePopup();
                                 }
-                            });        
+                            });
                         }
                     }
                 }
+            },
+            /**
+             * Removes a bonus icon from the bonus bar
+             * @param bonus - The bonus type
+             */
+            removeBonus: function(bonus) {
+                $("#"+bonus).remove();
             },
             /**
              * Inits the component

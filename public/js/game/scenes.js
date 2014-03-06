@@ -117,7 +117,7 @@ function drawLevel(level, mode) {
         type = level.map[i];
         drawTile(x,y,level.map[i],mode);
     }
-    if (mode.online) {
+    if (mode !== undefined && mode.online) {
         Crafty.e("Multiplayer").at(Crafty("Character").x/32,Crafty("Character").y/32);
         if (mode.mode === "connector") {
             Crafty("Multiplayer").connectorMode();

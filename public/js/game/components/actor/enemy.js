@@ -20,7 +20,11 @@ define (["./enemy/enemy1", "./enemy/enemy2","./enemy/enemy3","./enemy/enemy4",".
 // Private
 // -----------------------------------------------------------------------------
 
-var DAMAGE = 35;
+var MIN_DAMAGE = 25;
+var MAX_DAMAGE = 45;
+var POWERUP_MIN_DAMAGE = 45;
+var POWERUP_MAX_DAMAGE = 70;
+
 
 /**
  * Registers all the child components.
@@ -55,7 +59,16 @@ return {
              * @return boolean - If the enemy's dead it's true.
              */
             damage: function() {
-                this._enemyHealth = this._enemyHealth - Math.floor(Math.random()*(DAMAGE-10+1)+10);
+                if (Crafty("Character")._power > 0) {
+                    this._enemyHealth = this._enemyHealth - Math.floor(Math.random()*(POWERUP_MAX_DAMAGE-POWERUP_MIN_DAMAGE+1)+POWERUP_MIN_DAMAGE);
+                    Crafty("Character")._power--;
+                    if (Crafty("Character")._power === 0) {
+                        this.removeBonus("power");
+                    }
+                } else {
+                    this._enemyHealth = this._enemyHealth - Math.floor(Math.random()*(MAX_DAMAGE-MIN_DAMAGE+1)+MIN_DAMAGE);
+                }
+                
                 if (this._enemyHealth > 0) {
                     $('#enemybar').css({"width": (this._enemyHealth*3) + "px"});
                     return false;

@@ -47,7 +47,7 @@ return {
     registerComponent: function(edition) {
         Crafty.c('Character', {
             _health: 100, // Health of the character
-            _shield: 0,
+            _shield: 0, // Shield of the character
             stopAll: function() {
                 // Kills components
                 this.removeComponent("Camera");

@@ -56,6 +56,7 @@ return {
                     shield = 0;
                     $('#lifebar').css({"width": "300px", "background" : "rgb(50,200,50)"});
                     $('#vidatext').html("Vida:");
+                    this.removeBonus("shield");
                 }
                 if (shield > 0) {
                     $('#lifebar').css({"width": (shield*3) + "px"});
