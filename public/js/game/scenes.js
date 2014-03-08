@@ -151,6 +151,7 @@ function gameScene(name, level, mode) {
     Crafty.scene(name, function(){
         drawLevel(level,mode);
         drawElements();
+        Crafty.audio.play("level",-1);
     });
 }
 

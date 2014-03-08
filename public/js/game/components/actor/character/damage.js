@@ -75,6 +75,7 @@ return {
              * @param cause - The cause of death (lava or enemy)
              */
             die: function(cause) {
+                this._health = 0;
                 if (cause === "lava") {
                     this.clearLava();
                 }

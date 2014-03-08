@@ -236,9 +236,9 @@ body, html {
 .battle {
     position: relative;
     z-index: 10;
-    margin: 5% auto;
+    margin: 1% auto;
     width: 70%;
-    height: 80%;
+    height: 90%;
     background: rgba(200,200,200,0.8);
     box-shadow: 10px 10px 10px #111111;
 }

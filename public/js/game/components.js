@@ -21,12 +21,12 @@ function getEditor() {
 }
 
 var EDITOR_ICONS = ['char.png', 'floor1.jpg', 'floor2.jpg','floor3.jpg','floor4.jpg',
-                    'floor5.jpg','abyss.png','hide.png', 'chest.png','enemy1.png',
+                    'floor5.jpg','abyss.jpg','hide.png', 'chest.png','enemy1.png',
                     'enemy2.png','enemy3.png', 'enemy4.png','enemy5.png', 'exit.jpg'];
 var GAME_ICONS = ['char.png', 'floor1.jpg', 'floor2.jpg','floor3.jpg','floor4.jpg',
-                  'floor5.jpg','abyss.png','hide.png', 'chest.png','enemy1.png',
+                  'floor5.jpg','abyss.jpg','hide.png', 'chest.png','enemy1.png',
                   'enemy2.png','enemy3.png', 'enemy4.png','enemy5.png', 'exit.jpg',
-                  'mimic.png',
+                  'multiplayer.png',
                   'keys/delete.png','keys/minus.png','keys/enter.png', 'keys/number.png',
                   'keys/x.png', 'keys/plus.png'];
 
@@ -75,8 +75,13 @@ function loadGameGraphics() {
         Crafty.sprite(32, gi[12], { spr_enemy4: [0, 0] });
         Crafty.sprite(32, gi[13], { spr_enemy5: [0, 0] });
         Crafty.sprite(32, gi[14], { spr_exit: [0, 0] });
-        Crafty.sprite(28, 32, gi[15], { spr_mimic: [0, 0] });
+        Crafty.sprite(28, 32, gi[15], { spr_multiplayer: [0, 0] });
     });
+}
+
+function loadSounds() {
+    Crafty.audio.add("battle", "assets/music/battle.mp3");
+    Crafty.audio.add("level", "assets/music/level.mp3");
 }
 
 // -----------------------------------------------------------------------------
@@ -84,7 +89,10 @@ function loadGameGraphics() {
 // -----------------------------------------------------------------------------
 function setComponents(edition) {
     if (edition) loadEditorGraphics();
-    else loadGameGraphics();
+    else {
+        loadGameGraphics();
+        loadSounds();
+    }
     Grid.registerComponent(edition);
 }
 

@@ -38,7 +38,7 @@ return {
                     this._detectionHidden = false;
                 }
                 var obst_izq, obst_der;
-                this._detectionRange = Crafty.map.search({_x: this.x-318, _y: this.y-1, _w: 636, _h: 32}, true);
+                this._detectionRange = Crafty.map.search({_x: this.x-320, _y: this.y+32, _w: 640, _h: 1}, true);
                 // Search for entities
                 for (var i=0; i<this._detectionRange.length; i++) {
                     // Search for an enemy

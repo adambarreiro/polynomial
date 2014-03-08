@@ -40,7 +40,7 @@ return {
                 });
             },
             init: function() {
-                this.requires('Actor, spr_mimic');
+                this.requires('Actor, spr_multiplayer');
                 this.z=6;
                 if (!edition) {
                     this.gravity("Terrain").gravityConst(0.3);

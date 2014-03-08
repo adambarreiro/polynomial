@@ -76,7 +76,9 @@ return {
                     $($(".lifebox").children()[2]).hide();
                     $($(".lifebox").children()[3]).hide();
                     $('#enemybar').css({"width": "300px"});
-                    Crafty("Character")._enemy.destroy();
+                    Crafty("Character").getEnemy().destroy();
+                    Crafty.audio.stop("battle");
+                    Crafty.audio.play("level",-1);
                     return true;
                 }
             },

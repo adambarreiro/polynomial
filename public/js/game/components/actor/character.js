@@ -52,6 +52,8 @@ return {
                 // Kills components
                 this.removeComponent("Camera");
                 this.removeComponent("Detection");
+                this.removeComponent("Bonus");
+                this.removeComponent("Battle");
                 this.removeComponent("Movement");
                 // Kills events
                 this.unbind("EnterFrame");
@@ -66,6 +68,8 @@ return {
                 // Restarts components
                 this.addComponent("Camera");
                 this.addComponent("Detection");
+                this.addComponent("Bonus");
+                this.addComponent("Battle");
                 this.addComponent("Movement");
                 // Restarts enemy events
                 Crafty('Enemy').each(function() {

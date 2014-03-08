@@ -15,14 +15,20 @@ var SIGN_PROBABILITY = 0.5; // Balanced sign probability +/-
 var TERM_PROBABILITY = 0.7; // Probability that a term appears in the polynomial
 
 // Timeouts for battles
-var ADD_TIMEOUT = 24.99;
-var SUB_TIMEOUT = 34.99;
-var MUL_TIMEOUT = 69.99;
-var NOT_TIMEOUT = 69.99;
-var DIV_TIMEOUT = 99.99;
+var ADD_TIMEOUT = 2999;
+var SUB_TIMEOUT = 3999;
+var MUL_TIMEOUT = 9999;
+var NOT_TIMEOUT = 9999;
+var DIV_TIMEOUT = 14999;
 
 // Timeout bonus
-var BONUS_TIMEOUT = 30.00;
+var BONUS_TIMEOUT = 3000;
+
+// Result screen time
+var RESULT_SCREEN = 100;
+var CORRECT_SCREEN = "rgba(0,255,0,0.8)";
+var WRONG_SCREEN = "rgba(255,0,0,0.8)";
+var NORMAL_SCREEN = "rgba(200,200,200,0.8)";
 
 /**
  * Draws the help panel that shows during battles
@@ -30,12 +36,12 @@ var BONUS_TIMEOUT = 30.00;
  */
 function dibujarAyuda() {
     var html = "";
-    html += '<div id="btn_plus"><img src="/assets/img/keys/plus.png"/><p>Colocar +</p></div>';
-    html += '<div id="btn_minus"><img src="/assets/img/keys/minus.png"/><p>Colocar -</p></div>';
-    html += '<div id="btn_number"><img src="/assets/img/keys/number.png"/><p>Colocar números</p></div>';
-    html += '<div id="btn_x"><img src="/assets/img/keys/x.png"/><p>Colocar x</p></div>';
-    html += '<div id="btn_delete"><img src="/assets/img/keys/delete.png"/><p>Borrar</p></div>';
-    html += '<div id="btn_enter"><img src="/assets/img/keys/enter.png"/><p>Resolver</p></div>';
+    html += '<div id="btn_plus"><img src="/assets/img/game/keys/plus.png"/><p>Colocar +</p></div>';
+    html += '<div id="btn_minus"><img src="/assets/img/game/keys/minus.png"/><p>Colocar -</p></div>';
+    html += '<div id="btn_number"><img src="/assets/img/game/keys/number.png"/><p>Colocar números</p></div>';
+    html += '<div id="btn_x"><img src="/assets/img/game/keys/x.png"/><p>Colocar x</p></div>';
+    html += '<div id="btn_delete"><img src="/assets/img/game/keys/delete.png"/><p>Borrar</p></div>';
+    html += '<div id="btn_enter"><img src="/assets/img/game/keys/enter.png"/><p>Resolver</p></div>';
     return '<div class="help"><p>Ayuda</p>' + html +'</div>';
 }
 
@@ -57,49 +63,85 @@ return {
             _battleNotables: [[],"",""], // Array of notable products. 0 should be the poly. 1 the operation. 2 the type.
             _battleQuotient: [], //  The quotient if it's a quotient operation
             _battleInput: [], // User input
+            _battleResult: undefined,
             /**
              * Generates the polynomials and HTML and inserts it into the
              * game, controlling timing and all the events.
              */
             polynomialBattle: function() {
                 this.whichOperation();
-                this.polynomialArray(0,6);
+                this._battlePolynomials[0] = this.polynomialArray(9,6);
                 var operationString;
                 switch (this._battleOperation) {
                     case "*":
-                        operationString = "MULTIPLICACIÓN"; this.polynomialArray(1,9,3); break;
+                        operationString = "MULTIPLICACIÓN"; this._battlePolynomials[1] = this.polynomialArray(9,3); break;
                     case "**":
                         this.polynomialNotableArray(1); break;
                     case "/":
                         operationString = "DIVISIÓN"; this.polynomialCocientArray(0,2); break;
                     case "+":
-                        operationString = "SUMA"; this.polynomialArray(1,9,6); break;
+                        operationString = "SUMA"; this._battlePolynomials[1] = this.polynomialArray(9,6); break;
                     case "-":
-                        operationString = "RESTA"; this.polynomialArray(1,9,6); break;
+                        operationString = "RESTA"; this._battlePolynomials[1] = this.polynomialArray(9,6); break;
                 }
                 var html = ['<div class="battle"><h1>Batalla</h1>',
                                 '<h2 class="left">Operación: ' + operationString + "</h2>",
                                 '<h2 class="right">Tiempo restante:</h2>',
                                 this.polynomialHtml(),
                                 '<table class="solutionbox"><tr id="solution"></tr></table>',
-                                '<div id="time">SIN TIEMPO</div>',
+                                '<div id="time">' + this._battleTimeout + '</div>',
                                 dibujarAyuda(),
                             '</div>'].join('\n');
-                if (this._battleTimed) {
-                    $($(".lifebox").children()[2]).show();
-                    $($(".lifebox").children()[3]).show();
-                    $('#time').text(this._battleTimeout);
-                    var time = this._battleTimeout;
-                    this._battleTimer = setInterval( function() {
-                        time-=0.01;
-                        if (time <= 0.0) {
-                            Crafty("Character").damage("enemy");
-                            time = Crafty("Character")._battleTimeout;
-                        }
-                        $("#time").text(time.toFixed(2));
-                    }, 10);
-                }
                 $("#cr-stage").append(html);
+                $($(".lifebox").children()[2]).show();
+                $($(".lifebox").children()[3]).show();
+                if (this._battleResult !== undefined) {
+                    battleResultScreen = RESULT_SCREEN;
+                    if (this._battleResult) $(".battle").css({"background": CORRECT_SCREEN});
+                    else $(".battle").css({"background": WRONG_SCREEN});
+                }
+                if (this._battleTimed) {
+                    var time = this._battleTimeout;
+                    var battleResultScreen = 0;
+                    $("#time").css({"text": "#FF0000"});
+                } else {
+                    $("#time").css({"text": "#00FF00"}).text("∞");
+                }
+                var before = new Date();
+                this._battleTimer = setInterval( function() {
+                    var elapsedTime = (new Date().getTime() - before.getTime());
+                    if (Crafty("Character")._battleTimed) {
+                        if(elapsedTime > 100) {
+                            time-=parseInt(elapsedTime/10,10);
+                            if (battleResultScreen > 0) battleResultScreen-=parseInt(elapsedTime/10,10);
+                        } else {
+                            time-=1;
+                            if (battleResultScreen > 0) battleResultScreen-=1;
+                        }
+                        if (time <= 0) {
+                            Crafty("Character").clearBattle();
+                            Crafty("Character")._battleResult = false;
+                            if (Crafty("Character")._health > 0) Crafty("Character").battle(Crafty("Character")._battleTimed);
+                            Crafty("Character").damage("enemy");
+                        } else if (battleResultScreen <= 0) {
+                            $(".battle").css({"background": NORMAL_SCREEN});
+                            battleResultScreen = 0;
+                        }
+                        $("#time").text((time/100).toFixed(2));
+                    } else {
+                        if(elapsedTime > 100) {
+                            if (battleResultScreen > 0) battleResultScreen-=parseInt(elapsedTime/10,10);
+                        } else {
+                            if (battleResultScreen > 0) battleResultScreen-=1;
+                        }
+                        if (battleResultScreen <= 0) {
+                            $(".battle").css({"background": NORMAL_SCREEN});
+                            battleResultScreen = 0;
+                        }
+                    }
+                    before = new Date();
+                },10);
+                
             },
             /**
              * Determines the battle operation depending on the enemy spotted. Stores
@@ -249,28 +291,28 @@ return {
             },
             /**
              * Makes an array with a coeficient per element, being the element the i-th exponent.
-             * @param position - Position in the polynomials array.
              * @param maxDegree - Maximum degree of the polynomial.
              * @param maxElements - Maximum number of elements.
              * @return array - The polynomial array.
              */
-            polynomialArray: function(position, maxDegree, maxElements) {
-                this._battlePolynomials[position] = [];
-                while (this._battlePolynomials[position].length === 0) {
+            polynomialArray: function(maxDegree, maxElements) {
+                polyArray = [];
+                while (polyArray.length === 0) {
                     var i=0;
                     while (i < maxDegree) {
-                        if (this._battlePolynomials[position].length >= maxElements) {
+                        if (polyArray.length >= maxElements) {
                             break;
                         }
                         if (Math.random() <= TERM_PROBABILITY) {
-                            this._battlePolynomials[position][i] = Math.floor(Math.random()*(MAX_COEFICIENT)+1);
+                            polyArray[i] = Math.floor(Math.random()*(MAX_COEFICIENT)+1);
                             if (Math.random() <= SIGN_PROBABILITY) {
-                                this._battlePolynomials[position][i] = -this._battlePolynomials[position][i];
+                                polyArray[i] = -polyArray[i];
                             }
                         }
                         i++;
                     }
                 }
+                return polyArray;
             },
             /**
              * [polynomialNotableArray description]
@@ -504,7 +546,10 @@ return {
                                 aux2 = parseInt($('#poly' + cursor).text(),10);
                             } else {
                                 aux2 = parseInt($('#poly' + cursor).text().substring(0,ps),10);
-                                if (isNaN(aux2)) aux2 = 1;
+                                if (isNaN(aux2)) {
+                                    if (aux2 === '-') aux2 = -1;
+                                    else aux2 = 1;
+                                }
                                 
                             }
                             solCoeficient = aux2;
@@ -515,7 +560,7 @@ return {
                             }
                             solExponent = aux2;
                             inputArray[solExponent] = solCoeficient;
-                            Crafty("Character")._inputSolution = inputArray;
+                            Crafty("Character")._battleInput = inputArray;
                             Crafty("Character").polynomialSolution();
                         }
                     } // Backspace
@@ -551,7 +596,7 @@ return {
                 var toMultiply = this.polynomialArray(MAX_COEFICIENT, maxElements);
                 var result = [];
                 // Starts in 1 to avoid constants
-                delete Crafty("Char")._polinomios[1][0];
+                delete this._battlePolynomials[1][0];
                 for (var i=1; i<MAX_COEFICIENT; i++) {
                     if (poly[i] !== undefined) {
                         for (var j=1; j<MAX_COEFICIENT; j++) {
@@ -562,7 +607,7 @@ return {
                         }
                     }
                 }
-                Crafty("Char")._polinomios[5] = toMultiply;
+                this._battleQuotient = toMultiply;
                 return result;
             },
             /**
@@ -587,12 +632,12 @@ return {
                         }
                         break;
                     case "**":
-                        switch(Crafty("Char")._polinomios[5]) {
+                        switch(this._battleNotables[1]) {
                             case "+":
                                 for (i=0; i<MAX_COEFICIENT; i++) {
                                     if (this._battlePolynomials[0][i] === undefined) this._battlePolynomials[0][i] = 0;
                                     if (this._battlePolynomials[1][i] === undefined) this._battlePolynomials[1][i] = 0;
-                                    if (this._battleInput[i] === undefined) input[i] = 0;
+                                    if (this._battleInput[i] === undefined) this._battleInput[i] = 0;
                                     solution[i] = this._battlePolynomials[0][i] + this._battlePolynomials[1][i];
                                     correct = (solution[i] === this._battleInput[i]);
                                     if (!correct) break;
@@ -612,10 +657,9 @@ return {
                         }
                         break;
                     case "/":
-                        this._battlePolynomials[0] = Crafty("Char")._polinomios[5];
                         for (i=0; i<MAX_COEFICIENT; i++) {
-                            if (this._battlePolynomials[0][i] !== undefined) {
-                                correct = (this._battlePolynomials[0][i] === this._battleInput[i]);
+                            if (this._battleQuotient[0][i] !== undefined) {
+                                correct = (this._battleQuotient[0][i] === this._battleInput[i]);
                             }
                         }
                         break;
@@ -626,7 +670,9 @@ return {
                             if (this._battleInput[i] === undefined) this._battleInput[i] = 0;
                             solution[i] = this._battlePolynomials[0][i] + this._battlePolynomials[1][i];
                             correct = (solution[i] === this._battleInput[i]);
-                            if (!correct) break;
+                            if (!correct) {
+                                break;
+                            }
                             
                         }
                         break;
@@ -641,10 +687,9 @@ return {
                         }
                         break;
                 }
-                console.log(solution);
-                console.log(this._battleInput);
                 this.clearBattle();
                 if (correct) {
+                    this._battleResult = true;
                     if (this.getEnemy().damage()) {
                         if (this._extraTime > 0) {
                             this._extraTime--;
@@ -653,19 +698,26 @@ return {
                             }
                         }
                         this.startAll();
+                    } else {
+                        if (this._health > 0) this.battle(this._battleTimed);
                     }
                 }
                 else {
                     this.damage("enemy");
+                    $('#timeout').css({"color":"red",  "border-color" : "red"});
+                    $('#timeout').html("ALERTA MÁXIMA, ¡TE HAN PILLADO!");
+                    this._battleResult = false;
+                    this._battleTimed = true;
+                    if (this._health > 0) this.battle(this._battleTimed);
                 }
-                this.battle(this._battleTimed);
-                
             },
             /**
              * Trigger for entering a battle
              * @return {[type]} [description]
              */
             battle: function(timed) {
+                Crafty.audio.stop("level");
+                Crafty.audio.play("battle",-1);
                 this._battleTimed = timed;
                 // Stops the game
                 this.stopAll();
