@@ -76,11 +76,10 @@ return {
             Crafty.background("black");
         });
         Crafty.init(Constants.getLevelSize('px').width, Constants.getLevelSize('px').height);
-        Crafty.canvas.init();
         Crafty.viewport.init(size.width,size.height);
+        Crafty.canvas.init();
         Crafty.viewport.x = 0;
         Crafty.viewport.y = 0;
-        
         Crafty.scene("Loading");
     },
 

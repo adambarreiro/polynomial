@@ -34,41 +34,39 @@ return {
              * @param cause - The cause of damage (lava or enemy)
              */
             damage: function(cause) {
-                var shield = this._shield;
-                var health = this._health;
                 switch(cause) {
                     case "lava":
-                        if (shield > 0) {
-                            shield = shield-2;
+                        if (this._shield > 0) {
+                            this._shield = this._shield-2;
                         } else {
-                            health--;
+                            this._health--;
                         }
                         break;
                     case "enemy":
-                        if (shield > 0) {
-                            shield = shield - Math.floor(Math.random()*(MAX_DAMAGE_SHIELD-MIN_DAMAGE_SHIELD+1)+MIN_DAMAGE_SHIELD);
+                        Crafty.audio.play("monster_scream");
+                        Crafty.audio.play("damage");
+                        if (this._shield > 0) {
+                            this._shield = this._shield - Math.floor(Math.random()*(MAX_DAMAGE_SHIELD-MIN_DAMAGE_SHIELD+1)+MIN_DAMAGE_SHIELD);
                         } else {
-                            health = health - Math.floor(Math.random()*(MAX_DAMAGE_HEALTH-MIN_DAMAGE_HEALTH+1)+MIN_DAMAGE_HEALTH);
+                            this._health = this._health - Math.floor(Math.random()*(MAX_DAMAGE_HEALTH-MIN_DAMAGE_HEALTH+1)+MIN_DAMAGE_HEALTH);
                         }
                         break;
                 }
-                if (shield <= 0) {
-                    shield = 0;
+                if (this._shield <= 0) {
+                    this._shield = 0;
                     $('#lifebar').css({"width": "300px", "background" : "rgb(50,200,50)"});
                     $('#vidatext').html("Vida:");
                     this.removeBonus("shield");
                 }
-                if (shield > 0) {
-                    $('#lifebar').css({"width": (shield*3) + "px"});
+                if (this._shield > 0) {
+                    $('#lifebar').css({"width": (this._shield*3) + "px"});
                 } else {
-                    if (health > 0) {
-                        $('#lifebar').css({"width": (health*3) + "px"});
+                    if (this._health > 0) {
+                        $('#lifebar').css({"width": (this._health*3) + "px"});
                     } else {
                         this.die(cause);
                     }
                 }
-                this._shield = shield;
-                this._health = health;
             },
             /**
              * Kills the character, restarting the game
@@ -76,6 +74,9 @@ return {
              */
             die: function(cause) {
                 this._health = 0;
+                Crafty.audio.stop("level");
+                Crafty.audio.stop("alert");
+                Crafty.audio.stop("hidden");
                 if (cause === "lava") {
                     this.clearLava();
                 }
@@ -83,6 +84,7 @@ return {
                     this.stopAll();
                     this.clearBattle();
                 }
+                if ($(".battle").length > 0) $(".battle").remove();
                 Crafty('obj').each(function() { this.destroy(); });
                 Scenes.restartLevel();
             },

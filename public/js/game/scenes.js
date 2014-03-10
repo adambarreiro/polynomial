@@ -126,6 +126,7 @@ function drawLevel(level, mode) {
         }
     }
     Crafty.viewport.centerOn(getCharacter(),0);
+    Crafty.viewport.follow(getCharacter(), 0, 0);
     resizeController();
 }
 
@@ -133,8 +134,8 @@ function resize() {
     SIZE = Constants.getViewportSize('px');
     Crafty.viewport.init(SIZE.width,SIZE.height);
     $('.bottom').css({'width': Constants.getViewportSize('px').width});
-    Crafty.DrawManager.renderCanvas();
-
+    $('canvas').remove();
+    Crafty.canvas.init();
 }
 
 function resizeController() {
@@ -186,7 +187,7 @@ function endScene(name) {
 function loadingScene(name, callbackScene) {
     var html = ['<div class="popup">',
                     '<div class="separator">Cargando...</div>',
-                    '<p>Por favor, espere.</p>',
+                    '<p>Cargando gráficos, música y sonidos.<br/>Por favor, espere.</p>',
                 '</div>'].join('\n');
     Crafty.scene(name, function(){
         Crafty.load(['/assets/img/controls.png',
@@ -194,7 +195,20 @@ function loadingScene(name, callbackScene) {
                     '/assets/img/backgrounds/wall2.jpg',
                     '/assets/img/backgrounds/wall3.jpg',
                     '/assets/img/backgrounds/wall4.jpg',
-                    '/assets/img/backgrounds/wall5.jpg'], function() {
+                    '/assets/img/backgrounds/wall5.jpg',
+                    '/assets/music/alert.mp3',
+                    '/assets/music/hidden.mp3',
+                    '/assets/music/level.mp3',
+                    '/assets/sfx/attack.mp3',
+                    '/assets/sfx/chest.mp3',
+                    '/assets/sfx/clock.mp3',
+                    '/assets/sfx/damage.mp3',
+                    '/assets/sfx/enemy_death.mp3',
+                    '/assets/sfx/health.mp3',
+                    '/assets/sfx/monster_scream.mp3',
+                    '/assets/sfx/power.mp3',
+                    '/assets/sfx/shield.mp3',
+                    ], function() {
             clean();
             Crafty.scene(callbackScene);
         });
@@ -276,8 +290,8 @@ function explanationScene(name, callbackScene) {
 
 function initCrafty() {
     Crafty.init(Constants.getLevelSize('px').width, Constants.getLevelSize('px').height);
-    Crafty.canvas.init();
     Crafty.viewport.init(SIZE.width,SIZE.height);
+    Crafty.canvas.init();
 }
 
 function drawElements() {

@@ -36,7 +36,7 @@ function loadEditorGraphics() {
         ei[i] = ROOT_ROUTE + EDITOR_ROUTE + EDITOR_ICONS[i];
     }
     Crafty.load(ei, function() {
-        Crafty.sprite(28, 32, ei[0], { spr_char: [0, 0] });
+        Crafty.sprite(32, ei[0], { spr_char: [0, 0] });
         Crafty.sprite(32, ei[1], { spr_floor1: [0, 0] });
         Crafty.sprite(32, ei[2], { spr_floor2: [0, 0] });
         Crafty.sprite(32, ei[3], { spr_floor3: [0, 0] });
@@ -60,28 +60,38 @@ function loadGameGraphics() {
         gi[i] = ROOT_ROUTE + GAME_ROUTE + GAME_ICONS[i];
     }
     Crafty.load(gi, function() {
-        Crafty.sprite(28, 32, gi[0], { spr_char: [0, 0] });
-        Crafty.sprite(32, gi[1], { spr_floor1: [0, 0] });
-        Crafty.sprite(32, gi[2], { spr_floor2: [0, 0] });
-        Crafty.sprite(32, gi[3], { spr_floor3: [0, 0] });
-        Crafty.sprite(32, gi[4], { spr_floor4: [0, 0] });
-        Crafty.sprite(32, gi[5], { spr_floor5: [0, 0] });
-        Crafty.sprite(32, gi[6], { spr_abyss: [0, 0] });
-        Crafty.sprite(32, gi[7], { spr_hide: [0, 0] });
-        Crafty.sprite(32, gi[8], { spr_chest: [0, 0] });
-        Crafty.sprite(32, gi[9], { spr_enemy1: [0, 0] });
-        Crafty.sprite(32, gi[10], { spr_enemy2: [0, 0] });
-        Crafty.sprite(32, gi[11], { spr_enemy3: [0, 0] });
-        Crafty.sprite(32, gi[12], { spr_enemy4: [0, 0] });
-        Crafty.sprite(32, gi[13], { spr_enemy5: [0, 0] });
-        Crafty.sprite(32, gi[14], { spr_exit: [0, 0] });
-        Crafty.sprite(28, 32, gi[15], { spr_multiplayer: [0, 0] });
+        Crafty.sprite(24, 32, gi[0], { spr_char: [0, 0] });
+        Crafty.sprite(32, 32, gi[1], { spr_floor1: [0, 0] });
+        Crafty.sprite(32, 32, gi[2], { spr_floor2: [0, 0] });
+        Crafty.sprite(32, 32, gi[3], { spr_floor3: [0, 0] });
+        Crafty.sprite(32, 32, gi[4], { spr_floor4: [0, 0] });
+        Crafty.sprite(32, 32, gi[5], { spr_floor5: [0, 0] });
+        Crafty.sprite(32, 32, gi[6], { spr_abyss: [0, 0] });
+        Crafty.sprite(32, 32, gi[7], { spr_hide: [0, 0] });
+        Crafty.sprite(32, 32, gi[8], { spr_chest: [0, 0] });
+        Crafty.sprite(32, 32, gi[9], { spr_enemy1: [0, 0] });
+        Crafty.sprite(32, 32, gi[10], { spr_enemy2: [0, 0] });
+        Crafty.sprite(32, 32, gi[11], { spr_enemy3: [0, 0] });
+        Crafty.sprite(32, 32, gi[12], { spr_enemy4: [0, 0] });
+        Crafty.sprite(32, 32, gi[13], { spr_enemy5: [0, 0] });
+        Crafty.sprite(32, 32, gi[14], { spr_exit: [0, 0] });
+        Crafty.sprite(24, 32, gi[15], { spr_multiplayer: [0, 0] });
     });
 }
 
 function loadSounds() {
-    Crafty.audio.add("battle", "assets/music/battle.mp3");
+    Crafty.audio.add("alert", "assets/music/alert.mp3");
+    Crafty.audio.add("hidden", "assets/music/hidden.mp3");
     Crafty.audio.add("level", "assets/music/level.mp3");
+    Crafty.audio.add("chest", "assets/sfx/chest.mp3");
+    Crafty.audio.add("shield", "assets/sfx/shield.mp3");
+    Crafty.audio.add("clock", "assets/sfx/clock.mp3");
+    Crafty.audio.add("power", "assets/sfx/power.mp3");
+    Crafty.audio.add("health", "assets/sfx/health.mp3");
+    Crafty.audio.add("attack", "assets/sfx/attack.mp3");
+    Crafty.audio.add("damage", "assets/sfx/damage.mp3");
+    Crafty.audio.add("enemy_death", "assets/sfx/enemy_death.mp3");
+    Crafty.audio.add("monster_scream", "assets/sfx/monster_scream.mp3");
 }
 
 // -----------------------------------------------------------------------------

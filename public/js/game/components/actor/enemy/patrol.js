@@ -41,7 +41,6 @@ return {
              */
             goRight: function() {
                 this._patrolWall = Crafty.map.search({_x: this.x+32, _y: this.y, _w: 1, _h: 1}, true);
-                
                 if (this._patrolWall.length > 0) {
                     if (this._patrolWall[0].has("Terrain")) {
                         this._patrolOrientation = "left";
@@ -63,7 +62,6 @@ return {
              */
             goLeft: function() {
                 this._patrolWall = Crafty.map.search({_x: this.x-1, _y: this.y, _w: 1, _h: 1}, true);
-                
                 if (this._patrolWall.length > 0) {
                     if (this._patrolWall[0].has("Terrain")) {
                         this._patrolOrientation = "right";
@@ -72,7 +70,7 @@ return {
                     }
                 }
                 else {
-                    this._patrolFloor = Crafty.map.search({_x: this.x-32, _y: this.y+32, _w: 1, _h: 1}, true);
+                    this._patrolFloor = Crafty.map.search({_x: this.x-1, _y: this.y+32, _w: 1, _h: 1}, true);
                     if (this._patrolFloor.length === 0) {
                         this._patrolOrientation = "right";
                     } else {
@@ -93,8 +91,14 @@ return {
                 }
                 this.bind("EnterFrame", function(e) {
                     if (this._patrolOrientation === "right") {
+                        if (!this.isPlaying("EnemyAnimationRight")) {
+                            this.animate("EnemyAnimationRight",-1);    
+                        }
                         this.goRight();
                     } else if (this._patrolOrientation === "left") {
+                        if (!this.isPlaying("EnemyAnimationLeft")) {
+                            this.animate("EnemyAnimationLeft",-1);    
+                        }
                         this.goLeft();
                     }
                 });

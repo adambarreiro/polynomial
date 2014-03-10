@@ -46,13 +46,14 @@ return {
      */
     registerComponent: function(edition) {
         Crafty.c('Character', {
+            _orientation: "right",
             _health: 100, // Health of the character
             _shield: 0, // Shield of the character
             stopAll: function() {
                 // Kills components
                 this.removeComponent("Camera");
                 this.removeComponent("Detection");
-                this.removeComponent("Bonus");
+                this.removeComponent("Lava");
                 this.removeComponent("Battle");
                 this.removeComponent("Movement");
                 // Kills events
@@ -68,7 +69,7 @@ return {
                 // Restarts components
                 this.addComponent("Camera");
                 this.addComponent("Detection");
-                this.addComponent("Bonus");
+                this.addComponent("Lava");
                 this.addComponent("Battle");
                 this.addComponent("Movement");
                 // Restarts enemy events
@@ -89,6 +90,10 @@ return {
                 this.requires('Actor, Keyboard, Multiway, spr_char');
                 this.z=2;
                 if (!edition) {
+                    this.reel("CharMoveLeft",800,0,1,8);
+                    this.reel("CharMoveRight",800,0,2,8);
+                    this.reel("CharJumpLeft",300,0,3,3);
+                    this.reel("CharJumpRight",300,0,4,3);
                     this.startCharacter();
                 }
             }

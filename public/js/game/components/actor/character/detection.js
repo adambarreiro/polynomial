@@ -21,7 +21,6 @@ return {
      */
     createComponent: function(editing) {
         Crafty.c('Detection', {
-            _detectionRange: undefined,
             _detectionEnemy: undefined,
             _detectionSpotted: false,
             _detectionReachable: false,
@@ -31,6 +30,7 @@ return {
              * objects in between in order to cover the character.
              */
             detection: function() {
+                var detectionRange = Crafty.map.search({_x: this.x-320, _y: this.y, _w: 640, _h: 32}, true);
                 // If the character is hidden
                 if (this.hit("Hide")) {
                     this._detectionHidden = true;
@@ -38,30 +38,45 @@ return {
                     this._detectionHidden = false;
                 }
                 var obst_izq, obst_der;
-                this._detectionRange = Crafty.map.search({_x: this.x-320, _y: this.y+32, _w: 640, _h: 1}, true);
                 // Search for entities
-                for (var i=0; i<this._detectionRange.length; i++) {
+                for (var i=0; i<detectionRange.length; i++) {
                     // Search for an enemy
-                    if (this._detectionEnemy === undefined && this._detectionRange[i].has("Enemy")) {
-                        this._detectionEnemy = this._detectionRange[i];
-                    } else if (this._detectionRange[i].has("Terrain")) {
-                        // There's an obstacle
-                        if (obst_izq !== undefined) {
-                            if ((this.x > this._detectionRange[i].x) && (this.x - obst_izq.x > this.x - this._detectionRange[i].x)) {
-                                obst_izq = this._detectionRange[i];
-                            }
+                    if (detectionRange[i].has("Enemy")) {
+                        // New enemy spotted
+                        if (this._detectionEnemy === undefined) {
+                            this._detectionEnemy = detectionRange[i];
                         } else {
-                            if (this.x > this._detectionRange[i].x) {
-                                obst_izq = this._detectionRange[i];
+                            // Another enemy, check if it's nearer
+                            if (Math.abs(this.x - detectionRange[i].x) < Math.abs(this.x - this._detectionEnemy.x)) {
+                                this._detectionEnemy = detectionRange[i];
                             }
                         }
-                        if (obst_der !== undefined) {
-                            if ((this.x < this._detectionRange[i].x) && (obst_der.x - this.x > this._detectionRange[i].x - this.x)) {
-                                obst_der = this._detectionRange[i];
+                    }
+                    if (detectionRange[i].has("Terrain")) {
+                        // We didn't detect an obstacle at left yet
+                        if (obst_izq === undefined) {
+                            // If the obstacle is at left, save it.
+                            if (this.x > detectionRange[i].x) {
+                                obst_izq = detectionRange[i];
                             }
                         } else {
-                            if (this.x < this._detectionRange[i].x) {
-                                obst_der = this._detectionRange[i];
+                            // We have an obstacle stored. Check if it's at left and if it's nearer
+                            // from the character than the saved. If yes, update.
+                            if ((this.x > detectionRange[i].x) && (Math.abs(this.x - detectionRange[i].x) < Math.abs(this.x - obst_izq.x))) {
+                                obst_izq = detectionRange[i];
+                            }
+                        }
+                        // We didn't detect an obstacle at right yet
+                        if (obst_der === undefined) {
+                            // If the obstacle is at right, save it.
+                            if (this.x < detectionRange[i].x) {
+                                obst_der = detectionRange[i];
+                            }
+                        } else {
+                            // We have an obstacle stored. Check if it's at right and if it's nearer
+                            // from the character than the saved. If yes, update.
+                            if ((this.x < detectionRange[i].x) && (Math.abs(this.x - detectionRange[i].x) < Math.abs(this.x - obst_der.x))) {
+                                obst_der = detectionRange[i];
                             }
                         }
                     }
@@ -70,44 +85,29 @@ return {
                 if (this._detectionEnemy !== undefined) {
                     var covered = false;
                     var d;
-                    if (this._detectionEnemy.getOrientation() === "left") {
-                        // We're in front
-                        if (this._detectionEnemy.x >= this.x) {
-                            if (obst_der !== undefined) {
-                                if (this._detectionEnemy.x > obst_der.x && this.x < obst_der.x) {
-                                    covered = true;
-                                    this._detectionReachable = false;
-                                }
-                            }
-                            if (!covered) {
-                                d = Math.abs(this.x - this._detectionEnemy.x);
-                                if (d < 128.0 && !this._detectionHidden) {
-                                    this._detectionSpotted = true;
-                                } else {
-                                    this._detectionSpotted = false;
-                                    if (d < 128.0) this._detectionReachable = true;
-                                    else this._detectionReachable = false;
-                                }
-                            }
-                        } else {
-                            // We're behind
-                            d = Math.abs(this.x - this._detectionEnemy.x);
-                            if (d < 128.0) this._detectionReachable = true;
-                            else this._detectionReachable = false;
-                            this._detectionSpotted = false;
+                    // Check if there's an obstacle at right
+                    if (obst_der !== undefined) {
+                        // There's an obstacle. Check if it's between the enemy and us.
+                        if (this.x < obst_der.x && obst_der.x < this._detectionEnemy.x) {
+                            covered = true;
+                            this._detectionReachable = false;
                         }
                     }
-                    else if (this._detectionEnemy.getOrientation() === "right") {
-                        // We're in front
-                        if (this._detectionEnemy.x <= this.x) {
-                            if (obst_izq !== undefined) {
-                                if (obst_izq.x > this._detectionEnemy.x && this.x > obst_izq.x) {
-                                    covered = true;
-                                    this._detectionReachable = false;
-                                }
-                            }
-                            if (!covered) {
+                    // Check if there's an obstacle at left
+                    if (obst_izq !== undefined) {
+                        // There's an obstacle. Check if it's between the enemy and us.
+                        if (this.x > obst_izq.x && obst_izq.x > this._detectionEnemy.x) {
+                            covered = true;
+                            this._detectionReachable = false;
+                        }
+                    }
+                    // Left orientation
+                    if (!covered) {
+                        if (this._detectionEnemy.getOrientation() === "left") {
+                            if (this.x < this._detectionEnemy.x) {
+                                // We can be spotted
                                 d = Math.abs(this.x - this._detectionEnemy.x);
+                                // Check distance and if we're hidden
                                 if (d < 128.0 && !this._detectionHidden) {
                                     this._detectionSpotted = true;
                                 } else {
@@ -115,13 +115,34 @@ return {
                                     if (d < 128.0) this._detectionReachable = true;
                                     else this._detectionReachable = false;
                                 }
+                            } else {
+                                // We're behind
+                                d = Math.abs(this.x - this._detectionEnemy.x);
+                                if (d < 128.0) this._detectionReachable = true;
+                                else this._detectionReachable = false;
+                                this._detectionSpotted = false;
                             }
-                        } else {
-                            // We're behind
-                            d = Math.abs(this.x - this._detectionEnemy.x);
-                            if (d < 128.0) this._detectionReachable = true;
-                            else this._detectionReachable = false;
-                            this._detectionSpotted = false;
+                        }
+                        else {
+                            // Right orientation
+                            if (this._detectionEnemy.x <= this.x) {
+                                // We can be spotted
+                                d = Math.abs(this.x - this._detectionEnemy.x);
+                                // Check distance and if we're hidden
+                                if (d < 128.0 && !this._detectionHidden) {
+                                    this._detectionSpotted = true;
+                                } else {
+                                    this._detectionSpotted = false;
+                                    if (d < 128.0) this._detectionReachable = true;
+                                    else this._detectionReachable = false;
+                                }
+                            } else {
+                                // We're behind
+                                d = Math.abs(this.x - this._detectionEnemy.x);
+                                if (d < 128.0) this._detectionReachable = true;
+                                else this._detectionReachable = false;
+                                this._detectionSpotted = false;
+                            }
                         }
                     }
                     if (this._detectionHidden) {
@@ -161,7 +182,11 @@ return {
                 }
                 if (this._detectionSpotted) {
                     this._detectionSpotted = false;
+                    Crafty.audio.stop("level");
+                    Crafty.audio.play("alert",-1);
                     this.battle(true);
+                } else {
+                    this._detectionEnemy = undefined;
                 }
             },
             /**
@@ -178,9 +203,12 @@ return {
                 this.bind("KeyDown", function () {
                     if (this.isDown("A")) {
                         if (this._detectionReachable) {
+                            Crafty.audio.stop("level");
                             if (!this._detectionHidden) {
+                                Crafty.audio.play("alert",-1);
                                 this.battle(true);
                             } else {
+                                Crafty.audio.play("hidden",-1);
                                 this.battle(false);
                             }
                         }

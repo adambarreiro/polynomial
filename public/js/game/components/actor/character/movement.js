@@ -28,19 +28,10 @@ return {
      */
     createComponent: function() {
         Crafty.c('Movement', {
-            _jumpJumping: false,
-            _jumpFalling: false,
-            _jumpTimeFalling: 0,
             /**
              * Jumping event
              */
             jump: function() {
-                if (this.isDown(Crafty.keys.UP_ARROW)) {
-                    if (!this._jumpJumping && this._jumpFalling) {
-                        //Crafty.audio.play("salto");
-                    }
-                    this._jumpJumping = true;
-                }
                 // Collision check. This is the inverse of the Crafty.js gravity
                 // component.
                 var obj;
@@ -66,28 +57,24 @@ return {
                 if (hit) {
                     // Collide
                     this.y = hit._y + this._h; // Makes the character stop
-                    this._jumpFalling = false;
-                    this._jumpJumping = false;
                     this_up = false;
                 } else {
                     // Dont collide, go up
                     if (this._up) {
                         this.clearLava();
                         this.y -= JUMPY;
-                        this._jumpFalling = true;
+                        if (this._orientation === "right") {
+                            if (!this.isPlaying("CharJumpRight")) {
+                                this.animate("CharJumpRight",1);
+                            }
+                        }
+                        else {
+                            if (!this.isPlaying("CharJumpLeft")) {
+                                this.animate("CharJumpLeft",1);
+                            }
+                        }
                     }
                 }
-                // Spriting
-                if (this._jumpFalling) {
-                    if (this._jumpTimeFalling++ <= TIMEFALLING && this._jumpJumping) {
-                        // Sprite salto
-                    } else {
-                        // Sprite caida
-                    }
-                }
-                this._jumpJumping = false;
-                this._jumpTimeFalling = 0;
-                
             },
             /**
              * Inits the component
@@ -101,13 +88,71 @@ return {
                 });
                 this.bind("EnterFrame", function () {
                     this.jump();
+                    if (!this._up && !this.isPlaying("CharMoveRight") && !this.isPlaying("CharMoveLeft")) {
+                        this.pauseAnimation();
+                        if (this._orientation == "left") {
+                            this.sprite(1,0);
+                        } else {
+                            this.sprite(0,0);
+                        }
+                    }
                 });
                 this.bind("KeyDown", function () {
                     if (this.isDown("UP_ARROW")){
                         this._up = true;
                         Crafty.trigger("Moved", {x: this.x, y: this.y});
+                    } else if (this.isDown("RIGHT_ARROW")){
+                        this._orientation="right";
+                        if (!this.isPlaying("CharMoveRight")){
+                            this.animate("CharMoveRight",-1);
+                        }
+                    } else if (this.isDown("LEFT_ARROW")){
+                        this._orientation="left";
+                        if (!this.isPlaying("CharMoveLeft")){
+                            this.animate("CharMoveLeft",-1);
+                        }
                     }
                 });
+                this.bind("KeyUp", function(e) {
+                    if(e.key === Crafty.keys.LEFT_ARROW) {
+                        this.pauseAnimation();
+                        this.sprite(1,0);
+                    } else if (e.key === Crafty.keys.RIGHT_ARROW) {
+                        this.pauseAnimation();
+                        this.sprite(0,0);
+                    }
+                });
+                this.bind("Moved", function(from) {
+                    if (this.hit("Terrain")) {
+                        this.x = from.x;
+                        this.y = from.y;
+                    }
+                    if (this.x <= 0 || this.x >= Constants.getLevelSize('px').width) {
+                        this.x = from.x;
+                    }
+                    if(from.x < this.x) {
+                        this._orientation="right";
+                        if (!this._up) {
+                            if (!this.isPlaying("CharMoveRight")){
+                                this.animate("CharMoveRight",-1);
+                            }
+                        }
+                    } else if (from.x > this.x) {
+                        this._orientation="left";
+                        if (!this._up) {
+                            if (!this.isPlaying("CharMoveLeft")){
+                                this.animate("CharMoveLeft",-1);
+                            }
+                        }
+                    } else {
+                        if (this._orientation == "left") {
+                            this.sprite(1,0);
+                        } else {
+                            this.sprite(0,0);
+                        }
+                    }
+                });
+
             }
         });
     }

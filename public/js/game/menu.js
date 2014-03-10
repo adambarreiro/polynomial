@@ -145,7 +145,7 @@ return {
             $('.container').empty();
             $('.container').append(getOnePlayerPanel());
             $('#new').bind('click', function() {
-                Menu.startGame(Menu.readStudentCookie(), 1);
+                Menu.startGame(Menu.readStudentCookie(), 6);
             });
             $('#continue').bind('click', function() {
                 Menu.startGame(Menu.readStudentCookie(), Menu.readSavegameCookie());

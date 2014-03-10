@@ -25,6 +25,10 @@ return {
              */
             init: function() {
                 this.requires('Enemy, spr_enemy2');
+                if (!edition) {
+                    this.reel("EnemyAnimationLeft",300,0,0,3);
+                    this.reel("EnemyAnimationRight",300,0,1,3);
+                }
             }
         });
     }

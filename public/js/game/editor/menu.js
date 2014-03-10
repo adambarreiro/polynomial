@@ -115,7 +115,8 @@ function resize() {
     $(".moverh").css({"height" : size.height + "px", "line-height" : size.height + "px"});
     $(".moverv").css({"width" : size.width + "px"});
     $(".palette").css({"height" : (size.height + 20) + "px"});
-    Crafty.DrawManager.renderCanvas();
+    $('canvas').remove();
+    Crafty.canvas.init();
 }
 
 function resizeController() {
@@ -410,7 +411,7 @@ function startBrushes() {
         setBrushes(Engine.getTileset());
         brushes = getBrushes();
         $(".palette").append('<li id="brush_00"></li>');
-        $("#brush_00").css( {"background-image" : "url(/assets/img/clean.jpg)"});
+        $("#brush_00").css( {"background-image" : "url(/assets/img/editor/clean.jpg)"});
         for (i=1; i<brushes.length; i++) {
             if (i < 10) {
                 $(".palette").append('<li id="brush_0'+ i +'"></li>');

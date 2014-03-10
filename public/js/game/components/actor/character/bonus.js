@@ -12,6 +12,9 @@ define (function() {
 // -----------------------------------------------------------------------------
 var QUESTIONS = [];
 var ANSWERS = [];
+var CURATION = 70;
+var POWER = 5;
+var CLOCKS = 1;
 
 /**
  * Ajax call to retrieve the questions and answers.
@@ -39,10 +42,10 @@ function getQuestions(callback) {
 /**
  * Draws a popup explaining that the question was not answered correctly
  */
-function mistakePopup() {
+function mistakePopup(correctAnswer) {
     var html = ['<div class="popup">',
                     '<div class="separator">Perdiste el tesoro...</div>',
-                    '<p>La afirmación era falsa...</p>',
+                    '<p>La afirmación era '+correctAnswer+'...</p>',
                     '<input class="button" type="button" name="true" value="Maldición"/>',
                 '</div>'].join('\n');
     $("#cr-stage").append(html);
@@ -86,7 +89,7 @@ return {
                     description = "¡Puedes soportar más daño!";
                 } else {
                     bonus = "TIEMPO EXTRA";
-                    icon = "time";
+                    icon = "clock";
                     description = "¡Tienes más tiempo para realizar operaciones!";
                 }
                 $('.popup').remove();
@@ -99,30 +102,32 @@ return {
                 $("#cr-stage").append(html);
                 $('input').on("click",function() {
                     $('.popup').remove();
-                    if (bonus !== health) {
-                        if ($("#" + icon).length < 0) {
+                    if (bonus !== "SALUD") {
+                        if ($("#" + icon).length === 0) {
                             $('.inventory').append('<div class="element" id="'+icon+'"></div>');
-                            $('#' +icon).css({"background" : "url('/assets/img/items/" + icon +".png') no-repeat"});
+                            $('#' +icon).css({"background" : "url('/assets/img/game/items/" + icon +".png') no-repeat"});
                         }
                     }
-                    switch(bonus) {
-                        case "SALUD":
-                            var salud = this._health;
-                            salud=salud + Math.floor(Math.random()*(100-70+1)+70);
-                            if (salud > 100) salud = 100;
-                            this._health = salud;
-                            $('#lifebar').css({"width": (salud*3) + "px"});
+                    switch(icon) {
+                        case "health":
+                            Crafty.audio.play("health");
+                            Crafty("Character")._health=Crafty("Character")._health + Math.floor(Math.random()*(100-CURATION+1)+CURATION);
+                            if (Crafty("Character")._health > 100) Crafty("Character")._health = 100;
+                            $('#lifebar').css({"width": (Crafty("Character")._health*3) + "px"});
                             break;
-                        case "ESCUDO":
-                            this._shield=100;
+                        case "shield":
+                            Crafty.audio.play("shield");
+                            Crafty("Character")._shield=100;
                             $('#lifebar').css({"width": "300px", "background" : "rgb(50,50,200)"});
                             $('#vidatext').html("Escudo: ");
                             break;
-                        case "POTENCIA":
-                            this._power=this._power+5;
+                        case "power":
+                            Crafty.audio.play("power");
+                            Crafty("Character")._power=Crafty("Character")._power+POWER;
                             break;
-                        case "TIEMPO EXTRA":
-                            this._extraTime = this._extraTime++;
+                        case "clock":
+                            Crafty.audio.play("clock");
+                            Crafty("Character")._extraTime = Crafty("Character")._extraTime+CLOCKS;
                             break;
                     }
                     Crafty("Character").startAll();
@@ -144,9 +149,10 @@ return {
                     if (chest !== undefined) {
                         if (!chest._opened) {
                             this.stopAll();
+                            Crafty.audio.play("chest");
                             chest._opened = true;
                             if (QUESTIONS.length === 0 || ANSWERS.length === 0) return;
-                            var index = (Math.floor(Math.random()*(QUESTIONS.length-1))+1);
+                            var index = (Math.floor(Math.random()*QUESTIONS.length));
                             var html = ['<div class="popup">',
                                     '<div class="separator">¡TESORO ENCONTRADO!</div>',
                                     '<p>' + QUESTIONS[index] +'</p>',
@@ -159,14 +165,14 @@ return {
                                 if (ANSWERS[index] == "V") {
                                     Crafty("Character").item();
                                 } else {
-                                    mistakePopup();
+                                    mistakePopup("falsa");
                                 }
                             });
                             $('input[name=false]').on("click",function() {
                                 if (ANSWERS[index] == "F") {
                                     Crafty("Character").item();
                                 } else {
-                                    mistakePopup();
+                                    mistakePopup("verdadera");
                                 }
                             });
                         }

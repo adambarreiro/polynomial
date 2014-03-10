@@ -17,9 +17,9 @@ var TERM_PROBABILITY = 0.7; // Probability that a term appears in the polynomial
 // Timeouts for battles
 var ADD_TIMEOUT = 2999;
 var SUB_TIMEOUT = 3999;
-var MUL_TIMEOUT = 9999;
-var NOT_TIMEOUT = 9999;
-var DIV_TIMEOUT = 14999;
+var MUL_TIMEOUT = 14999;
+var NOT_TIMEOUT = 14999;
+var DIV_TIMEOUT = 15999;
 
 // Timeout bonus
 var BONUS_TIMEOUT = 3000;
@@ -76,16 +76,22 @@ return {
                     case "*":
                         operationString = "MULTIPLICACIÓN"; this._battlePolynomials[1] = this.polynomialArray(9,3); break;
                     case "**":
-                        this.polynomialNotableArray(1); break;
+                        this.polynomialNotableArray(1);
+                        if (this._battleNotables[1] === "+") {
+                            operationString = "SUMA";
+                        } else {
+                            operationString = "RESTA";
+                        }
+                        break;
                     case "/":
-                        operationString = "DIVISIÓN"; this.polynomialCocientArray(0,2); break;
+                        operationString = "DIVISIÓN"; this.polynomialCocientArray(2); break;
                     case "+":
                         operationString = "SUMA"; this._battlePolynomials[1] = this.polynomialArray(9,6); break;
                     case "-":
                         operationString = "RESTA"; this._battlePolynomials[1] = this.polynomialArray(9,6); break;
                 }
                 var html = ['<div class="battle"><h1>Batalla</h1>',
-                                '<h2 class="left">Operación: ' + operationString + "</h2>",
+                                '<h2 class="left">Operación: <span style="color:#FF0000">' + operationString + "</span></h2>",
                                 '<h2 class="right">Tiempo restante:</h2>',
                                 this.polynomialHtml(),
                                 '<table class="solutionbox"><tr id="solution"></tr></table>',
@@ -321,22 +327,23 @@ return {
              */
             polynomialNotableArray: function(position) {
                 // Notable operation
+                this._battleNotables[0] = [];
                 if (Math.random() > 0.5) this._battleNotables[1] = "+";
-                else this._battleNotableType = "-";
-
+                else this._battleNotables[1] = "-";
                 var notable = [];
                 var index1 = 1, index2 = 1;
                 while (index1 === index2) {
-                    index1 = Math.floor(Math.random()*(maxCoeficient)+1);
-                    index2 = Math.floor(Math.random()*(maxCoeficient)+1);
+                    index1 = Math.floor(Math.random()*(3)+1);
+                    index2 = Math.floor(Math.random()*(3)+1);
                 }
-                this._battleNotables[0][index1] = Math.floor(Math.random()*(maxCoeficient)+1);
-                this._battleNotables[0][index2] = Math.floor(Math.random()*(maxCoeficient)+1);
+                this._battleNotables[0][index1] = Math.floor(Math.random()*(4)+1);
+                this._battleNotables[0][index2] = Math.floor(Math.random()*(4)+1);
                 var p = Math.random();
                 var indexes = [];
                 var j=0;
                 if (p < 0.66) {
-                    for (var i=0; i<maxCoeficient; i++) {
+                    // Primer termino al cuadrado y segundo termino al cuadrado
+                    for (var i=0; i<MAX_COEFICIENT; i++) {
                         if (this._battleNotables[0][i] !== undefined) {
                             this._battlePolynomials[position][i*2] = this._battleNotables[0][i] * this._battleNotables[0][i];
                             indexes[j] = i;
@@ -344,23 +351,29 @@ return {
                         }
                     }
                     if (p < 0.33) {
+                        // Más el doble del primero por el segundo
                         this._battlePolynomials[position][indexes[0] + indexes[1]] = 2*(this._battleNotables[0][indexes[0]] * this._battleNotables[0][indexes[1]]);
                         this._battleNotables[2] = "+";
                     } else {
+                        // Menos el doble del primero por el segundo
                         this._battlePolynomials[position][indexes[0] + indexes[1]] = -2*(this._battleNotables[0][indexes[0]] * this._battleNotables[0][indexes[1]]);
                         this._battleNotables[2] = "-";
                     }
                 } else {
                     var minDegree = 9999;
-                    for (var k=0; k<maxCoeficient; k++) {
+                    // Suma por diferencia, diferencia de cuadrados:
+                    // Al cuadrado
+                    for (var k=0; k<MAX_COEFICIENT; k++) {
                         if (this._battleNotables[0][k] !== undefined) {
                             this._battlePolynomials[position][k*2] = this._battleNotables[0][k] * this._battleNotables[0][k];
                             if (k < minDegree) minDegree = k;
                         }
                     }
+                    // Si quedara positiva, la volvemos negativa.
                     if (this._battleNotables[0][minDegree] > 0) this._battleNotables[0][minDegree] = -this._battleNotables[0][minDegree];
                     this._battleNotables[2] = "*";
                 }
+                // Se controla que si es de la forma (ax-b)^2 no quede el termino 2*a*b*x negativo.
                 if (p >= 0.33 && p < 0.66) {
                     if (index1 > index2) {
                         if (this._battleNotables[0][index2] > 0) this._battleNotables[0][index2] = -this._battleNotables[0][index2];
@@ -368,6 +381,7 @@ return {
                         if (this._battleNotables[0][index1] > 0) this._battleNotables[0][index1] = -this._battleNotables[0][index1];
                     }
                 } else {
+                    // Al revés, se controla que siempre sean positivos en el resto de casos.
                     if (index1 > index2) {
                         this._battleNotables[0][index2] = Math.abs(this._battleNotables[0][index2]);
                     } else {
@@ -402,6 +416,10 @@ return {
                                 } else {
                                     if (key !== 48) {
                                         $('#exp' + cursor).append(+key-48);
+                                    } else {
+                                        if ($('#exp' + cursor).text() !== "") {
+                                            $('#exp' + cursor).append(+key-48);
+                                        }
                                     }
                                 }
                             } else {
@@ -503,8 +521,14 @@ return {
                                     if (ps < 0) {
                                         aux = parseInt($('#poly' + cursor).text(),10);
                                     } else {
-                                        aux = parseInt($('#poly' + cursor).text().substring(0,ps),10);
-                                        if (isNaN(aux)) aux = 1;
+                                        aux = $('#poly' + cursor).text().substring(0,ps);
+                                        if (aux === "+") {
+                                            aux = 1;
+                                        } else if (aux === "-") {
+                                            aux = -1;
+                                        } else {
+                                            aux = parseInt(aux,10);
+                                        }
                                     }
                                     solCoeficient = aux;
                                     aux = parseInt($('#exp' + cursor).text(),10);
@@ -540,17 +564,19 @@ return {
                     if (key === 13) {
                         if ($("#solution").text() !== "\n" && $("#solution").text() !== "") {
                             // Solution saving
-                            var ps = $('#poly' + cursor).text().indexOf("x");
+                            var ps2 = $('#poly' + cursor).text().indexOf("x");
                             var aux2;
-                            if (ps < 0) {
+                            if (ps2 < 0) {
                                 aux2 = parseInt($('#poly' + cursor).text(),10);
                             } else {
-                                aux2 = parseInt($('#poly' + cursor).text().substring(0,ps),10);
-                                if (isNaN(aux2)) {
-                                    if (aux2 === '-') aux2 = -1;
-                                    else aux2 = 1;
+                                aux2 = $('#poly' + cursor).text().substring(0,ps2);
+                                if (aux2 === "+") {
+                                    aux2 = 1;
+                                } else if (aux2 === "-") {
+                                    aux2 = -1;
+                                } else {
+                                    aux2 = parseInt(aux2,10);
                                 }
-                                
                             }
                             solCoeficient = aux2;
                             aux2 = parseInt($('#exp' + cursor).text(),10);
@@ -591,24 +617,24 @@ return {
              * @param poly - Polynomial to multiply
              * @param maxElements- Number of terms of the random polynomial.
              */
-            polynomialCocientArray: function(poly, maxElements) {
+            polynomialCocientArray: function(maxElements) {
                 this._battlePolynomials[1] = this._battlePolynomials[0];
                 var toMultiply = this.polynomialArray(MAX_COEFICIENT, maxElements);
                 var result = [];
                 // Starts in 1 to avoid constants
-                delete this._battlePolynomials[1][0];
+                delete this._battlePolynomials[0][0];
                 for (var i=1; i<MAX_COEFICIENT; i++) {
-                    if (poly[i] !== undefined) {
+                    if (this._battlePolynomials[0][i] !== undefined) {
                         for (var j=1; j<MAX_COEFICIENT; j++) {
                             if (toMultiply[j] !== undefined) {
                                 if (result[i+j] === undefined) result[i+j] = 0;
-                                result[i+j] = result[i+j] + poly[i]*toMultiply[j];
+                                result[i+j] = result[i+j] + this._battlePolynomials[0][i]*toMultiply[j];
                             }
                         }
                     }
                 }
                 this._battleQuotient = toMultiply;
-                return result;
+                this._battlePolynomials[0] = result;
             },
             /**
              * Checks the input with the solution.
@@ -658,8 +684,8 @@ return {
                         break;
                     case "/":
                         for (i=0; i<MAX_COEFICIENT; i++) {
-                            if (this._battleQuotient[0][i] !== undefined) {
-                                correct = (this._battleQuotient[0][i] === this._battleInput[i]);
+                            if (this._battleQuotient[i] !== undefined) {
+                                correct = (this._battleQuotient[i] === this._battleInput[i]);
                             }
                         }
                         break;
@@ -673,7 +699,6 @@ return {
                             if (!correct) {
                                 break;
                             }
-                            
                         }
                         break;
                     case "-":
@@ -691,10 +716,13 @@ return {
                 if (correct) {
                     this._battleResult = true;
                     if (this.getEnemy().damage()) {
+                        Crafty.audio.stop("alert");
+                        Crafty.audio.stop("hidden");
+                        Crafty.audio.play("level",-1);
                         if (this._extraTime > 0) {
                             this._extraTime--;
                             if (this._extraTime === 0) {
-                                this.removeBonus("time");
+                                this.removeBonus("clock");
                             }
                         }
                         this.startAll();
@@ -703,12 +731,18 @@ return {
                     }
                 }
                 else {
+                    if (!this._battleTimed) {
+                        Crafty.audio.stop("hidden");
+                        Crafty.audio.play("alert",-1);
+                    }
                     this.damage("enemy");
                     $('#timeout').css({"color":"red",  "border-color" : "red"});
                     $('#timeout').html("ALERTA MÁXIMA, ¡TE HAN PILLADO!");
                     this._battleResult = false;
                     this._battleTimed = true;
-                    if (this._health > 0) this.battle(this._battleTimed);
+                    if (this._health > 0) {
+                        this.battle(this._battleTimed);
+                    }
                 }
             },
             /**
@@ -716,8 +750,9 @@ return {
              * @return {[type]} [description]
              */
             battle: function(timed) {
-                Crafty.audio.stop("level");
-                Crafty.audio.play("battle",-1);
+                if (timed) {
+                    Crafty.audio.play("monster_scream");
+                }
                 this._battleTimed = timed;
                 // Stops the game
                 this.stopAll();

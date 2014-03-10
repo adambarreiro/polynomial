@@ -25,7 +25,9 @@ return {
              */
             init: function() {
                 this.requires('Terrain, SpriteAnimation, spr_abyss');
-                this.reel("AbyssAnimation",800,0,0,4).animate("AbyssAnimation",-1);
+                if (!edition) {
+                    this.reel("AbyssAnimation",800,0,0,4).animate("AbyssAnimation",-1);
+                }
             }
         });
     }
