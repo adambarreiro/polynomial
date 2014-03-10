@@ -15,7 +15,7 @@
  * @dependency /public/js/game/components/actor/character/movement.js
  * @dependency /public/js/game/components/actor/character/lava.js
  */
-define (["./character/battle","./character/bonus","./character/camera","./character/damage","./character/detection","./character/movement","./character/lava"], function(Battle, Bonus, Camera, Damage, Detection, Movement, Lava) {
+define (["./character/battle","./character/bonus","./character/camera","./character/damage","./character/detection","./character/movement","./character/lava","./character/mimic"], function(Battle, Bonus, Camera, Damage, Detection, Movement, Lava, Mimic) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -34,6 +34,7 @@ function createChildComponents() {
     Lava.createComponent(); // Damage, Battle
     Movement.createComponent(); // Lava
     Detection.createComponent(); // Battle
+    Mimic.createComponent(); // Battle
 }
 
 // -----------------------------------------------------------------------------

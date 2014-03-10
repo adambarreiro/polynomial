@@ -14,10 +14,10 @@ define (["require","../menu"], function(Require) {
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
-var STARTED = false;
-var SOCKET;
-var CREATOR;
-var CONNECTOR;
+var CREATOR_STARTED = false;
+var CREATOR_SOCKET;
+var CREATOR_CONNECTORADDRESS;
+var CREATOR_ADDRESS;
 
 // -----------------------------------------------------------------------------
 // Public
@@ -29,10 +29,10 @@ var CONNECTOR;
  */
 function onRegister() {
     var Menu = Require("menu");
-    SOCKET.on("readyACK", function() {
-        Menu.waitingMenu(CREATOR);
+    CREATOR_SOCKET.on("readyACK", function() {
+        Menu.waitingMenu(CREATOR_ADDRESS);
     });
-    SOCKET.on("readyERROR", function() {
+    CREATOR_SOCKET.on("readyERROR", function() {
         alert("ERROR: Parece que tu IP ya está siendo usada.");
     });
     emitRegister();
@@ -44,8 +44,8 @@ function onRegister() {
  */
 function emitRegister() {
     var Menu = Require("menu");
-    SOCKET.emit("ready", {
-        address: CREATOR,
+    CREATOR_SOCKET.emit("ready", {
+        address: CREATOR_ADDRESS,
         student: Menu.readStudentCookie(),
         level: Menu.readSavegameCookie()
     });
@@ -56,9 +56,9 @@ function emitRegister() {
  */
 function wait() {
     var Menu = Require("menu");
-    SOCKET.on("join", function(data) {
-        CONNECTOR = data.player;
-        Menu.startGame(Menu.readStudentCookie(), Menu.readSavegameCookie(),{online: true, mode: "creator"});
+    CREATOR_SOCKET.on("join", function(data) {
+        CREATOR_CONNECTORADDRESS = data.player;
+        Menu.startGame(Menu.readStudentCookie(), Menu.readSavegameCookie(),{creator: true, connector: false});
     });
 }
 
@@ -68,13 +68,13 @@ return {
      * @param  address - Our IP address
      */
     startCreator: function(address) {
-        if (!STARTED) {
-            CREATOR = address;
-            SOCKET = io.connect(CREATOR);
-            SOCKET.on("connect", function () {
+        if (!CREATOR_STARTED) {
+            CREATOR_ADDRESS = address;
+            CREATOR_SOCKET = io.connect(CREATOR_ADDRESS);
+            CREATOR_SOCKET.on("connect", function () {
                 onRegister();
                 wait();
-                STARTED = true;
+                CREATOR_STARTED = true;
             });
         } else {
             emitRegister();
@@ -84,9 +84,9 @@ return {
      * Sends the connector the creator position
      * @param x,y - The position of the character in the game.
      */
-    sendPosition: function(x,y) {
-        SOCKET.emit("posCreatorToConnector", {
-            address: CONNECTOR,
+    sendMovement: function(x,y) {
+        CREATOR_SOCKET.emit("posCreatorToConnector", {
+            address: CREATOR_CONNECTORADDRESS,
             x: x,
             y: y
         });
@@ -94,8 +94,8 @@ return {
     /**
      * Receives the position from the connector
      */
-    onReceivePosition: function(callback) {
-        SOCKET.on("posConnectorToCreator", function(data) {
+    onReceiveMovement: function(callback) {
+        CREATOR_SOCKET.on("posConnectorToCreator", function(data) {
             callback(data);
         });
     },
@@ -103,7 +103,7 @@ return {
      * Closes the socket
      */
     closeCreator: function() {
-        SOCKET.emit("close");
+        CREATOR_SOCKET.emit("close");
     }
 };
 

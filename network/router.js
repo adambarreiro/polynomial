@@ -18,13 +18,15 @@ var connections = []; // Array of connection data indexed by IP address.
 /**
  * Searches for an id in the entire connections array and returns its
  * address.
- * @param address - The address to search
- * @return -1 if the address doesn't exist. Socket id in other case.
+ * @param id - The socket id to search
+ * @return undefined if the address doesn't exist. Address in other case.
  */
 function checkConnection(id) {
     for (var i in connections) {
         if (connections[i] !== undefined) {
+            console.log(i);
             if (connections[i].id === id) {
+                console.log(i);
                 return i;
             }
         }
@@ -60,17 +62,22 @@ function responseReady(socket) {
 function responseJoin(socket) {
     socket.on("join", function (data) {
         if (connections[data.address] === undefined) {
-            connections[data.id] = {
-                address: data.address,
-                player: data.player,
-                connector: true
-            };
-            // Response to the connector with the game of the creator game
-            socket.emit("joinACK", connections[data.player].game);
-            // Response to the creator for starting his game and the IP of the connector
-            io.sockets.socket(connections[data.player].id).emit("join", {player: data.address});
+            if (connections[data.player] !== undefined) {
+                connections[data.address] = {
+                    id: socket.id,
+                    address: data.address,
+                    player: data.player,
+                    connector: true
+                };
+                // Response to the connector with the game of the creator game
+                socket.emit("joinACK", connections[data.player].game);
+                // Response to the creator for starting his game and the IP of the connector
+                io.sockets.socket(connections[data.player].id).emit("join", {player: data.address});
+            } else {
+                socket.emit("joinERROR",{error: "noplayer"});
+            }
         } else {
-            socket.emit("joinERROR");
+            socket.emit("joinERROR",{error: "already"});
         }
     });
 }
@@ -80,10 +87,10 @@ function responseJoin(socket) {
  */
 function responseSender(socket) {
     socket.on("posCreatorToConnector", function (data) {
-        io.sockets.socket(connections[data.address]).volatile.emit("posCreatorToConnector", {x: data.x, y: data.y});
+        io.sockets.socket(connections[data.address].id).emit("posCreatorToConnector", {x: data.x, y: data.y});
     });
     socket.on("posConnectorToCreator", function (data) {
-       io.sockets.socket(connections[data.address]).volatile.emit("posConnectorToCreator", {x: data.x, y: data.y});
+       io.sockets.socket(connections[data.address].id).emit("posConnectorToCreator", {x: data.x, y: data.y});
     });
 }
 
@@ -95,6 +102,7 @@ function responseDisconnect(socket) {
         var address = checkConnection(socket.id);
         if (address !== undefined) {
             delete connections[address];
+            connections[address] = undefined;
         }
     });
 }
@@ -107,6 +115,7 @@ function responseClose(socket) {
         var address = checkConnection(socket.id);
         if (address !== undefined) {
             delete connections[address];
+            connections[address] = undefined;
         }
         
     });

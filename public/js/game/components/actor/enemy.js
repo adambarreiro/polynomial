@@ -55,24 +55,36 @@ return {
         Crafty.c('Enemy', {
             _enemyHealth: 100, // Health of the enemy
             /**
+             * Sends the other player the amount of damage dealt to the enemy
+             */
+            multiplayerDamage: function(damage) {
+                if (Crafty("Multiplayer").length > 0) {
+                    Crafty("Character").multiplayerEnemyDamage(this, damage);
+                }
+            },
+            /**
              * Substracts a random amount of life from the enemy's health.
              * @return boolean - If the enemy's dead it's true.
              */
             damage: function() {
                 Crafty.audio.play("attack");
                 Crafty.audio.play("monster_scream");
+                var d;
                 if (Crafty("Character")._power > 0) {
-                    this._enemyHealth = this._enemyHealth - Math.floor(Math.random()*(POWERUP_MAX_DAMAGE-POWERUP_MIN_DAMAGE+1)+POWERUP_MIN_DAMAGE);
+                    d = Math.floor(Math.random()*(POWERUP_MAX_DAMAGE-POWERUP_MIN_DAMAGE+1)+POWERUP_MIN_DAMAGE);
+                    this._enemyHealth = this._enemyHealth - d;
                     Crafty("Character")._power--;
                     if (Crafty("Character")._power === 0) {
                         Crafty("Character").removeBonus("power");
                     }
                 } else {
-                    this._enemyHealth = this._enemyHealth - Math.floor(Math.random()*(MAX_DAMAGE-MIN_DAMAGE+1)+MIN_DAMAGE);
+                    d = Math.floor(Math.random()*(MAX_DAMAGE-MIN_DAMAGE+1)+MIN_DAMAGE);
+                    this._enemyHealth = this._enemyHealth - d;
                 }
                 
                 if (this._enemyHealth > 0) {
                     $('#enemybar').css({"width": (this._enemyHealth*3) + "px"});
+                    this.multiplayerDamage(d);
                     return false;
                 } else {
                     Crafty.audio.play("enemy_death");

@@ -186,7 +186,9 @@ return {
                     Crafty.audio.play("alert",-1);
                     this.battle(true);
                 } else {
-                    this._detectionEnemy = undefined;
+                    if (!this._detectionHidden) {
+                        this._detectionEnemy = undefined;
+                    }
                 }
             },
             /**

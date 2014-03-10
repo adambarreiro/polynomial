@@ -117,12 +117,12 @@ function drawLevel(level, mode) {
         type = level.map[i];
         drawTile(x,y,level.map[i],mode);
     }
-    if (mode !== undefined && mode.online) {
+    if (mode !== undefined) {
         Crafty.e("Multiplayer").at(Crafty("Character").x/32,Crafty("Character").y/32);
-        if (mode.mode === "connector") {
-            Crafty("Multiplayer").connectorMode();
+        if (mode.connector) {
+            Crafty("Character").addComponent("Mimic").connectorMode();
         } else {
-            Crafty("Multiplayer").creatorMode();
+            Crafty("Character").addComponent("Mimic").creatorMode();
         }
     }
     Crafty.viewport.centerOn(getCharacter(),0);
@@ -350,7 +350,7 @@ return {
         });
     },
 
-    nextLevel: function() {
+    nextLevel: function(mode) {
         var html = ['<div class="popup">',
                 '<div class="separator">¡NIVEL SUPERADO!</div>',
                 '<p>Pulsa Siguiente para ir al siguiente nivel</p>',
@@ -361,7 +361,7 @@ return {
             $('.popup').remove();
             clean();
             Scenes = Require("./scenes");
-            Scenes.loadGame(getStudent(), getLevel()+1);
+            Scenes.loadGame(getStudent(), getLevel()+1, mode);
         });
     },
 

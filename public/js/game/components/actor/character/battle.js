@@ -16,7 +16,7 @@ var TERM_PROBABILITY = 0.7; // Probability that a term appears in the polynomial
 
 // Timeouts for battles
 var ADD_TIMEOUT = 2999;
-var SUB_TIMEOUT = 3999;
+var SUB_TIMEOUT = 2999;
 var MUL_TIMEOUT = 14999;
 var NOT_TIMEOUT = 14999;
 var DIV_TIMEOUT = 15999;
@@ -136,9 +136,9 @@ return {
                         $("#time").text((time/100).toFixed(2));
                     } else {
                         if(elapsedTime > 100) {
-                            if (battleResultScreen > 0) battleResultScreen-=parseInt(elapsedTime/10,10);
+                            if (battleResultScreen > 0) battleResultScreen-=parseInt(elapsedTime,10);
                         } else {
-                            if (battleResultScreen > 0) battleResultScreen-=1;
+                            if (battleResultScreen > 0) battleResultScreen-=10;
                         }
                         if (battleResultScreen <= 0) {
                             $(".battle").css({"background": NORMAL_SCREEN});
@@ -715,7 +715,8 @@ return {
                 this.clearBattle();
                 if (correct) {
                     this._battleResult = true;
-                    if (this.getEnemy().damage()) {
+                    var endBattle = this.getEnemy().damage()
+                    if (endBattle) {
                         Crafty.audio.stop("alert");
                         Crafty.audio.stop("hidden");
                         Crafty.audio.play("level",-1);

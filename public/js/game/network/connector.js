@@ -14,10 +14,10 @@ define (["require","../menu"], function(Require) {
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
-var STARTED = false;
-var SOCKET;
-var CREATOR;
-var CONNECTOR;
+var CONNECTOR_STARTED = false;
+var CONNECTOR_SOCKET;
+var CONNECTOR_CREATORADDRESS;
+var CONNECTOR_ADDRESS;
 
 /**
  * Prepares the handler to the join emit response.
@@ -26,11 +26,16 @@ var CONNECTOR;
  */
 function onJoin() {
     var Menu = Require("menu");
-    SOCKET.on("joinACK", function(data) {
-        Menu.startGame(data.student, data.level,{online: true, mode: "creator"});
+    CONNECTOR_SOCKET.on("joinACK", function(data) {
+        Menu.startGame(data.student, data.level,{connector: true, creator: false});
     });
-    SOCKET.on("joinERROR", function() {
-        alert("ERROR: Parece que tu IP ya está siendo usada.");
+    CONNECTOR_SOCKET.on("joinERROR", function(data) {
+        if (data.error === "noplayer") {
+            alert("ERROR: Parece que nadie ha creado una partida en esa IP.");
+        } else {
+            alert("ERROR: Parece que tu IP ya está siendo usada.");
+        }
+        
     });
     emitJoin();
 }
@@ -39,10 +44,9 @@ function onJoin() {
  * Tells the server we want to join a game
  */
 function emitJoin() {
-    SOCKET.emit("join", {
-        id: SOCKET.socket.sessionid,
-        address: CONNECTOR,
-        player: CREATOR
+    CONNECTOR_SOCKET.emit("join", {
+        address: CONNECTOR_ADDRESS,
+        player: CONNECTOR_CREATORADDRESS
     });
 }
 
@@ -53,18 +57,18 @@ function emitJoin() {
 return {
 
     /**
-     * Creates the socket and controls all the events.
+     * Creates the CONNECTOR_SOCKET and controls all the events.
      * @param ourAddress - Our IP address
      * @param address - The IP address of the other player
      */
     startConnector: function(ourAddress, address) {
-        if (!STARTED) {
-            CONNECTOR = ourAddress;
-            CREATOR = address;
-            SOCKET = io.connect(CONNECTOR);
-            SOCKET.on("connect", function () {
+        if (!CONNECTOR_STARTED) {
+            CONNECTOR_ADDRESS = ourAddress;
+            CONNECTOR_CREATORADDRESS = address;
+            CONNECTOR_SOCKET = io.connect(CONNECTOR_ADDRESS);
+            CONNECTOR_SOCKET.on("connect", function () {
                 onJoin();
-                STARTED = true;
+                CONNECTOR_STARTED = true;
             });
         } else {
             emitJoin();
@@ -74,9 +78,9 @@ return {
      * Sends the creator the connector position
      * @param x,y - The position of the character in the game
      */
-    sendPosition: function(x,y) {
-        SOCKET.emit("posConnectorToCreator", {
-            address: CREATOR,
+    sendMovement: function(x,y) {
+        CONNECTOR_SOCKET.emit("posConnectorToCreator", {
+            address: CONNECTOR_CREATORADDRESS,
             x: x,
             y: y
         });
@@ -84,22 +88,22 @@ return {
     /**
      * Receives the position from the creator
      */
-    onReceivePosition: function(callback) {
-        SOCKET.on("posCreatorToConnector", function(data) {
+    onReceiveMovement: function(callback) {
+        CONNECTOR_SOCKET.on("posCreatorToConnector", function(data) {
             callback(data);
         });
     },
     /**
      * 
      */
-    getSocket: function() {
-        return SOCKET;
+    getSOCKET_CONNECTOR: function() {
+        return CONNECTOR_SOCKET;
     },
     /**
-     * Closes the socket.
+     * Closes the CONNECTOR_SOCKET.
      */
     closeConnector: function() {
-        SOCKET.emit("close");
+        CONNECTOR_SOCKET.emit("close");
     }
 };
 
