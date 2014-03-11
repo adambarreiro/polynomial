@@ -25,9 +25,9 @@ var CONNECTOR_ADDRESS;
  * @param address - The IP address of the other player
  */
 function onJoin() {
-    var Menu = Require("menu");
     CONNECTOR_SOCKET.on("joinACK", function(data) {
-        Menu.startGame(data.student, data.level,{connector: true, creator: false});
+        var Menu = Require("menu");
+        Menu.startGame(data.student, data.level, { multi: "connector"});
     });
     CONNECTOR_SOCKET.on("joinERROR", function(data) {
         if (data.error === "noplayer") {
@@ -35,9 +35,7 @@ function onJoin() {
         } else {
             alert("ERROR: Parece que tu IP ya está siendo usada.");
         }
-        
     });
-    emitJoin();
 }
 
 /**
@@ -46,7 +44,16 @@ function onJoin() {
 function emitJoin() {
     CONNECTOR_SOCKET.emit("join", {
         address: CONNECTOR_ADDRESS,
-        player: CONNECTOR_CREATORADDRESS
+        friend: CONNECTOR_CREATORADDRESS
+    });
+}
+
+/**
+ * The other player disconnects.
+ */
+function onDisconnected() {
+    CONNECTOR_SOCKET.on("disconnected", function() {
+        Crafty("Character").stopMultiplayer();
     });
 }
 
@@ -68,6 +75,8 @@ return {
             CONNECTOR_SOCKET = io.connect(CONNECTOR_ADDRESS);
             CONNECTOR_SOCKET.on("connect", function () {
                 onJoin();
+                onDisconnected();
+                emitJoin();
                 CONNECTOR_STARTED = true;
             });
         } else {
@@ -79,8 +88,8 @@ return {
      * @param x,y - The position of the character in the game
      */
     sendMovement: function(x,y) {
-        CONNECTOR_SOCKET.emit("posConnectorToCreator", {
-            address: CONNECTOR_CREATORADDRESS,
+        CONNECTOR_SOCKET.emit("movementConnectorToCreator", {
+            friend: CONNECTOR_CREATORADDRESS,
             x: x,
             y: y
         });
@@ -89,15 +98,45 @@ return {
      * Receives the position from the creator
      */
     onReceiveMovement: function(callback) {
-        CONNECTOR_SOCKET.on("posCreatorToConnector", function(data) {
+        CONNECTOR_SOCKET.on("movementCreatorToConnector", function(data) {
             callback(data);
         });
     },
     /**
-     * 
+     * Sends the creator the damage to an enemy
+     * @param enemy - The enemy to substract the life
+     * @param damage - Amount of life to substract.
      */
-    getSOCKET_CONNECTOR: function() {
-        return CONNECTOR_SOCKET;
+    sendDamage: function(enemy, damage) {
+        CONNECTOR_SOCKET.emit("damageConnectorToCreator", {
+            friend: CONNECTOR_CREATORADDRESS,
+            enemy: enemy,
+            damage: damage
+        });
+    },
+    /**
+     * Receives the damage to an enemy
+     */
+    onReceiveDamage: function(callback) {
+        CONNECTOR_SOCKET.on("damageCreatorToConnector", function(data) {
+            callback(data);
+        });
+    },
+    /**
+     * Sends the creator the change of a level
+     */
+    sendExit: function() {
+        CONNECTOR_SOCKET.emit("exitConnectorToCreator", {
+            friend: CONNECTOR_CREATORADDRESS
+        });
+    },
+    /**
+     * Receives the change of a level
+     */
+    onReceiveExit: function(callback) {
+        CONNECTOR_SOCKET.on("exitCreatorToConnector", function() {
+            callback();
+        });
     },
     /**
      * Closes the CONNECTOR_SOCKET.

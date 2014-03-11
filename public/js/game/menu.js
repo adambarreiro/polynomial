@@ -13,8 +13,6 @@
  */
 define (["./scenes", "./network/connector", "./network/creator", "require", "./menu"], function(Scenes, Connector, Creator, Require) {
 
-
-
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
@@ -193,9 +191,10 @@ return {
             twoPlayerMenuHandler();
         });
     },
-    startGame: function(student, level, mode) {
+    startGame: function(student, level, multi) {
         $('body').empty();
-        Scenes.loadGame(student, level, mode);
+        if (multi === undefined) multi = {multi: "single"}; // No multiplayer trick.
+        Scenes.loadGame(student, level, multi.multi);
     },
     readSavegameCookie: function() {
         var pri = document.cookie.indexOf("savegame=")+"savegame=".length;

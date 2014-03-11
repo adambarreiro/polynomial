@@ -19,10 +19,6 @@ var CREATOR_SOCKET;
 var CREATOR_CONNECTORADDRESS;
 var CREATOR_ADDRESS;
 
-// -----------------------------------------------------------------------------
-// Public
-// -----------------------------------------------------------------------------
-
 /**
  * Prepares the handler to the ready emit response.
  * @param  address - Our IP address
@@ -35,7 +31,6 @@ function onRegister() {
     CREATOR_SOCKET.on("readyERROR", function() {
         alert("ERROR: Parece que tu IP ya está siendo usada.");
     });
-    emitRegister();
 }
 
 /**
@@ -54,13 +49,37 @@ function emitRegister() {
 /**
  * Makes our client wait for a player to join us
  */
-function wait() {
-    var Menu = Require("menu");
+function onJoin() {
     CREATOR_SOCKET.on("join", function(data) {
-        CREATOR_CONNECTORADDRESS = data.player;
-        Menu.startGame(Menu.readStudentCookie(), Menu.readSavegameCookie(),{creator: true, connector: false});
+        var Menu = Require("menu");
+        CREATOR_CONNECTORADDRESS = data.friend;
+        emitEngaged();
+        Menu.startGame(Menu.readStudentCookie(), Menu.readSavegameCookie(),{multi: "creator"});
     });
 }
+
+/**
+ * Sends the server we're starting the game
+ */
+function emitEngaged() {
+    CREATOR_SOCKET.emit("engaged", {
+        address: CREATOR_ADDRESS,
+        friend: CREATOR_CONNECTORADDRESS
+    });
+}
+
+/**
+ * The other player disconnects.
+ */
+function onDisconnected() {
+    CREATOR_SOCKET.on("disconnected", function() {
+        Crafty("Character").stopMultiplayer();
+    });
+}
+
+// -----------------------------------------------------------------------------
+// Public
+// -----------------------------------------------------------------------------
 
 return {
     /**
@@ -73,7 +92,9 @@ return {
             CREATOR_SOCKET = io.connect(CREATOR_ADDRESS);
             CREATOR_SOCKET.on("connect", function () {
                 onRegister();
-                wait();
+                onJoin();
+                onDisconnected();
+                emitRegister();
                 CREATOR_STARTED = true;
             });
         } else {
@@ -85,8 +106,8 @@ return {
      * @param x,y - The position of the character in the game.
      */
     sendMovement: function(x,y) {
-        CREATOR_SOCKET.emit("posCreatorToConnector", {
-            address: CREATOR_CONNECTORADDRESS,
+        CREATOR_SOCKET.emit("movementCreatorToConnector", {
+            friend: CREATOR_CONNECTORADDRESS,
             x: x,
             y: y
         });
@@ -95,8 +116,44 @@ return {
      * Receives the position from the connector
      */
     onReceiveMovement: function(callback) {
-        CREATOR_SOCKET.on("posConnectorToCreator", function(data) {
+        CREATOR_SOCKET.on("movementConnectorToCreator", function(data) {
             callback(data);
+        });
+    },
+    /**
+     * Sends the connector the damage to an enemy
+     * @param enemy - The enemy to substract the life
+     * @param damage - Amount of life to substract.
+     */
+    sendDamage: function(enemy, damage) {
+        CREATOR_SOCKET.emit("damageCreatorToConnector", {
+            friend: CREATOR_CONNECTORADDRESS,
+            enemy: enemy,
+            damage: damage
+        });
+    },
+    /**
+     * Receives the damage to an enemy
+     */
+    onReceiveDamage: function(callback) {
+        CREATOR_SOCKET.on("damageConnectorToCreator", function(data) {
+            callback(data);
+        });
+    },
+    /**
+     * Sends the connector the change of a level
+     */
+    sendExit: function() {
+        CREATOR_SOCKET.emit("exitCreatorToConnector", {
+            friend: CREATOR_CONNECTORADDRESS
+        });
+    },
+    /**
+     * Receives the change of a level
+     */
+    onReceiveExit: function(callback) {
+        CREATOR_SOCKET.on("exitConnectorToCreator", function() {
+            callback();
         });
     },
     /**
