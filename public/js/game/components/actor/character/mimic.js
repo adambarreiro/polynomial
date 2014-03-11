@@ -9,8 +9,9 @@
  * mimic.js
  * @dependency /public/js/game/network/connector.js
  * @dependency /public/js/game/network/creator.js
+ * @dependency /public/js/game/network/scenes.js
  */
-define (["../../../network/connector", "../../../network/creator"], function(Connector, Creator) {
+define (["../../../network/connector", "../../../network/creator", "../../../scenes"], function(Connector, Creator, Scenes) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -44,13 +45,13 @@ function onReceiveMovement() {
 function onReceiveExit() {
     switch(TYPE) {
         case "connector":
-            Connector.onReceiveExit(function(data) {
+            Connector.onReceiveExit(function() {
                 Crafty('Character').stopAll();
                 Scenes.nextLevel();
             });
             break;
         case "creator":
-            Creator.onReceiveExit(function(data) {
+            Creator.onReceiveExit(function() {
                 Crafty('Character').stopAll();
                 Scenes.nextLevel();
             });
@@ -65,39 +66,13 @@ function onReceiveExit() {
 function onReceiveDeath() {
     switch(TYPE) {
         case "connector":
-            Connector.onReceiveDeath(function(data) {
-                this._health = 0;
-                Crafty.audio.stop("level");
-                Crafty.audio.stop("alert");
-                Crafty.audio.stop("hidden");
-                if (cause === "lava") {
-                    this.clearLava();
-                }
-                if (cause === "enemy") {
-                    this.stopAll();
-                    this.clearBattle();
-                }
-                if ($(".battle").length > 0) $(".battle").remove();
-                Crafty('obj').each(function() { this.destroy(); });
-                Scenes.restartLevel();
+            Connector.onReceiveDeath(function() {
+                this.stopMultiplayer();
             });
             break;
         case "creator":
-            Creator.onReceiveDeath(function(data) {
-                this._health = 0;
-                Crafty.audio.stop("level");
-                Crafty.audio.stop("alert");
-                Crafty.audio.stop("hidden");
-                if (cause === "lava") {
-                    this.clearLava();
-                }
-                if (cause === "enemy") {
-                    this.stopAll();
-                    this.clearBattle();
-                }
-                if ($(".battle").length > 0) $(".battle").remove();
-                Crafty('obj').each(function() { this.destroy(); });
-                Scenes.restartLevel();
+            Creator.onReceiveDeath(function() {
+                this.stopMultiplayer();
             });
             break;
         default: break;
@@ -107,29 +82,73 @@ function onReceiveDeath() {
 /**
  * Function fired when we receive that an enemy's been damaged
  */
-function onReceiveEnemyDamage() {
+function onReceiveDamage() {
     switch(TYPE) {
         case "connector":
-            Connector.onReceiveEnemyDamage(function(data) {
+            Connector.onReceiveDamage(function(data) {
                 Crafty.audio.play("attack");
                 Crafty.audio.play("monster_scream");
-                data.enemy._enemyHealth = data.enemy._enemyHealth - d;
-                if (data.enemy._enemyHealth > 0) {
-                    $('#enemybar').css({"width": (data.enemy._enemyHealth*3) + "px"});
+                Crafty(data.enemy)._enemyHealth = Crafty(data.enemy)._enemyHealth - data.damage;
+                if (Crafty(data.enemy)._enemyHealth > 0) {
+                    // We're fighting the same enemy
+                    if (Crafty("Character")._battleFighting && Crafty("Character")._detectionEnemy[0] === data.enemy) {
+                        $('#enemybar').css({"width": (Crafty(data.enemy)._enemyHealth*3) + "px"});
+                    }
                 } else {
-                    // Erase enemy
+                    Crafty.audio.play("enemy_death");
+                    // We're fighting the same enemy
+                    if (Crafty("Character")._battleFighting && Crafty("Character")._detectionEnemy !== undefined && Crafty("Character")._detectionEnemy[0] === data.enemy) {
+                        $($(".lifebox").children()[2]).hide();
+                        $($(".lifebox").children()[3]).hide();
+                        $('#enemybar').css({"width": "300px"});
+                        Crafty("Character").clearBattle();
+                        Crafty.audio.stop("alert");
+                        Crafty.audio.stop("hidden");
+                        Crafty.audio.play("level",-1);
+                        if (Crafty("Character")._extraTime > 0) {
+                            Crafty("Character")._extraTime--;
+                            if (Crafty("Character")._extraTime === 0) {
+                                Crafty("Character").removeBonus("clock");
+                            }
+                        }
+                        Crafty("Character")._battleFighting = false;
+                        Crafty("Character").startAll();
+                    }
+                    Crafty(data.enemy).destroy();
                 }
             });
             break;
         case "creator":
-            Creator.onReceiveEnemyDamage(function(data) {
+            Creator.onReceiveDamage(function(data) {
                 Crafty.audio.play("attack");
                 Crafty.audio.play("monster_scream");
-                data.enemy._enemyHealth = data.enemy._enemyHealth - d;
-                if (data.enemy._enemyHealth > 0) {
-                    $('#enemybar').css({"width": (data.enemy._enemyHealth*3) + "px"});
+                Crafty(data.enemy)._enemyHealth = Crafty(data.enemy)._enemyHealth - data.damage;
+                if (Crafty(data.enemy)._enemyHealth > 0) {
+                    // We're fighting the same enemy
+                    if (Crafty("Character")._battleFighting && Crafty("Character")._detectionEnemy !== undefined && Crafty("Character")._detectionEnemy[0] === data.enemy) {
+                        $('#enemybar').css({"width": (Crafty(data.enemy)._enemyHealth*3) + "px"});
+                    }
                 } else {
-                    // Erase enemy
+                    Crafty.audio.play("enemy_death");
+                    // We're fighting the same enemy
+                    if (Crafty("Character")._battleFighting && Crafty("Character")._detectionEnemy !== undefined && Crafty("Character")._detectionEnemy[0] === data.enemy) {
+                        $($(".lifebox").children()[2]).hide();
+                        $($(".lifebox").children()[3]).hide();
+                        $('#enemybar').css({"width": "300px"});
+                        Crafty("Character").clearBattle();
+                        Crafty.audio.stop("alert");
+                        Crafty.audio.stop("hidden");
+                        Crafty.audio.play("level",-1);
+                        if (Crafty("Character")._extraTime > 0) {
+                            Crafty("Character")._extraTime--;
+                            if (Crafty("Character")._extraTime === 0) {
+                                Crafty("Character").removeBonus("clock");
+                            }
+                        }
+                        Crafty("Character")._battleFighting = false;
+                        Crafty("Character").startAll();
+                    }
+                    Crafty(data.enemy).destroy();
                 }
             });
             break;
@@ -150,10 +169,10 @@ return {
             /**
              * Function called to retransmit the damage of an enemy
              */
-            multiplayerDamage: function(enemy,damage) {
+            multiplayerDamage: function(enemy, damage) {
                 switch(TYPE) {
-                    case "connector": Connector.sendEnemyDamage(enemy, damage); break;
-                    case "creator": Creator.sendEnemyDamage(enemy, damage); break;
+                    case "connector": Connector.sendDamage(enemy, damage); break;
+                    case "creator": Creator.sendDamage(enemy, damage); break;
                     default: break;
                 }
             },
@@ -171,7 +190,6 @@ return {
              * Function called to retransmit the next level event
              */
             multiplayerExit: function() {
-                // Qué hacer si recibo un evento de salida: Parar todo, nextLevel
                 switch(TYPE) {
                     case "connector": Connector.sendExit(); break;
                     case "creator": Creator.sendExit(); break;
@@ -220,6 +238,12 @@ return {
             },
             init: function() {
                 this.requires('Character');
+            },
+            stopMultiplayer: function() {
+                Crafty("Multiplayer").destroy();
+                Scenes.setMultiplayer("single");
+                this.removeComponent("Mimic");
+
             }
         });
     }

@@ -51,6 +51,14 @@ return {
             _health: 100, // Health of the character
             _shield: 0, // Shield of the character
             stopAll: function() {
+                // Kills exit events
+                Crafty("Exit").each(function() {
+                    this.stopExit();
+                });
+                // Kills enemy events
+                Crafty("Enemy").each(function(){
+                    this.stopEnemy();
+                });
                 // Kills components
                 this.removeComponent("Camera");
                 this.removeComponent("Detection");
@@ -61,10 +69,7 @@ return {
                 this.unbind("EnterFrame");
                 this.unbind("Moved");
                 this.unbind("KeyDown");
-                // Kills enemy events
-                Crafty("Enemy").each(function(){
-                    this.stopEnemy();
-                });
+                
             },
             startAll: function() {
                 // Restarts components
@@ -77,6 +82,10 @@ return {
                 Crafty('Enemy').each(function() {
                     this.startEnemy();
                 });
+                // Restarts exit events
+                Crafty("Exit").each(function() {
+                    this.startExit();
+                });
             },
             startCharacter: function() {
                 this.addComponent("Camera");
@@ -86,6 +95,7 @@ return {
                 this.addComponent("Movement");
                 this.addComponent("Detection");
                 this.addComponent("Battle");
+                Crafty.trigger("InvalidateViewport");
             },
             init: function() {
                 this.requires('Actor, Keyboard, Multiway, spr_char');
@@ -93,8 +103,6 @@ return {
                 if (!edition) {
                     this.reel("CharMoveLeft",800,0,1,8);
                     this.reel("CharMoveRight",800,0,2,8);
-                    this.reel("CharJumpLeft",300,0,3,3);
-                    this.reel("CharJumpRight",300,0,4,3);
                     this.startCharacter();
                 }
             }

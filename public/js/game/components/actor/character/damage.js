@@ -8,8 +8,9 @@
 /**
  * damage.js
  * @dependency /public/js/game/scenes.js
+ * @dependency /public/js/game/audio.js
  */
-define (["../../../scenes"], function(Scenes) {
+define (["../../../scenes", "../../../audio"], function(Scenes, Audio) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -48,8 +49,7 @@ return {
                         }
                         break;
                     case "enemy":
-                        Crafty.audio.play("monster_scream");
-                        Crafty.audio.play("damage");
+                        Audio.playDamage();
                         if (this._shield > 0) {
                             this._shield = this._shield - Math.floor(Math.random()*(MAX_DAMAGE_SHIELD-MIN_DAMAGE_SHIELD+1)+MIN_DAMAGE_SHIELD);
                         } else {
@@ -79,9 +79,9 @@ return {
              */
             die: function(cause) {
                 this._health = 0;
-                Crafty.audio.stop("level");
-                Crafty.audio.stop("alert");
-                Crafty.audio.stop("hidden");
+                Audio.stopLevel();
+                Audio.stopAlert();
+                Audio.stopHidden();
                 this.multiplayerDeath();
                 if (cause === "lava") {
                     this.clearLava();

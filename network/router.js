@@ -24,14 +24,19 @@ var connections = []; // Array of connection data indexed by IP address.
 function checkConnection(id) {
     for (var i in connections) {
         if (connections[i] !== undefined) {
-            console.log(i);
             if (connections[i].id === id) {
-                console.log(i);
                 return i;
             }
         }
     }
     return undefined;
+}
+
+/**
+ * Checks if the IP address of our friend exists in the connection
+ */
+function checkFriend(data) {
+    return connections[data.friend] !== undefined;
 }
 
 /**
@@ -47,7 +52,6 @@ function responseReady(socket) {
                     student: data.student,
                     level: data.level
                 },
-                creator: true
             };
             socket.emit("readyACK");
         } else {
@@ -62,17 +66,15 @@ function responseReady(socket) {
 function responseJoin(socket) {
     socket.on("join", function (data) {
         if (connections[data.address] === undefined) {
-            if (connections[data.player] !== undefined) {
+            if (connections[data.friend] !== undefined) {
                 connections[data.address] = {
                     id: socket.id,
-                    address: data.address,
-                    player: data.player,
-                    connector: true
+                    friend: data.friend,
                 };
                 // Response to the connector with the game of the creator game
-                socket.emit("joinACK", connections[data.player].game);
+                socket.emit("joinACK", connections[data.friend].game);
                 // Response to the creator for starting his game and the IP of the connector
-                io.sockets.socket(connections[data.player].id).emit("join", {player: data.address});
+                io.sockets.socket(connections[data.friend].id).emit("join", {friend: data.address});
             } else {
                 socket.emit("joinERROR",{error: "noplayer"});
             }
@@ -83,14 +85,45 @@ function responseJoin(socket) {
 }
 
 /**
+ * Receive an "engaged" request which implies that the game has started.
+ */
+function responseEngaged(socket) {
+    socket.on("engaged", function (data) {
+        connections[data.address].friend = data.friend;
+        console.log("% PARTIDA MULTIJUGADOR INICIADA entre [Creador: " + data.address + ", Invitado: " + data.friend);
+    });
+}
+
+/**
  *  Handles the position events
  */
 function responseSender(socket) {
-    socket.on("posCreatorToConnector", function (data) {
-        io.sockets.socket(connections[data.address].id).emit("posCreatorToConnector", {x: data.x, y: data.y});
+    // Movement response
+    socket.on("movementCreatorToConnector", function (data) {
+        if (checkFriend(data))
+            io.sockets.socket(connections[data.friend].id).emit("movementCreatorToConnector", {x: data.x, y: data.y});
     });
-    socket.on("posConnectorToCreator", function (data) {
-       io.sockets.socket(connections[data.address].id).emit("posConnectorToCreator", {x: data.x, y: data.y});
+    socket.on("movementConnectorToCreator", function (data) {
+        if (checkFriend(data))
+            io.sockets.socket(connections[data.friend].id).emit("movementConnectorToCreator", {x: data.x, y: data.y});
+    });
+    // Damage response
+    socket.on("damageCreatorToConnector", function (data) {
+        if (checkFriend(data))
+            io.sockets.socket(connections[data.friend].id).emit("damageCreatorToConnector", {enemy: data.enemy, damage: data.damage});
+    });
+    socket.on("damageConnectorToCreator", function (data) {
+        if (checkFriend(data))
+            io.sockets.socket(connections[data.friend].id).emit("damageConnectorToCreator", {enemy: data.enemy, damage: data.damage});
+    });
+    // Exit response
+    socket.on("exitCreatorToConnector", function (data) {
+        if (checkFriend(data))
+            io.sockets.socket(connections[data.friend].id).emit("exitCreatorToConnector");
+    });
+    socket.on("exitConnectorToCreator", function (data) {
+        if (checkFriend(data))
+            io.sockets.socket(connections[data.friend].id).emit("exitConnectorToCreator");
     });
 }
 
@@ -101,6 +134,15 @@ function responseDisconnect(socket) {
     socket.on("disconnect", function () {
         var address = checkConnection(socket.id);
         if (address !== undefined) {
+            var friend = connections[address].friend;
+            if (friend !== undefined && connections[friend] !== undefined) {
+                io.sockets.socket(connections[friend].id).emit("disconnected");
+                if (connections[friend].game !== undefined) {
+                    // Connector. Kill his session
+                    delete connections[friend];
+                    connections[friend] = undefined;
+                }
+            }
             delete connections[address];
             connections[address] = undefined;
         }
@@ -136,6 +178,7 @@ function createRouter(server) {
     io.on('connection', function (socket) {
         responseReady(socket);
         responseJoin(socket);
+        responseEngaged(socket);
         responseClose(socket);
         responseDisconnect(socket);
         responseSender(socket);

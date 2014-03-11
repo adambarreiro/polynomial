@@ -5,7 +5,11 @@
 // Updated: 28-10-2013
 // -----------------------------------------------------------------------------
 
-define (function() {
+/**
+ * lava.js
+ * @dependency /public/js/game/audio.js
+ */
+define (["../../../audio"], function(Audio) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -13,27 +17,34 @@ define (function() {
 
 // Taken from the documentation of Crafty.js
 var drawLava = {
-    maxParticles: 2,
+    maxParticles: 150,
     size: 18,
     sizeRandom: 4,
     speed: 1,
     speedRandom: 1.2,
-    lifeSpan: 20,
+    // Lifespan in frames
+    lifeSpan: 29,
     lifeSpanRandom: 7,
+    // Angle is calculated clockwise: 12pm is 0deg, 3pm is 90deg etc.
     angle: 65,
     angleRandom: 34,
     startColour: [255, 131, 0, 1],
     startColourRandom: [48, 50, 45, 0],
     endColour: [245, 35, 0, 0],
     endColourRandom: [60, 60, 60, 0],
+    // Only applies when fastMode is off, specifies how sharp the gradients are drawn
     sharpness: 20,
     sharpnessRandom: 10,
+    // Random spread from origin
     spread: 10,
+    // How many frames should this last
     duration: -1,
-    fastMode: true,
+    // Will draw squares instead of circle gradients
+    fastMode: false,
     gravity: { x: 0, y: 0.1 },
+    // sensible values are 0-3
     jitter: 0
-};
+}
 
 var LAVA_MAX = 2; // CAUTION: Incresing this parameter means CPU usage to the max.
 
@@ -61,11 +72,11 @@ return {
                         if (this._lavaInterval === undefined) {
                             this._lavaParticles = 0;
                             this._lavaInterval = setInterval( function() {
-                                //Crafty.e("2D, Canvas, Particles").attr({"_x": Crafty("Character").x, "_y": Crafty("Character").y+16}).particles(drawLava);
+                                Crafty.e("2D, Canvas, Particles").attr({"_x": Crafty("Character").x, "_y": Crafty("Character").y+16}).particles(drawLava);
                                 Crafty("Character")._lavaParticles++;
                                 Crafty("Character").damage("lava");
                                 if (Crafty("Character")._lavaParticles % LAVA_MAX === 0) {
-                                    Crafty.audio.play("damage");
+                                    Audio.playDamage();
                                     Crafty('Particles').each(function() { this.destroy(); });
                                 }
                             }, 100);

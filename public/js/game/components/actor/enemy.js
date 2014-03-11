@@ -59,7 +59,8 @@ return {
              */
             multiplayerDamage: function(damage) {
                 if (Crafty("Multiplayer").length > 0) {
-                    Crafty("Character").multiplayerEnemyDamage(this, damage);
+                    // this[0] is the enemy id
+                    Crafty("Character").multiplayerDamage(this[0], damage);
                 }
             },
             /**
@@ -81,10 +82,9 @@ return {
                     d = Math.floor(Math.random()*(MAX_DAMAGE-MIN_DAMAGE+1)+MIN_DAMAGE);
                     this._enemyHealth = this._enemyHealth - d;
                 }
-                
+                this.multiplayerDamage(d);
                 if (this._enemyHealth > 0) {
                     $('#enemybar').css({"width": (this._enemyHealth*3) + "px"});
-                    this.multiplayerDamage(d);
                     return false;
                 } else {
                     Crafty.audio.play("enemy_death");

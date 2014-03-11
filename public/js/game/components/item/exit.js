@@ -30,14 +30,21 @@ return {
                 }
             },
             /**
+             * Stops all the events
+             */
+            stopExit: function() {
+                this.removeComponent("Collision");
+                this.unbind("EnterFrame");
+            },
+            /**
              * Starts all the components attached and events.
              */
             startExit: function() {
                 this.addComponent("Collision");
                 this.bind("EnterFrame", function(e) {
                     if(this.hit('Character')){
-                        this.multiplayerExit();
                         Crafty('Character').stopAll();
+                        this.multiplayerExit();
                         Scenes.nextLevel();
                     }
                 });

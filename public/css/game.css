@@ -236,9 +236,10 @@ body, html {
 .battle {
     position: relative;
     z-index: 10;
-    margin: 1% auto;
-    width: 70%;
-    height: 90%;
+    overflow: auto;
+    margin: 0 auto;
+    width: 820px;
+    height: 460px;
     background: rgba(200,200,200,0.8);
     box-shadow: 10px 10px 10px #111111;
 }
@@ -267,8 +268,8 @@ body, html {
     font-family: Courier;
     width: 60%;
     padding-top: 20px;
-    padding-left: 30px;
-    padding-right: 30px;
+    
+    
     margin-left: 30px;
     margin-top: 10px;
     border-right: 1px solid #000000;
@@ -312,6 +313,7 @@ body, html {
 
 .help {
     clear: both;
+    float: left;
     margin-left: 20px;
     width: 100%;
 }

@@ -4,8 +4,11 @@
 // Description: 
 // Updated: 28-10-2013
 // -----------------------------------------------------------------------------
-
-define (function() {
+/**
+ * battle.js
+ * @dependency /public/js/game/audio.js
+ */
+define (["../../../audio"], function(Audio) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -55,6 +58,7 @@ return {
      */
     createComponent: function() {
         Crafty.c('Battle', {
+            _battleFighting: false, // If we're currently in a fight.
             _battleOperation: undefined, // Operation: +,-,*,**,/
             _battleTimed: false, // If has a timeout
             _battleTimeout: undefined, // The timeout
@@ -99,6 +103,8 @@ return {
                                 dibujarAyuda(),
                             '</div>'].join('\n');
                 $("#cr-stage").append(html);
+                $(".solutionbox").width($(".poly").width());
+                $('#enemybar').css({"width": (this._detectionEnemy._enemyHealth*3) + "px"});
                 $($(".lifebox").children()[2]).show();
                 $($(".lifebox").children()[3]).show();
                 if (this._battleResult !== undefined) {
@@ -237,7 +243,7 @@ return {
                         if (this._battlePolynomials[position][i] > 0) {
                             poly[i] = "+";
                         }
-                        if (this._battlePolynomials[position][i] !== 1 || this._battlePolynomials[position][i] !== -1) {
+                        if (this._battlePolynomials[position][i] !== 1 && this._battlePolynomials[position][i] !== -1) {
                             poly[i] = poly[i] + this._battlePolynomials[position][i];
                         }
                         if (i > 1) {
@@ -401,6 +407,9 @@ return {
                 var inputArray = [], solCoeficient, solExponent;
                 $('body').on("keydown",function(e) {
                     var key = e.keyCode || e.which;
+                    // Chrome strange key mapping:
+                    if (key === 187) key = 171; // -
+                    else if (key === 189) key = 173; // +
                     // Numbers
                     if (!full) {
                        if (key > 47 && key < 58) {
@@ -715,17 +724,18 @@ return {
                 this.clearBattle();
                 if (correct) {
                     this._battleResult = true;
-                    var endBattle = this.getEnemy().damage()
+                    var endBattle = this.getEnemy().damage();
                     if (endBattle) {
-                        Crafty.audio.stop("alert");
-                        Crafty.audio.stop("hidden");
-                        Crafty.audio.play("level",-1);
+                        Audio.stopAlert();
+                        Audio.stopHidden();
+                        Audio.playLevel();
                         if (this._extraTime > 0) {
                             this._extraTime--;
                             if (this._extraTime === 0) {
                                 this.removeBonus("clock");
                             }
                         }
+                        this._battleFighting = false;
                         this.startAll();
                     } else {
                         if (this._health > 0) this.battle(this._battleTimed);
@@ -733,8 +743,8 @@ return {
                 }
                 else {
                     if (!this._battleTimed) {
-                        Crafty.audio.stop("hidden");
-                        Crafty.audio.play("alert",-1);
+                        Audio.stopHidden();
+                        Audio.playAlert();
                     }
                     this.damage("enemy");
                     $('#timeout').css({"color":"red",  "border-color" : "red"});
@@ -751,8 +761,9 @@ return {
              * @return {[type]} [description]
              */
             battle: function(timed) {
+                this._battleFighting = true;
                 if (timed) {
-                    Crafty.audio.play("monster_scream");
+                    Audio.playMonsterScream();
                 }
                 this._battleTimed = timed;
                 // Stops the game

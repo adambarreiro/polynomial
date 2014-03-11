@@ -5,7 +5,11 @@
 // Updated: 02-02-2014
 // -----------------------------------------------------------------------------
 
-define (function() {
+/**
+ * detection.js
+ * @dependency /public/js/game/audio.js
+ */
+define (["../../../audio"], function(Audio) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -180,13 +184,13 @@ return {
                         $('#timeout').html("¡ESTÁS ESCONDIDO! ESPERA PARA ATACAR...");
                     }
                 }
-                if (this._detectionSpotted) {
+                if (this._detectionSpotted && !this._battleFighting) {
                     this._detectionSpotted = false;
-                    Crafty.audio.stop("level");
-                    Crafty.audio.play("alert",-1);
+                    Audio.stopLevel();
+                    Audio.playAlert();
                     this.battle(true);
                 } else {
-                    if (!this._detectionHidden) {
+                    if (!this._detectionHidden && !this._detectionReachable) {
                         this._detectionEnemy = undefined;
                     }
                 }
@@ -205,12 +209,12 @@ return {
                 this.bind("KeyDown", function () {
                     if (this.isDown("A")) {
                         if (this._detectionReachable) {
-                            Crafty.audio.stop("level");
+                            Audio.stopLevel();
                             if (!this._detectionHidden) {
-                                Crafty.audio.play("alert",-1);
+                                Audio.playAlert();
                                 this.battle(true);
                             } else {
-                                Crafty.audio.play("hidden",-1);
+                                Audio.playHidden();
                                 this.battle(false);
                             }
                         }

@@ -28,6 +28,7 @@ return {
      */
     createComponent: function() {
         Crafty.c('Movement', {
+            _posy: undefined,
             /**
              * Jumping event
              */
@@ -57,22 +58,19 @@ return {
                 if (hit) {
                     // Collide
                     this.y = hit._y + this._h; // Makes the character stop
-                    this_up = false;
                 } else {
                     // Dont collide, go up
                     if (this._up) {
                         this.clearLava();
                         this.y -= JUMPY;
+                        this._falling = true;
                         if (this._orientation === "right") {
-                            if (!this.isPlaying("CharJumpRight")) {
-                                this.animate("CharJumpRight",1);
-                            }
+                            this.sprite(1,4);
                         }
                         else {
-                            if (!this.isPlaying("CharJumpLeft")) {
-                                this.animate("CharJumpLeft",1);
-                            }
+                            this.sprite(1,3);
                         }
+                        this.trigger('Moved', { x: this._x, y: this._y + JUMPY });
                     }
                 }
             },
@@ -88,7 +86,7 @@ return {
                 });
                 this.bind("EnterFrame", function () {
                     this.jump();
-                    if (!this._up && !this.isPlaying("CharMoveRight") && !this.isPlaying("CharMoveLeft")) {
+                    if (!this._up && !this._falling && !this.isPlaying("CharMoveRight") && !this.isPlaying("CharMoveLeft")) {
                         this.pauseAnimation();
                         if (this._orientation == "left") {
                             this.sprite(1,0);
@@ -98,19 +96,20 @@ return {
                     }
                 });
                 this.bind("KeyDown", function () {
-                    if (this.isDown("UP_ARROW")){
+                    if (!this._falling && this.isDown("UP_ARROW")){
                         this._up = true;
-                        Crafty.trigger("Moved", {x: this.x, y: this.y});
                     } else if (this.isDown("RIGHT_ARROW")){
                         this._orientation="right";
-                        if (!this.isPlaying("CharMoveRight")){
+                        if (!this._up && !this._falling && !this.isPlaying("CharMoveRight")){
                             this.animate("CharMoveRight",-1);
                         }
                     } else if (this.isDown("LEFT_ARROW")){
                         this._orientation="left";
-                        if (!this.isPlaying("CharMoveLeft")){
+                        if (!this._up && !this._falling && !this.isPlaying("CharMoveLeft")){
                             this.animate("CharMoveLeft",-1);
                         }
+                    } else if (this.isDown("DOWN_ARROW")) {
+                        this.trigger('Moved', { x: this._x, y: this._y });
                     }
                 });
                 this.bind("KeyUp", function(e) {
@@ -125,29 +124,24 @@ return {
                 this.bind("Moved", function(from) {
                     if (this.hit("Terrain")) {
                         this.x = from.x;
-                        this.y = from.y;
                     }
                     if (this.x <= 0 || this.x >= Constants.getLevelSize('px').width) {
                         this.x = from.x;
                     }
                     if(from.x < this.x) {
                         this._orientation="right";
-                        if (!this._up) {
-                            if (!this.isPlaying("CharMoveRight")){
-                                this.animate("CharMoveRight",-1);
-                            }
+                        if (!this._up && !this._falling && !this.isPlaying("CharMoveRight")){
+                            this.animate("CharMoveRight",-1);
                         }
                     } else if (from.x > this.x) {
                         this._orientation="left";
-                        if (!this._up) {
-                            if (!this.isPlaying("CharMoveLeft")){
-                                this.animate("CharMoveLeft",-1);
-                            }
+                        if (!this._up && !this._falling && !this.isPlaying("CharMoveLeft")){
+                            this.animate("CharMoveLeft",-1);
                         }
                     } else {
-                        if (this._orientation == "left") {
+                        if (!this._up && !this._falling && this._orientation == "left") {
                             this.sprite(1,0);
-                        } else {
+                        } else if (!this._up && !this._falling && this._orientation == "right") {
                             this.sprite(0,0);
                         }
                     }

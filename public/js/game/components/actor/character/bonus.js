@@ -5,7 +5,11 @@
 // Updated: 01-03-2014
 // -----------------------------------------------------------------------------
 
-define (function() {
+/**
+ * bonus.js
+ * @dependency /public/js/game/audio.js
+ */
+define (["../../../audio"], function(Audio) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -110,23 +114,23 @@ return {
                     }
                     switch(icon) {
                         case "health":
-                            Crafty.audio.play("health");
+                            Audio.playHealth();
                             Crafty("Character")._health=Crafty("Character")._health + Math.floor(Math.random()*(100-CURATION+1)+CURATION);
                             if (Crafty("Character")._health > 100) Crafty("Character")._health = 100;
                             $('#lifebar').css({"width": (Crafty("Character")._health*3) + "px"});
                             break;
                         case "shield":
-                            Crafty.audio.play("shield");
+                            Audio.playShield();
                             Crafty("Character")._shield=100;
                             $('#lifebar').css({"width": "300px", "background" : "rgb(50,50,200)"});
                             $('#vidatext').html("Escudo: ");
                             break;
                         case "power":
-                            Crafty.audio.play("power");
+                            Audio.playPower();
                             Crafty("Character")._power=Crafty("Character")._power+POWER;
                             break;
                         case "clock":
-                            Crafty.audio.play("clock");
+                            Audio.playClock();
                             Crafty("Character")._extraTime = Crafty("Character")._extraTime+CLOCKS;
                             break;
                     }
@@ -149,7 +153,7 @@ return {
                     if (chest !== undefined) {
                         if (!chest._opened) {
                             this.stopAll();
-                            Crafty.audio.play("chest");
+                            Audio.playChest();
                             chest._opened = true;
                             if (QUESTIONS.length === 0 || ANSWERS.length === 0) return;
                             var index = (Math.floor(Math.random()*QUESTIONS.length));

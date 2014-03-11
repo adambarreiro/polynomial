@@ -8,8 +8,9 @@
 /**
  * components.js
  * @dependency /public/js/game/components/grid.js
+ * @dependency /public/js/game/audio.js
  */
-define (["./components/grid"], function(Grid) {
+define (["./components/grid", "./audio"], function(Grid, Audio) {
 
 var EDITOR = false;
 var ROOT_ROUTE = "/assets/img/";
@@ -79,21 +80,6 @@ function loadGameGraphics() {
     });
 }
 
-function loadSounds() {
-    Crafty.audio.add("alert", "assets/music/alert.mp3");
-    Crafty.audio.add("hidden", "assets/music/hidden.mp3");
-    Crafty.audio.add("level", "assets/music/level.mp3");
-    Crafty.audio.add("chest", "assets/sfx/chest.mp3");
-    Crafty.audio.add("shield", "assets/sfx/shield.mp3");
-    Crafty.audio.add("clock", "assets/sfx/clock.mp3");
-    Crafty.audio.add("power", "assets/sfx/power.mp3");
-    Crafty.audio.add("health", "assets/sfx/health.mp3");
-    Crafty.audio.add("attack", "assets/sfx/attack.mp3");
-    Crafty.audio.add("damage", "assets/sfx/damage.mp3");
-    Crafty.audio.add("enemy_death", "assets/sfx/enemy_death.mp3");
-    Crafty.audio.add("monster_scream", "assets/sfx/monster_scream.mp3");
-}
-
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
@@ -101,7 +87,7 @@ function setComponents(edition) {
     if (edition) loadEditorGraphics();
     else {
         loadGameGraphics();
-        loadSounds();
+        Audio.addAudio();
     }
     Grid.registerComponent(edition);
 }
