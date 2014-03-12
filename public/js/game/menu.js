@@ -25,6 +25,40 @@ function csrf() {
     return '<input type="hidden" value="' + document.cookie.substring(pri,fin) + '" name="_csrf" />';
 }
 
+/**
+ * Returns true if the length of a text exceeds a limit given.
+ * @param text - The text to check.
+ * @param limitUp - Limit that must not be exceeded.
+ * @param limitDown - Limit that must BE exceeded. If <=0 ignores it.
+ * @return Boolean - True if the length is allright.
+ */
+function lengthCheck(text, limitUp, limitDown) {
+    var r = text.length <= limitUp;
+    if (limitDown > 0)
+        r = r && (text.length >= limitDown);
+    return r;
+}
+
+/**
+ * Checks if the text has valid characters for a generic text depending on
+ * the parameters given: Only letters, or only letters and numbers, etc.
+ * @param text - The text to check.
+ * @param allowEmpty - Allows the text to be empty.
+ * @param allowNumbers - Allows the text to have numbers.
+ * @return Boolean - True if text is correct.
+ */
+function checkText(text, allowEmpty, allowNumbers) {
+    var regex = /^(\ *[A-Za-zÁáÉéÍíÓóÚúÜüºª]+\ *)+$/;
+    if (allowNumbers) regex = /^(\ *[A-Za-z0-9ÁáÉéÍíÓóÚúÜüºª]+\ *)+$/;
+    if (!lengthCheck(text, 20, 1))
+        return false;
+    else
+        if (!allowEmpty)
+            return regex.test(text);
+        else
+            return (text === "") || regex.test(text);
+}
+
 function getOnePlayerPanel() {
     var cont = '';
     var Menu = Require("menu");
@@ -55,7 +89,7 @@ function getTwoPlayerPanel() {
 function createPanel() {
    return ['<div class="menu">',
                 '<div class="separator">Crear partida</div>',
-                '<input class="field" type="text" name="ip" placeholder="IP de tu PC"/>',
+                '<input class="field" type="text" name="game" placeholder="Nombre de la partida"/>',
                 '<div class="buttonext" id="create">Crear</div>',
             '</div>',
             '<div class="extra">',
@@ -66,8 +100,7 @@ function createPanel() {
 function connectPanel() {
    return ['<div class="menu">',
                 '<div class="separator">Conectar</div>',
-                '<input class="field" type="text" name="ourip" placeholder="IP de tu PC"/>',
-                '<input class="field" type="text" name="ip" placeholder="IP del PC de tu amigo"/>',
+                '<input class="field" type="text" name="game" placeholder="Nombre de la partida"/>',
                 '<div class="buttonext" id="connect">Conectar</div>',
             '</div>',
             '<div class="extra">',
@@ -81,10 +114,23 @@ function twoPlayerMenuHandler() {
         $('.container').empty();
         $('.container').append(createPanel());
         $('#create').bind('click', function() {
-            var ip = $("input[name='ip']").val();
-            Creator.startCreator('http://localhost');
+            var game = $("input[name='game']").val();
+            if (checkText(game, false, true)) {
+                $("body").unbind("keyup");
+                Creator.startCreator(game);
+            }
+        });
+        $("body").bind("keyup", function(e) {
+            if ((e.keyCode || e.which) == 13) {
+                var game = $("input[name='game']").val();
+                if (checkText(game, false, true)) {
+                    $("body").unbind("keyup");
+                    Creator.startCreator(game);
+                }
+            }
         });
         $('#edbutton').bind('click',function() {
+            $("body").unbind("keyup");
            $('.container').empty();
            $('.container').append(getTwoPlayerPanel());
            twoPlayerMenuHandler();
@@ -95,11 +141,23 @@ function twoPlayerMenuHandler() {
         $('.container').empty();
         $('.container').append(connectPanel());
         $('#connect').bind('click', function() {
-            var ip1 = $("input[name='ourip']").val();
-            var ip2 = $("input[name='ip']").val();
-            Connector.startConnector('http://127.0.0.1','http://localhost');
+            var game = $("input[name='game']").val();
+            if (checkText(game, false, true)) {
+                $("body").unbind("keyup");
+                Connector.startConnector(game);
+            }
+        });
+        $("body").bind("keyup", function(e) {
+            if ((e.keyCode || e.which) == 13) {
+                var game = $("input[name='game']").val();
+                if (checkText(game, false, true)) {
+                    $("body").unbind("keyup");
+                    Connector.startConnector(game);
+                }
+            }
         });
         $('#edbutton').bind('click',function() {
+        $("body").unbind("keyup");
            $('.container').empty();
            $('.container').append(getTwoPlayerPanel());
            twoPlayerMenuHandler();
@@ -111,7 +169,6 @@ function twoPlayerMenuHandler() {
         Menu.menuHandler();
     });
 }
-
 
 // -----------------------------------------------------------------------------
 // Public
@@ -156,10 +213,10 @@ return {
             twoPlayerMenuHandler();
         });
     },
-    waitingMenu: function(address) {
+    waitingMenu: function(game) {
         var html = ['<div class="menu">',
                     '<div class="separator">Esperando...</div>',
-                    '<p>Esperando a que tu amigo se conecte a '+ address +' ...</p>',
+                    '<p>Esperando a que tu amigo se conecte a "'+ game + '"...</p>',
                 '</div>',
                 '<div class="extra">',
                     '<div id="edbutton">Atr&aacute;s</div>',
@@ -169,15 +226,15 @@ return {
         $('#edbutton').bind('click',function() {
             $('.container').empty();
             $('.container').append(getTwoPlayerPanel());
-            Creator.closeCreator(address);
+            Creator.closeCreator(game);
             twoPlayerMenuHandler();
         });
 
     },
-    connectionMenu: function(address) {
+    connectionMenu: function(game) {
         var html = ['<div class="menu">',
                     '<div class="separator">Conectando...</div>',
-                    '<p>Conectando al PC de tu amigo ('+ address +')...</p>',
+                    '<p>Conectando a la partida "'+ game+'"...</p>',
                 '</div>',
                 '<div class="extra">',
                     '<div id="edbutton">Atr&aacute;s</div>',
@@ -187,7 +244,7 @@ return {
         $('#edbutton').bind('click',function() {
             $('.container').empty();
             $('.container').append(getTwoPlayerPanel());
-            Connector.closeConnector(address);
+            Connector.closeConnector(game);
             twoPlayerMenuHandler();
         });
     },

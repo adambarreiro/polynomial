@@ -14,6 +14,7 @@ define (["require","../menu"], function(Require) {
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
+var CREATOR_SERVER = "http://" + window.location.host;
 var CREATOR_STARTED = false;
 var CREATOR_SOCKET;
 var CREATOR_CONNECTORADDRESS;
@@ -21,7 +22,7 @@ var CREATOR_ADDRESS;
 
 /**
  * Prepares the handler to the ready emit response.
- * @param  address - Our IP address
+ * @param  host - Our IP host
  */
 function onRegister() {
     var Menu = Require("menu");
@@ -29,18 +30,18 @@ function onRegister() {
         Menu.waitingMenu(CREATOR_ADDRESS);
     });
     CREATOR_SOCKET.on("readyERROR", function() {
-        alert("ERROR: Parece que tu IP ya está siendo usada.");
+        alert("ERROR: Este nombre ya se está usando en una partida ahora mismo.");
     });
 }
 
 /**
  * Tells the server that we want to create a new game, sending our game data.
- * @param  address - Our IP address
+ * @param  host - Our IP host
  */
 function emitRegister() {
     var Menu = Require("menu");
     CREATOR_SOCKET.emit("ready", {
-        address: CREATOR_ADDRESS,
+        host: CREATOR_ADDRESS,
         student: Menu.readStudentCookie(),
         level: Menu.readSavegameCookie()
     });
@@ -63,7 +64,7 @@ function onJoin() {
  */
 function emitEngaged() {
     CREATOR_SOCKET.emit("engaged", {
-        address: CREATOR_ADDRESS,
+        host: CREATOR_ADDRESS,
         friend: CREATOR_CONNECTORADDRESS
     });
 }
@@ -84,12 +85,12 @@ function onDisconnected() {
 return {
     /**
      * Starts the socket and all the events.
-     * @param  address - Our IP address
+     * @param  host - Our IP host
      */
-    startCreator: function(address) {
+    startCreator: function(host) {
         if (!CREATOR_STARTED) {
-            CREATOR_ADDRESS = address;
-            CREATOR_SOCKET = io.connect(CREATOR_ADDRESS);
+            CREATOR_ADDRESS = host;
+            CREATOR_SOCKET = io.connect(CREATOR_SERVER);
             CREATOR_SOCKET.on("connect", function () {
                 onRegister();
                 onJoin();
@@ -97,6 +98,12 @@ return {
                 emitRegister();
                 CREATOR_STARTED = true;
             });
+            /*
+            var counter = 0;
+            var caca = setInterval(function() {
+                CREATOR_SOCKET.socket.connected
+            },1000);*/
+
         } else {
             emitRegister();
         }

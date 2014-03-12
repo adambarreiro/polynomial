@@ -30,11 +30,6 @@ return {
      */
     createComponent: function() {
         Crafty.c('Damage', {
-            multiplayerDeath: function() {
-                if (Crafty("Multiplayer").length > 0) {
-                    this.multiplayerDeath();
-                }
-            },
             /**
              * Hurts the character by some random amount.
              * @param cause - The cause of damage (lava or enemy)
@@ -82,7 +77,6 @@ return {
                 Audio.stopLevel();
                 Audio.stopAlert();
                 Audio.stopHidden();
-                this.multiplayerDeath();
                 if (cause === "lava") {
                     this.clearLava();
                 }

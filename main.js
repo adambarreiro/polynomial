@@ -33,8 +33,8 @@ function startNodeServer(port, securePort) {
         app.use(express.cookieParser());
         app.use(express.session({secret: "pfc_adambarreiro"}));
         app.use(express.static(__dirname + '/public'));
-        app.use(express.csrf()); // Avoids Cross-Site Request Forgery attacks
-        app.use(errors.handle403);
+        //app.use(express.csrf()); // Avoids Cross-Site Request Forgery attacks
+        //app.use(errors.handle403);
     });
     console.log("(i) INFO: Leyendo certificados.");
     // Certificates
@@ -45,10 +45,10 @@ function startNodeServer(port, securePort) {
     console.log("(i) INFO: Creando servidor HTTP.");
     // Create the two different servers
     var unsecure = http.createServer(app);
-    unsecure.listen(port);
-    console.log("(i) INFO: Creando servidor HTTPS.");
+    unsecure.listen(process.env.PORT || port);
+    /*console.log("(i) INFO: Creando servidor HTTPS.");
     var secure = https.createServer(options, app);
-    secure.listen(securePort);
+    secure.listen(securePort);*/
     // Creates the socket router for the multiplayer
     console.log("(i) INFO: Arrancando Socket.io para el multijugador.");
     router.createRouter(unsecure);

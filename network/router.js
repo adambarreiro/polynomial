@@ -13,13 +13,13 @@ var io = require('socket.io');
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
-var connections = []; // Array of connection data indexed by IP address.
+var connections = []; // Array of connection data indexed by IP host.
 
 /**
  * Searches for an id in the entire connections array and returns its
- * address.
+ * host.
  * @param id - The socket id to search
- * @return undefined if the address doesn't exist. Address in other case.
+ * @return undefined if the host doesn't exist. Address in other case.
  */
 function checkConnection(id) {
     for (var i in connections) {
@@ -33,7 +33,7 @@ function checkConnection(id) {
 }
 
 /**
- * Checks if the IP address of our friend exists in the connection
+ * Checks if the IP host of our friend exists in the connection
  */
 function checkFriend(data) {
     return connections[data.friend] !== undefined;
@@ -45,8 +45,9 @@ function checkFriend(data) {
  */
 function responseReady(socket) {
     socket.on("ready", function (data) {
-        if (connections[data.address] === undefined) {
-            connections[data.address] = {
+        console.log(data);
+        if (connections[data.host] === undefined) {
+            connections[data.host] = {
                 id: socket.id,
                 game: {
                     student: data.student,
@@ -65,16 +66,17 @@ function responseReady(socket) {
  */
 function responseJoin(socket) {
     socket.on("join", function (data) {
-        if (connections[data.address] === undefined) {
+        console.log(data);
+        if (connections[data.host] === undefined) {
             if (connections[data.friend] !== undefined) {
-                connections[data.address] = {
+                connections[data.host] = {
                     id: socket.id,
                     friend: data.friend,
                 };
                 // Response to the connector with the game of the creator game
                 socket.emit("joinACK", connections[data.friend].game);
                 // Response to the creator for starting his game and the IP of the connector
-                io.sockets.socket(connections[data.friend].id).emit("join", {friend: data.address});
+                io.sockets.socket(connections[data.friend].id).emit("join", {friend: data.host});
             } else {
                 socket.emit("joinERROR",{error: "noplayer"});
             }
@@ -89,8 +91,8 @@ function responseJoin(socket) {
  */
 function responseEngaged(socket) {
     socket.on("engaged", function (data) {
-        connections[data.address].friend = data.friend;
-        console.log("% PARTIDA MULTIJUGADOR INICIADA entre [Creador: " + data.address + ", Invitado: " + data.friend);
+        connections[data.host].friend = data.friend;
+        console.log("% PARTIDA MULTIJUGADOR INICIADA entre [Creador: " + data.host + ", Invitado: " + data.friend);
     });
 }
 
@@ -132,9 +134,9 @@ function responseSender(socket) {
  */
 function responseDisconnect(socket) {
     socket.on("disconnect", function () {
-        var address = checkConnection(socket.id);
-        if (address !== undefined) {
-            var friend = connections[address].friend;
+        var host = checkConnection(socket.id);
+        if (host !== undefined) {
+            var friend = connections[host].friend;
             if (friend !== undefined && connections[friend] !== undefined) {
                 io.sockets.socket(connections[friend].id).emit("disconnected");
                 if (connections[friend].game !== undefined) {
@@ -143,8 +145,8 @@ function responseDisconnect(socket) {
                     connections[friend] = undefined;
                 }
             }
-            delete connections[address];
-            connections[address] = undefined;
+            delete connections[host];
+            connections[host] = undefined;
         }
     });
 }
@@ -154,10 +156,10 @@ function responseDisconnect(socket) {
  */
 function responseClose(socket) {
     socket.on("close", function () {
-        var address = checkConnection(socket.id);
-        if (address !== undefined) {
-            delete connections[address];
-            connections[address] = undefined;
+        var host = checkConnection(socket.id);
+        if (host !== undefined) {
+            delete connections[host];
+            connections[host] = undefined;
         }
         
     });
@@ -173,7 +175,9 @@ function responseClose(socket) {
 function createRouter(server) {
     // Creates the socket
     io = io.listen(server);
-    io.set('log level', 1);
+    io.configure( function(){
+        io.set('log level', 1);
+    });
     // Connection events
     io.on('connection', function (socket) {
         responseReady(socket);

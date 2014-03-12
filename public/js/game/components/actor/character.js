@@ -63,6 +63,7 @@ return {
                 this.removeComponent("Camera");
                 this.removeComponent("Detection");
                 this.removeComponent("Lava");
+                this.removeComponent("Bonus");
                 this.removeComponent("Battle");
                 this.removeComponent("Movement");
                 // Kills events
@@ -75,6 +76,7 @@ return {
                 // Restarts components
                 this.addComponent("Camera");
                 this.addComponent("Detection");
+                this.addComponent("Bonus");
                 this.addComponent("Lava");
                 this.addComponent("Battle");
                 this.addComponent("Movement");

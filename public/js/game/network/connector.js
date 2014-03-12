@@ -14,6 +14,7 @@ define (["require","../menu"], function(Require) {
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
+var CONNECTOR_SERVER = "http://" + window.location.host;
 var CONNECTOR_STARTED = false;
 var CONNECTOR_SOCKET;
 var CONNECTOR_CREATORADDRESS;
@@ -21,8 +22,8 @@ var CONNECTOR_ADDRESS;
 
 /**
  * Prepares the handler to the join emit response.
- * @param ourAddress - Our IP address
- * @param address - The IP address of the other player
+ * @param ourAddress - Our IP host
+ * @param host - The IP host of the other player
  */
 function onJoin() {
     CONNECTOR_SOCKET.on("joinACK", function(data) {
@@ -31,9 +32,9 @@ function onJoin() {
     });
     CONNECTOR_SOCKET.on("joinERROR", function(data) {
         if (data.error === "noplayer") {
-            alert("ERROR: Parece que nadie ha creado una partida en esa IP.");
+            alert("ERROR: Parece que nadie ha creado una partida con este nombre.");
         } else {
-            alert("ERROR: Parece que tu IP ya está siendo usada.");
+            alert("ERROR: Este nombre ya se está usando en una partida ahora mismo.");
         }
     });
 }
@@ -43,7 +44,7 @@ function onJoin() {
  */
 function emitJoin() {
     CONNECTOR_SOCKET.emit("join", {
-        address: CONNECTOR_ADDRESS,
+        host: CONNECTOR_ADDRESS,
         friend: CONNECTOR_CREATORADDRESS
     });
 }
@@ -65,14 +66,13 @@ return {
 
     /**
      * Creates the CONNECTOR_SOCKET and controls all the events.
-     * @param ourAddress - Our IP address
-     * @param address - The IP address of the other player
+     * @param host - The IP host of the other player
      */
-    startConnector: function(ourAddress, address) {
+    startConnector: function(host) {
         if (!CONNECTOR_STARTED) {
-            CONNECTOR_ADDRESS = ourAddress;
-            CONNECTOR_CREATORADDRESS = address;
-            CONNECTOR_SOCKET = io.connect(CONNECTOR_ADDRESS);
+            CONNECTOR_ADDRESS = host + "connector";
+            CONNECTOR_CREATORADDRESS = host;
+            CONNECTOR_SOCKET = io.connect(CONNECTOR_SERVER);
             CONNECTOR_SOCKET.on("connect", function () {
                 onJoin();
                 onDisconnected();

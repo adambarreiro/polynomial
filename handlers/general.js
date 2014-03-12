@@ -65,8 +65,8 @@ function setAjaxHandlers() {
 exports.setAjaxHandlers = setAjaxHandlers;
 
 function csrf(req, res, next) {
-    res.locals.token = req.session._csrf;
-    res.cookie('token', res.locals.token);
+    //res.locals.csrftoken = req.csrfToken();
+    res.cookie('token', res.locals.csrftoken);
     next();
 }
 exports.csrf = csrf;

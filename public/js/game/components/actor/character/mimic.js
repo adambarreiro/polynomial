@@ -61,25 +61,6 @@ function onReceiveExit() {
 }
 
 /**
- * Function fired when we receive that the other player's dead.
- */
-function onReceiveDeath() {
-    switch(TYPE) {
-        case "connector":
-            Connector.onReceiveDeath(function() {
-                this.stopMultiplayer();
-            });
-            break;
-        case "creator":
-            Creator.onReceiveDeath(function() {
-                this.stopMultiplayer();
-            });
-            break;
-        default: break;
-    }
-}
-
-/**
  * Function fired when we receive that an enemy's been damaged
  */
 function onReceiveDamage() {
@@ -177,16 +158,6 @@ return {
                 }
             },
             /**
-             * Function called to retransmit the death of the character
-             */
-            multiplayerDeath: function() {
-                switch(TYPE) {
-                    case "connector": Connector.sendDeath(); break;
-                    case "creator": Creator.sendDeath(); break;
-                    default: break;
-                }
-            },
-            /**
              * Function called to retransmit the next level event
              */
             multiplayerExit: function() {
@@ -221,7 +192,6 @@ return {
                 TYPE = "connector";
                 onReceiveMovement();
                 onReceiveExit();
-                onReceiveDeath();
                 onReceiveDamage();
                 this.multiplayerMove();
             },
@@ -232,7 +202,6 @@ return {
                 TYPE = "creator";
                 onReceiveMovement();
                 onReceiveExit();
-                onReceiveDeath();
                 onReceiveDamage();
                 this.multiplayerMove();
             },
