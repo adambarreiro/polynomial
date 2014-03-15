@@ -45,7 +45,6 @@ function checkFriend(data) {
  */
 function responseReady(socket) {
     socket.on("ready", function (data) {
-        console.log(data);
         if (connections[data.host] === undefined) {
             connections[data.host] = {
                 id: socket.id,
@@ -92,7 +91,7 @@ function responseJoin(socket) {
 function responseEngaged(socket) {
     socket.on("engaged", function (data) {
         connections[data.host].friend = data.friend;
-        console.log("% PARTIDA MULTIJUGADOR INICIADA entre [Creador: " + data.host + ", Invitado: " + data.friend);
+        console.log('% Partida multijugador "'+data.host+'" empezada.');
     });
 }
 
@@ -103,11 +102,11 @@ function responseSender(socket) {
     // Movement response
     socket.on("movementCreatorToConnector", function (data) {
         if (checkFriend(data))
-            io.sockets.socket(connections[data.friend].id).emit("movementCreatorToConnector", {x: data.x, y: data.y});
+            io.sockets.socket(connections[data.friend].id).volatile.emit("movementCreatorToConnector", {x: data.x, y: data.y});
     });
     socket.on("movementConnectorToCreator", function (data) {
         if (checkFriend(data))
-            io.sockets.socket(connections[data.friend].id).emit("movementConnectorToCreator", {x: data.x, y: data.y});
+            io.sockets.socket(connections[data.friend].id).volatile.emit("movementConnectorToCreator", {x: data.x, y: data.y});
     });
     // Damage response
     socket.on("damageCreatorToConnector", function (data) {
@@ -177,6 +176,8 @@ function createRouter(server) {
     io = io.listen(server);
     io.configure( function(){
         io.set('log level', 1);
+        io.set('transports',['websocket', 'flashsocket','htmlfile', 'xhr-polling' ,'jsonp-polling']);
+        io.set('polling duration',10);
     });
     // Connection events
     io.on('connection', function (socket) {

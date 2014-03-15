@@ -72,7 +72,7 @@ return {
                         if (this._lavaInterval === undefined) {
                             this._lavaParticles = 0;
                             this._lavaInterval = setInterval( function() {
-                                Crafty.e("2D, Canvas, Particles").attr({"_x": Crafty("Character").x, "_y": Crafty("Character").y+16}).particles(drawLava);
+                                Crafty.e("2D, Canvas, Particles").attr({"x": Crafty("Character").x, "y": Crafty("Character").y+16}).particles(drawLava);
                                 Crafty("Character")._lavaParticles++;
                                 Crafty("Character").damage("lava");
                                 if (Crafty("Character")._lavaParticles % LAVA_MAX === 0) {

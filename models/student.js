@@ -23,7 +23,8 @@ var studentSchema = new mongoose.Schema({
     surname2: String,
     group: { type: String, ref: 'Group' },
     assigned: Boolean,
-    savegame: Number
+    savegame: Number,
+    stats: [mongoose.Schema.Types.Mixed]
 });
 var Student = mongoose.model('Student', studentSchema);
 
@@ -229,9 +230,20 @@ exports.deleteStudent = deleteStudent;
 function setLevelStudent(e, l, callback) {
     console.log("$ Asignarle el nivel " + l + " al estudiante " + e + ".");
     var stud = unescape(e);
-    Student.update({email: stud}, { $set: {savegame: l}}, function(error) {
-        if (!error) callback({ok: true});
-        else callback({ok: false});
-    });
+    var dateUnformatted = new Date();
+    var date = ("0" + dateUnformatted.getDate()).slice(-2) + "/" + ("0"+dateUnformatted.getMonth()).slice(-2) + "/" + dateUnformatted.getFullYear() + " a las " +
+               ("0"+dateUnformatted.getHours()).slice(-2) + ":" + ("0"+dateUnformatted.getMinutes()).slice(-2);
+    if (l == 1) {
+        Student.update({email: stud}, { $set: {savegame: l, stats: {level: l, date: date}}}, function(error) {
+            if (!error) callback({ok: true});
+            else callback({ok: false});
+        });
+    } else {
+        Student.update({email: stud}, { $set: {savegame: l}, $push: {stats: {level: l, date: date}}}, function(error) {
+            if (!error) callback({ok: true});
+            else callback({ok: false});
+        });
+    }
+
 }
 exports.setLevelStudent = setLevelStudent;

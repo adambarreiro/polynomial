@@ -5,12 +5,26 @@
 // Updated: 26-12-2013
 // -----------------------------------------------------------------------------
 
+// Loading...
+window.onload = function(){
+    if ($(".container").html() === "") {
+       var html = ['<div class="menu">',
+                    '<div class="separator">Cargando...</div>',
+                    '<p>Por favor, espera...</p>',
+                '</div>'].join("\n");
+        $('.container').empty();
+        $('.container').append(html);
+    }
+};
+
 /**
  * Game main file - RequireJS
  * @dependency /public/js/menu/view.js
  * @dependency /public/js/menu/controller.js
  */
 require(['./constants', './menu', './components'], function(Constants, Menu, Components) {
+
+
     var pri = document.cookie.indexOf("token=")+"token=".length;
     var fin = document.cookie.indexOf(";", pri);
     if (fin < 0) {
@@ -22,7 +36,7 @@ require(['./constants', './menu', './components'], function(Constants, Menu, Com
     });
     content = $('.container');
     // Draws the game selector panel.
-    content.append(Menu.getGamePanel());
+    content.html(Menu.getGamePanel());
     // Sets all the handlers.
     Components.setEditor(false);
     Components.init();

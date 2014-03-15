@@ -14,7 +14,7 @@ define (["require","../menu"], function(Require) {
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
-var CREATOR_SERVER = "http://" + window.location.host;
+var CREATOR_SERVER;
 var CREATOR_STARTED = false;
 var CREATOR_SOCKET;
 var CREATOR_CONNECTORADDRESS;
@@ -31,6 +31,7 @@ function onRegister() {
     });
     CREATOR_SOCKET.on("readyERROR", function() {
         alert("ERROR: Este nombre ya se está usando en una partida ahora mismo.");
+        Menu.creatorPanel();
     });
 }
 
@@ -89,8 +90,22 @@ return {
      */
     startCreator: function(host) {
         if (!CREATOR_STARTED) {
+            var CREATOR_SERVER = "http://" + window.location.hostname;
+            if (window.location.port === "") CREATOR_SERVER += ":80";
+            else CREATOR_SERVER += ":"+window.location.port;
             CREATOR_ADDRESS = host;
             CREATOR_SOCKET = io.connect(CREATOR_SERVER);
+            CREATOR_SOCKET.on("connecting", function() {
+                var html = ['<div class="menu">',
+                                '<div class="separator">Conectando con el servidor...</div>',
+                                '<p>Enviando petición de conexión al servidor...</p>',
+                            '</div>'].join("\n");
+                $('.container').empty();
+                $('.container').append(html);
+            });
+            CREATOR_SOCKET.on("error", function() {
+                window.location = "/game";
+            });
             CREATOR_SOCKET.on("connect", function () {
                 onRegister();
                 onJoin();
@@ -98,12 +113,6 @@ return {
                 emitRegister();
                 CREATOR_STARTED = true;
             });
-            /*
-            var counter = 0;
-            var caca = setInterval(function() {
-                CREATOR_SOCKET.socket.connected
-            },1000);*/
-
         } else {
             emitRegister();
         }

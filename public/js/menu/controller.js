@@ -277,6 +277,7 @@ return {
      * @param content - The content of the page.
      */
     adminSetHandlers: function(content) {
+        var Controller = Require("controller");
         // Element binding.
         content.find("#createGroup").bind('click',function() {
             content.empty();
@@ -284,61 +285,61 @@ return {
             adminSetSubmenuGroupHandlers(content);
         });
         content.find("#editGroup").bind('click',function() {
-            content.empty();
-            content.append(View.adminEditGroup());
-            var Controller = Require("controller");
+            View.loadingPopup(content);
             Controller.ajaxGetGroups(function(data) {
+                content.empty();
+                content.append(View.adminEditGroup());
                 View.setGroupList(data);
+                adminSetSubmenuGroupHandlers(content);
             });
-            adminSetSubmenuGroupHandlers(content);
         });
         content.find("#deleteGroup").bind('click',function() {
-            content.empty();
-            content.append(View.adminDeleteGroup());
-            var Controller = Require("controller");
+            View.loadingPopup(content);
             Controller.ajaxGetGroups(function(data) {
+                content.empty();
+                content.append(View.adminDeleteGroup());
                 View.setGroupList(data);
+                adminSetSubmenuHandlers(content);
             });
-            adminSetSubmenuHandlers(content);
         });
         content.find("#assignGroup").bind('click',function() {
-            content.empty();
-            content.append(View.adminAssignGroup());
-            var Controller = Require("controller");
-            Controller.ajaxGetGroups(function(data) {
-                View.setGroupList(data);
-            });
+            View.loadingPopup(content);
             Controller.ajaxGetStudents(false, function(data) {
-                View.setStudentList(data);
+                Controller.ajaxGetGroups(function(data) {
+                    content.empty();
+                    content.append(View.adminAssignGroup());
+                    View.setGroupList(data);
+                    View.setStudentList(data);
+                    adminSetSubmenuHandlers(content);
+                });
             });
-            adminSetSubmenuHandlers(content);
         });
         content.find("#disposeGroup").bind('click',function() {
-            content.empty();
-            content.append(View.adminDisposeGroup());
-            var Controller = Require("controller");
+            View.loadingPopup(content);
             Controller.ajaxGetStudents(true, function(data) {
+                content.empty();
+                content.append(View.adminDisposeGroup());
                 View.setStudentList(data);
+                adminSetSubmenuHandlers(content);
             });
-            adminSetSubmenuHandlers(content);
         });
         content.find("#viewStudent").bind('click',function() {
-            content.empty();
-            content.append(View.adminViewStudent());
-            var Controller = Require("controller");
+            View.loadingPopup(content);
             Controller.ajaxGetStudents(null, function(data) {
+                content.empty();
+                content.append(View.adminViewStudent());
                 View.setStudentList(data);
+                adminSetSubmenuViewStudentHandlers(content);
             });
-            adminSetSubmenuViewStudentHandlers(content);
         });
         content.find("#deleteStudent").bind('click',function() {
-            content.empty();
-            content.append(View.adminDeleteStudent());
-            var Controller = Require("controller");
+            View.loadingPopup(content);
             Controller.ajaxGetStudents(null, function(data) {
+                content.empty();
+                content.append(View.adminDeleteStudent());
                 View.setStudentList(data);
+                adminSetSubmenuHandlers(content);
             });
-            adminSetSubmenuHandlers(content);
         });
         content.find("#editAdmin").bind('click',function() {
             content.empty();

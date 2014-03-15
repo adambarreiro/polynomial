@@ -21,6 +21,8 @@ define (["./character/battle","./character/bonus","./character/camera","./charac
 // Private
 // -----------------------------------------------------------------------------
 
+var ENEMYTOTAL;
+
 /**
  * Registers all the child components.
  */
@@ -47,6 +49,7 @@ return {
      */
     registerComponent: function(edition) {
         Crafty.c('Character', {
+            _enemyTotal: 0,
             _orientation: "right",
             _health: 100, // Health of the character
             _shield: 0, // Shield of the character
@@ -67,9 +70,9 @@ return {
                 this.removeComponent("Battle");
                 this.removeComponent("Movement");
                 // Kills events
-                this.unbind("EnterFrame");
+                /*this.unbind("EnterFrame");
                 this.unbind("Moved");
-                this.unbind("KeyDown");
+                this.unbind("KeyDown");*/
                 
             },
             startAll: function() {

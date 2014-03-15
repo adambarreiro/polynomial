@@ -238,8 +238,8 @@ body, html {
     z-index: 10;
     overflow: auto;
     margin: 0 auto;
-    width: 820px;
-    height: 460px;
+    min-width: 820px;
+    min-height: 460px;
     background: rgba(200,200,200,0.8);
     box-shadow: 10px 10px 10px #111111;
 }
@@ -265,11 +265,10 @@ body, html {
 .poly {
     clear: both;
     font-size: 200%;
+    font-weight: bold;
     font-family: Courier;
     width: 60%;
     padding-top: 20px;
-    
-    
     margin-left: 30px;
     margin-top: 10px;
     border-right: 1px solid #000000;
@@ -296,19 +295,20 @@ body, html {
     font-family: Courier;
     width: 60%;
     height: 68px;
+    text-align: left;
     line-height: 60px;
     max-width: 60%;
     margin-top: 10px;
     margin-left: 30px;
     padding-left: 10px;
     padding-right: 10px;
-    border: 1px dashed #000000;
-
+    background: #EEEEEE;
+    border: 2px inset #999999;
 }
 
 .solutionbox > tbody > tr > td {
     letter-spacing: 2px;
-    text-align: right;
+    text-align: left;
 }
 
 .help {

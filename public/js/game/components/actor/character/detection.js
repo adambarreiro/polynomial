@@ -185,10 +185,10 @@ return {
                     }
                 }
                 if (this._detectionSpotted && !this._battleFighting) {
-                    /*this._detectionSpotted = false;
+                    this._detectionSpotted = false;
                     Audio.stopLevel();
                     Audio.playAlert();
-                    this.battle(true);*/
+                    this.battle(true);
                 } else {
                     if (!this._detectionHidden && !this._detectionReachable) {
                         this._detectionEnemy = undefined;

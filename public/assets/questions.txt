@@ -1,10 +1,10 @@
-5x<sup>2</sup> y -7x<sup>2</sup> son semejantes#V#
+5x^2 y -7x^2 son semejantes#V#
 El literal de 2x es "2"#F#
-El grado de 2x<sup>3</sup> - 4x<sup>2</sup>+1 es 4#F#
+El grado de 2x^3 - 4x^2+1 es 4#F#
 La raíz de 2x - 4 es 2#V#
-El factor común de 12x<sup>2</sup>+3x+3 es 3(4x<sup>2</sup>+x+1)#V#
-(x+5)<sup>2</sup> es igual que x<sup>2</sup>+10x+24#F#
+El factor común de 12x^2+3x+3 es 3(4x^2+x+1)#V#
+(x+5)^2 es igual que x^2+10x+24#F#
 La inversa de 3/(x+2) es (x+2)/3#V#
-(x-3)(x-3) es x<sup>2</sup> - 9#F#
-(x-3)(x+3) es x<sup>2</sup> - 9#V#
-(x-3)(x-3) es x<sup>2</sup> - 6x+9#V#
+(x-3)(x-3) es x^2 - 9#F#
+(x-3)(x+3) es x^2 - 9#V#
+(x-3)(x-3) es x^2 - 6x+9#V#

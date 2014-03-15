@@ -28,7 +28,7 @@ function startNodeServer(port, securePort) {
     app = express();
     // Configuration of the server
     app.configure(function () {
-        app.use(express.favicon());
+        app.use(express.favicon(__dirname + '/public/assets/img/favicon.jpg'));
         app.use(express.bodyParser());
         app.use(express.cookieParser());
         app.use(express.session({secret: "pfc_adambarreiro"}));

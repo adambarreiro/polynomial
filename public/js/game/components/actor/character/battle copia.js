@@ -13,12 +13,9 @@ define (["../../../audio"], function(Audio) {
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
-// Polynomials configuration
-var MAX_COEFICIENT = 9; // Maximum coeficient per monomial.
-var MAX_DEGREE = 6; // Maximum degree of the polynomial.
-var MAX_ELEMENTS = 5; // Maximum number of monomials in the polynomial
-var SIGN_PROBABILITY = 0.5; // Monomial sign probability.
-var TERM_PROBABILITY = 0.75; // Probability that a term appears in the polynomial
+var MAX_COEFICIENT = 9; // Maximum coeficient per term.
+var SIGN_PROBABILITY = 0.5; // Balanced sign probability +/-
+var TERM_PROBABILITY = 0.7; // Probability that a term appears in the polynomial
 
 // Timeouts for battles
 var ADD_TIMEOUT = 2999;
@@ -35,138 +32,6 @@ var RESULT_SCREEN = 100;
 var CORRECT_SCREEN = "rgba(0,255,0,0.8)";
 var WRONG_SCREEN = "rgba(255,0,0,0.8)";
 var NORMAL_SCREEN = "rgba(200,200,200,0.8)";
-
-/**
- * Makes an array with a coeficient per element, being the element the i-th exponent.
- * @return array - The polynomial array.
- */
-function polynomialArray() {
-    array = [];
-    while (array.length === 0) {
-        for (var i=0; i < MAX_DEGREE; i++) {
-            if (array.length <= MAX_ELEMENTS) {
-                if (Math.random() <= TERM_PROBABILITY) {
-                    array[i] = Math.floor(Math.random()*(MAX_COEFICIENT)+1);
-                    if (Math.random() <= SIGN_PROBABILITY) {
-                        array[i] = -array[i];
-                    }
-                } else {
-                    array[i] = 0;
-                }
-            } else {
-                break;
-            }
-        }
-    }
-    return array;
-}
-
-/**
- * Makes the HTML code for a polynomial
- * @param position - Position in the character polynomial array.
- * @returns HTML code for the polynomial.
- */
-function polynomialHtml(array) {
-    var html = [];
-    for (var i=0; i<array.length; i++) {
-        html[i] = "";
-        if (array[i] !== 0) {
-            // Sign
-            if (array[i] > 0) {
-                html[i] += "+";
-            } else {
-                html[i] += "-";
-            }
-            // Coeficient
-            if (array[i] !== -1 && array[i] !== 1) {
-                html[i] += array[i];
-            }
-            // Exponent
-            if (i > 0) {
-                html+="x";
-                if (i > 1) {
-                    html += "<sup>" + i + "</sup>";
-                }
-            }
-        }
-    }
-    return html;
-}
-
-/**
- * Creates a compressed notable product and its solution
- */
-function notableArray() {
-    var maxDegree = Math.floor(MAX_DEGREE/2); // Maximum degree of the notable.
-    var type = Math.floor(Math.random()*(3)+1); // Type of the notable (Probability)
-    // Initialize arrays
-    var result = [];
-    var array = [];
-    for (var i=0; i<maxDegree; i++) {
-        array[i] = 0;
-        result[i] = 0;
-    }
-    // Build the exponents
-    var exponents = [0,0];
-    while (exponents[0] === exponents[1]) {
-        exponents = [Math.floor(Math.random()*(maxDegree)+1),Math.floor(Math.random()*(maxDegree)+1)];
-    }
-    // Build the notable
-    var coeficients = [0,0];
-    coeficients = [Math.floor(Math.random()*(MAX_COEFICIENT)+1),Math.floor(Math.random()*(MAX_COEFICIENT)+1)];
-    // Build the notable
-    array[exponents[0]] = coeficients[0];
-    array[exponents[1]] = coeficients[1];
-    // Build the result array
-    result[exponents[0]*2] = coeficients[0] * coeficients[0];
-    result[exponents[1]*2] = coeficients[1] * coeficients[1];
-    switch(type) {
-        case 1: // Square difference, +
-            result[exponents[0]+exponents[0]] = 2* coeficients[0] * coeficients[1];
-            break;
-        case 2: // Square difference, -
-            result[exponents[0]+exponents[0]] = -2* coeficients[0] * coeficients[1];
-            break;
-        case 3: // Addition per substract
-            break;
-    }
-    return [array, result];
-}
-/**
- * Creates an compressed notable product and its solution
- */
-function notableCompressed() {
-    var notable = notableArray();
-    this._battleSolution = notable[1];
-    return notablePolynomialHtml(notable[0], type);
-}
-
-/**
- * Creates an uncompressed notable product and its solution
- */
-function notableUncompressed() {
-    var notable = notableArray();
-    this._battleSolution = notable[0];
-    return polynomialHtml(notable[1], type);
-}
-
-/**
- * Makes the HTML code for a notable product.
- * @param array - The polynomial.
- * @param type - Type of the notable product.
- * @returns HTML code for the polynomial.
- */
-function notablePolynomialHtml(array, type) {
-    var html = "";
-    switch(type) {
-        case 3:
-            html = "(" + polynomialHtml(array) + ")(" + polynomialHtml(array) +")";
-            break;
-        default: // Addition per substract
-            html = "(" + polynomialHtml(array) + ")<sup>2</sup>";
-            break;
-    }
-}
 
 /**
  * Draws the help panel that shows during battles
@@ -227,6 +92,7 @@ function parseSolution(content) {
             parsed[parts[1]] += parseInt(parts[0].replace("x",""),10);
         }
     }
+    console.log(parsed);
     return parsed;
 }
 
@@ -245,78 +111,18 @@ return {
             _battleTimed: false, // If has a timeout
             _battleTimeout: undefined, // The timeout
             _battleTimer: undefined, // The setInterval variable
+            _battlePolynomials: [[],[]], // Array of 2 polynomials
+            _battleNotables: [[],"",""], // Array of notable products. 0 should be the poly. 1 the operation. 2 the type.
             _battleQuotient: [], //  The quotient if it's a quotient operation
             _battleInput: [], // User input
             _battleResult: undefined,
-            /**
-             * Adds two polynomials and returns the HTML to draw them
-             * @returns HTML code array for the 2 polynomials.
-             */
-            addOperation: function() {
-                var polynomials = [polynomialArray(),polynomialArray()];
-                var solution = [];
-                for (var i=0; i<MAX_COEFICIENT; i++) {
-                    solution[i] = polynomials[0][i] + polynomials[1][i];
-                }
-                this._battleSolution = solution;
-                return [polynomialHtml(array),polynomialHtml(array)];
-            },
-            /**
-             * Substracts two polynomials and returns the HTML to draw them
-             * @returns HTML code array for the 2 polynomials.
-             */
-            subOperation: function() {
-                var polynomials = [polynomialArray(),polynomialArray()];
-                var solution = [];
-                for (var i=0; i<MAX_COEFICIENT; i++) {
-                    solution[i] = polynomials[0][i] - polynomials[1][i];
-                }
-                this._battleSolution = solution;
-                return [polynomialHtml(array),polynomialHtml(array)];
-            },
-            /**
-             * Generates a notable product and its solution.
-             * @return array - The polynomial array.
-             */
-            notableOperation: function() {
-                if (Math.random() < 0.49) {
-                    return notableCompressed();
-                } else {
-                    return notableUncompressed();
-                }
-            },
-            /**
-             * Determines the battle operation depending on the enemy spotted. Stores
-             * this operation in the entity.
-             */
-            whichOperation: function() {
-                var enemy = this.getEnemy();
-                if (enemy.has("Enemy1")) {
-                    this._battleTimeout = ADD_TIMEOUT;
-                    this._battleOperation = "+";
-                } else if (enemy.has("Enemy2")) {
-                    this._battleTimeout = SUB_TIMEOUT;
-                    this._battleOperation = "-";
-                }  else if (enemy.has("Enemy3")) {
-                    this._battleTimeout = MUL_TIMEOUT;
-                    this._battleOperation = "*";
-                }  else if (enemy.has("Enemy4")) {
-                    this._battleTimeout = NOT_TIMEOUT;
-                    this._battleOperation = "**";
-                }  else if (enemy.has("Enemy5")) {
-                    this._battleTimeout = DIV_TIMEOUT;
-                    this._battleOperation = "/";
-                }
-                if (this._bonusTime > 0) {
-                    this._battleTimeout += BONUS_TIMEOUT;
-                }
-            },
             /**
              * Generates the polynomials and HTML and inserts it into the
              * game, controlling timing and all the events.
              */
             polynomialBattle: function() {
                 this.whichOperation();
+                this._battlePolynomials[0] = this.polynomialArray(9,6);
                 var operationString;
                 switch (this._battleOperation) {
                     case "*":
@@ -397,7 +203,32 @@ return {
                 },10);
                 
             },
-
+            /**
+             * Determines the battle operation depending on the enemy spotted. Stores
+             * this operation in the entity.
+             */
+            whichOperation: function() {
+                var enemy = this.getEnemy();
+                if (enemy.has("Enemy1")) {
+                    this._battleTimeout = ADD_TIMEOUT;
+                    this._battleOperation = "+";
+                } else if (enemy.has("Enemy2")) {
+                    this._battleTimeout = SUB_TIMEOUT;
+                    this._battleOperation = "-";
+                }  else if (enemy.has("Enemy3")) {
+                    this._battleTimeout = MUL_TIMEOUT;
+                    this._battleOperation = "*";
+                }  else if (enemy.has("Enemy4")) {
+                    this._battleTimeout = NOT_TIMEOUT;
+                    this._battleOperation = "**";
+                }  else if (enemy.has("Enemy5")) {
+                    this._battleTimeout = DIV_TIMEOUT;
+                    this._battleOperation = "/";
+                }
+                if (this._bonusTime > 0) {
+                    this._battleTimeout += BONUS_TIMEOUT;
+                }
+            },
             /**
              * Generates HTML code for the table with the two polynomials.
              * @return String - HTML code
@@ -518,6 +349,100 @@ return {
                         break;
                 }
                 return html;
+            },
+            /**
+             * Makes an array with a coeficient per element, being the element the i-th exponent.
+             * @param maxDegree - Maximum degree of the polynomial.
+             * @param maxElements - Maximum number of elements.
+             * @return array - The polynomial array.
+             */
+            polynomialArray: function(maxDegree, maxElements) {
+                polyArray = [];
+                while (polyArray.length === 0) {
+                    var i=0;
+                    while (i < maxDegree) {
+                        if (polyArray.length >= maxElements) {
+                            break;
+                        }
+                        if (Math.random() <= TERM_PROBABILITY) {
+                            polyArray[i] = Math.floor(Math.random()*(MAX_COEFICIENT)+1);
+                            if (Math.random() <= SIGN_PROBABILITY) {
+                                polyArray[i] = -polyArray[i];
+                            }
+                        }
+                        i++;
+                    }
+                }
+                return polyArray;
+            },
+            /**
+             * [polynomialNotableArray description]
+             * @param  {[type]} position [description]
+             * @return {[type]}          [description]
+             */
+            polynomialNotableArray: function(position) {
+                // Notable operation
+                this._battleNotables[0] = [];
+                if (Math.random() > 0.5) this._battleNotables[1] = "+";
+                else this._battleNotables[1] = "-";
+                var notable = [];
+                var index1 = 1, index2 = 1;
+                while (index1 === index2) {
+                    index1 = Math.floor(Math.random()*(3)+1);
+                    index2 = Math.floor(Math.random()*(3)+1);
+                }
+                this._battleNotables[0][index1] = Math.floor(Math.random()*(4)+1);
+                this._battleNotables[0][index2] = Math.floor(Math.random()*(4)+1);
+                var p = Math.random();
+                var indexes = [];
+                var j=0;
+                if (p < 0.66) {
+                    // Primer termino al cuadrado y segundo termino al cuadrado
+                    for (var i=0; i<MAX_COEFICIENT; i++) {
+                        if (this._battleNotables[0][i] !== undefined) {
+                            this._battlePolynomials[position][i*2] = this._battleNotables[0][i] * this._battleNotables[0][i];
+                            indexes[j] = i;
+                            j++;
+                        }
+                    }
+                    if (p < 0.33) {
+                        // Más el doble del primero por el segundo
+                        this._battlePolynomials[position][indexes[0] + indexes[1]] = 2*(this._battleNotables[0][indexes[0]] * this._battleNotables[0][indexes[1]]);
+                        this._battleNotables[2] = "+";
+                    } else {
+                        // Menos el doble del primero por el segundo
+                        this._battlePolynomials[position][indexes[0] + indexes[1]] = -2*(this._battleNotables[0][indexes[0]] * this._battleNotables[0][indexes[1]]);
+                        this._battleNotables[2] = "-";
+                    }
+                } else {
+                    var minDegree = 9999;
+                    // Suma por diferencia, diferencia de cuadrados:
+                    // Al cuadrado
+                    for (var k=0; k<MAX_COEFICIENT; k++) {
+                        if (this._battleNotables[0][k] !== undefined) {
+                            this._battlePolynomials[position][k*2] = this._battleNotables[0][k] * this._battleNotables[0][k];
+                            if (k < minDegree) minDegree = k;
+                        }
+                    }
+                    // Si quedara positiva, la volvemos negativa.
+                    if (this._battleNotables[0][minDegree] > 0) this._battleNotables[0][minDegree] = -this._battleNotables[0][minDegree];
+                    this._battleNotables[2] = "*";
+                }
+                // Se controla que si es de la forma (ax-b)^2 no quede el termino 2*a*b*x negativo.
+                if (p >= 0.33 && p < 0.66) {
+                    if (index1 > index2) {
+                        if (this._battleNotables[0][index2] > 0) this._battleNotables[0][index2] = -this._battleNotables[0][index2];
+                    } else {
+                        if (this._battleNotables[0][index1] > 0) this._battleNotables[0][index1] = -this._battleNotables[0][index1];
+                    }
+                } else {
+                    // Al revés, se controla que siempre sean positivos en el resto de casos.
+                    if (index1 > index2) {
+                        this._battleNotables[0][index2] = Math.abs(this._battleNotables[0][index2]);
+                    } else {
+                        this._battleNotables[0][index1] = Math.abs(this._battleNotables[0][index1]);
+                    }
+                }
             },
             /**
              * Creates a keyboard for introducing polynomials

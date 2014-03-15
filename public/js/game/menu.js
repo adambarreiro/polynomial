@@ -16,6 +16,9 @@ define (["./scenes", "./network/connector", "./network/creator", "require", "./m
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
+
+var START_LEVEL = 1;
+
 function csrf() {
     var pri = document.cookie.indexOf("token=")+"token=".length;
     var fin = document.cookie.indexOf(";", pri);
@@ -86,82 +89,14 @@ function getTwoPlayerPanel() {
             '</div>'].join('\n');
 }
 
-function createPanel() {
-   return ['<div class="menu">',
-                '<div class="separator">Crear partida</div>',
-                '<input class="field" type="text" name="game" placeholder="Nombre de la partida"/>',
-                '<div class="buttonext" id="create">Crear</div>',
-            '</div>',
-            '<div class="extra">',
-                '<div id="edbutton">Atr&aacute;s</div>',
-            '</div>'].join('\n');
-}
-
-function connectPanel() {
-   return ['<div class="menu">',
-                '<div class="separator">Conectar</div>',
-                '<input class="field" type="text" name="game" placeholder="Nombre de la partida"/>',
-                '<div class="buttonext" id="connect">Conectar</div>',
-            '</div>',
-            '<div class="extra">',
-                '<div id="edbutton">Atr&aacute;s</div>',
-            '</div>'].join('\n');
-}
-
 function twoPlayerMenuHandler() {
     var Menu = Require("menu");
     $('#create').bind('click', function() {
-        $('.container').empty();
-        $('.container').append(createPanel());
-        $('#create').bind('click', function() {
-            var game = $("input[name='game']").val();
-            if (checkText(game, false, true)) {
-                $("body").unbind("keyup");
-                Creator.startCreator(game);
-            }
-        });
-        $("body").bind("keyup", function(e) {
-            if ((e.keyCode || e.which) == 13) {
-                var game = $("input[name='game']").val();
-                if (checkText(game, false, true)) {
-                    $("body").unbind("keyup");
-                    Creator.startCreator(game);
-                }
-            }
-        });
-        $('#edbutton').bind('click',function() {
-            $("body").unbind("keyup");
-           $('.container').empty();
-           $('.container').append(getTwoPlayerPanel());
-           twoPlayerMenuHandler();
-        });
+        Menu.createPanel();
     });
     // Connect to a player
     $('#connect').bind('click', function() {
-        $('.container').empty();
-        $('.container').append(connectPanel());
-        $('#connect').bind('click', function() {
-            var game = $("input[name='game']").val();
-            if (checkText(game, false, true)) {
-                $("body").unbind("keyup");
-                Connector.startConnector(game);
-            }
-        });
-        $("body").bind("keyup", function(e) {
-            if ((e.keyCode || e.which) == 13) {
-                var game = $("input[name='game']").val();
-                if (checkText(game, false, true)) {
-                    $("body").unbind("keyup");
-                    Connector.startConnector(game);
-                }
-            }
-        });
-        $('#edbutton').bind('click',function() {
-        $("body").unbind("keyup");
-           $('.container').empty();
-           $('.container').append(getTwoPlayerPanel());
-           twoPlayerMenuHandler();
-        });
+        Menu.connectPanel();
     });
     $('#edbutton').bind('click',function() {
     $('.container').empty();
@@ -200,7 +135,7 @@ return {
             $('.container').empty();
             $('.container').append(getOnePlayerPanel());
             $('#new').bind('click', function() {
-                Menu.startGame(Menu.readStudentCookie(), 1);
+                Menu.startGame(Menu.readStudentCookie(),START_LEVEL);
             });
             $('#continue').bind('click', function() {
                 Menu.startGame(Menu.readStudentCookie(), Menu.readSavegameCookie());
@@ -211,6 +146,72 @@ return {
             $('.container').empty();
             $('.container').append(getTwoPlayerPanel());
             twoPlayerMenuHandler();
+        });
+    },
+    createPanel: function() {
+        $('.container').empty();
+        $('.container').append(['<div class="menu">',
+                    '<div class="separator">Crear partida</div>',
+                    '<input class="field" type="text" name="game" placeholder="Nombre de la partida"/>',
+                    '<div class="buttonext" id="create">Crear</div>',
+                '</div>',
+                '<div class="extra">',
+                    '<div id="edbutton">Atr&aacute;s</div>',
+                '</div>'].join('\n'));
+        $('#create').bind('click', function() {
+            var game = $("input[name='game']").val();
+            if (checkText(game, false, true)) {
+                $("body").unbind("keyup");
+                Creator.startCreator(game);
+            }
+        });
+        $("body").bind("keyup", function(e) {
+            if ((e.keyCode || e.which) == 13) {
+                var game = $("input[name='game']").val();
+                if (checkText(game, false, true)) {
+                    $("body").unbind("keyup");
+                    Creator.startCreator(game);
+                }
+            }
+        });
+        $('#edbutton').bind('click',function() {
+            $("body").unbind("keyup");
+           $('.container').empty();
+           $('.container').append(getTwoPlayerPanel());
+           twoPlayerMenuHandler();
+        });
+    },
+    connectPanel: function() {
+        $('.container').empty();
+        $('.container').append(['<div class="menu">',
+                    '<div class="separator">Conectar</div>',
+                    '<input class="field" type="text" name="game" placeholder="Nombre de la partida"/>',
+                    '<div class="buttonext" id="connect">Conectar</div>',
+                '</div>',
+                '<div class="extra">',
+                    '<div id="edbutton">Atr&aacute;s</div>',
+                '</div>'].join('\n'));
+        $('#connect').bind('click', function() {
+            var game = $("input[name='game']").val();
+            if (checkText(game, false, true)) {
+                $("body").unbind("keyup");
+                Connector.startConnector(game);
+            }
+        });
+        $("body").bind("keyup", function(e) {
+            if ((e.keyCode || e.which) == 13) {
+                var game = $("input[name='game']").val();
+                if (checkText(game, false, true)) {
+                    $("body").unbind("keyup");
+                    Connector.startConnector(game);
+                }
+            }
+        });
+        $('#edbutton').bind('click',function() {
+        $("body").unbind("keyup");
+           $('.container').empty();
+           $('.container').append(getTwoPlayerPanel());
+           twoPlayerMenuHandler();
         });
     },
     waitingMenu: function(game) {
@@ -251,7 +252,7 @@ return {
     startGame: function(student, level, multi) {
         $('body').empty();
         if (multi === undefined) multi = {multi: "single"}; // No multiplayer trick.
-        Scenes.loadGame(student, level, multi.multi);
+        Scenes.newGame(student, level, multi.multi);
     },
     readSavegameCookie: function() {
         var pri = document.cookie.indexOf("savegame=")+"savegame=".length;

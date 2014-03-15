@@ -7,7 +7,7 @@
 
 define (function() {
 
-var VOLUME = 0.1;
+var VOLUME = 0.0;
 var ALERT =          ["alert", "assets/music/alert.mp3"];
 var HIDDEN =         ["hidden", "assets/music/hidden.mp3"];
 var LEVEL =          ["level", "assets/music/level.mp3"];

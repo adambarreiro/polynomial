@@ -20,6 +20,28 @@ var CURATION = 70;
 var POWER = 5;
 var CLOCKS = 1;
 
+function parseQuestion(question) {
+    var parsed = "";
+    var parsedArray = question.split("^");
+    if (parsedArray.length > 1) {
+        // The first part only has a <sup>, never starts with </sup>
+        parsed += parsedArray[0].concat("<sup>");
+        // The rest part
+        for (i=1; i<parsedArray.length; i++) {
+            // Replace "^" with "<sup>, except if it's the last part"
+            if (i < parsedArray.length-1) parsedArray[i] = parsedArray[i].concat("<sup>");
+            // Search where the exponent ends
+            var firstNoNumber = parsedArray[i].search(/[^0-9]/);
+            // Rebuild the string
+            parsed += parsedArray[i].substring(0,firstNoNumber) + "</sup>" +
+            parsedArray[i].substring(firstNoNumber,parsedArray[i].length);
+        }
+    } else {
+        parsed = question;
+    }
+    return parsed;
+}
+
 /**
  * Ajax call to retrieve the questions and answers.
  */
@@ -33,7 +55,7 @@ function getQuestions(callback) {
             var q = [], a = [];
             for (var i = 0; i<all.length-1; i++) {
                 if (i % 2 === 0) {
-                    q.push(all[i]);
+                    q.push(parseQuestion(all[i]));
                 } else {
                     a.push(all[i]);
                 }
@@ -69,8 +91,8 @@ return {
      */
     createComponent: function() {
         Crafty.c('Bonus', {
-            _power: 0, // Power up bonus
-            _extraTime: 0, // Extra time bonus
+            _bonusPower: 0, // Power up bonus
+            _bonusTime: 0, // Extra time bonus
             /**
              * Obtains an item randomly
              */
@@ -79,6 +101,7 @@ return {
                 var icon;
                 var description;
                 var p = Math.random();
+                p=0.99;
                 if (p < 0.70) {
                     bonus = "SALUD";
                     icon = "health";
@@ -127,11 +150,11 @@ return {
                             break;
                         case "power":
                             Audio.playPower();
-                            Crafty("Character")._power=Crafty("Character")._power+POWER;
+                            Crafty("Character")._bonusPower=Crafty("Character")._bonusPower+POWER;
                             break;
                         case "clock":
                             Audio.playClock();
-                            Crafty("Character")._extraTime = Crafty("Character")._extraTime+CLOCKS;
+                            Crafty("Character")._bonusTime = Crafty("Character")._bonusTime+CLOCKS;
                             break;
                     }
                     Crafty("Character").startAll();
@@ -194,10 +217,12 @@ return {
              * Inits the component
              */
             init: function() {
-                getQuestions(function(q,a) {
-                    QUESTIONS = q;
-                    ANSWERS = a;
-                });
+                if (QUESTIONS.length === 0 && ANSWERS.length === 0) {
+                    getQuestions(function(q,a) {
+                        QUESTIONS = q;
+                        ANSWERS = a;
+                    });
+                }
                 this.bind("KeyDown", function () {
                     if (this.isDown("S")) {
                         this.treasure();
