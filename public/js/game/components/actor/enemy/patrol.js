@@ -53,7 +53,11 @@ return {
                     if (this._patrolFloor.length === 0) {
                         this._patrolOrientation = "left";
                     } else {
-                        this.x += this.patrolSpeed;
+                        if (!this._patrolFloor[0].has("Actor")) {
+                            this.x += this.patrolSpeed;
+                        } else {
+                            this._patrolOrientation = "left";
+                        }
                     }
                 }
             },
@@ -74,7 +78,11 @@ return {
                     if (this._patrolFloor.length === 0) {
                         this._patrolOrientation = "right";
                     } else {
-                        this.x -= this.patrolSpeed;
+                        if (!this._patrolFloor[0].has("Actor")) {
+                            this.x -= this.patrolSpeed;    
+                        } else {
+                            this._patrolOrientation = "right";
+                        }
                     }
                 }
             },

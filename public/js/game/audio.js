@@ -7,10 +7,12 @@
 
 define (function() {
 
-var VOLUME = 0.1;
-var ALERT =          ["alert", "assets/music/alert.mp3"];
+var VOLUME = 0.0;
+var ALERT =          ["alert", "assets/music/alert1.mp3"];
 var HIDDEN =         ["hidden", "assets/music/hidden.mp3"];
-var LEVEL =          ["level", "assets/music/level.mp3"];
+var LEVEL1 =          ["level1", "assets/music/level11.mp3"];
+var LEVEL2 =          ["level2", "assets/music/level21.mp3"];
+var LEVEL3 =          ["level3", "assets/music/level31.mp3"];
 var CHEST =          ["chest", "assets/sfx/chest.mp3"];
 var SHIELD =         ["shield", "assets/sfx/shield.mp3"];
 var CLOCK =          ["clock", "assets/sfx/clock.mp3"];
@@ -58,7 +60,9 @@ return {
         if (supports()) {
             Crafty.audio.add(ALERT[0], ALERT[1] );
             Crafty.audio.add(HIDDEN[0], HIDDEN[1]);
-            Crafty.audio.add(LEVEL[0], LEVEL[1] );
+            Crafty.audio.add(LEVEL1[0], LEVEL1[1] );
+            Crafty.audio.add(LEVEL2[0], LEVEL2[1] );
+            Crafty.audio.add(LEVEL3[0], LEVEL3[1] );
             Crafty.audio.add(CHEST[0], CHEST[1] );
             Crafty.audio.add(SHIELD[0],SHIELD[1]);
             Crafty.audio.add(CLOCK[0], CLOCK[1] );
@@ -75,7 +79,8 @@ return {
      */
     loadAudio: function() {
         if (supports()) {
-            return [ALERT[1],HIDDEN[1],LEVEL[1],ATTACK[1],CHEST[1],CLOCK[1],
+            return [ALERT[1],HIDDEN[1],LEVEL1[1],LEVEL2[1], LEVEL3[1],
+                    ATTACK[1],CHEST[1],CLOCK[1],
                     DAMAGE[1], ENEMY_DEATH[1], HEALTH[1], MONSTER_SCREAM[1],
                     POWER[1], SHIELD[1]];
         } else {
@@ -87,10 +92,18 @@ return {
      * Music tracks
      */
     playLevel: function() {
-        playMusic(LEVEL[0]);
+        var song = Math.floor(Math.random()*(3)+1);
+        switch(song) {
+            case 1: playMusic(LEVEL1[0]); break;
+            case 2: playMusic(LEVEL2[0]); break;
+            case 3: playMusic(LEVEL3[0]); break;
+        }
+        
     },
     stopLevel: function() {
-        stop(LEVEL[0]);
+        stop(LEVEL1[0]);
+        stop(LEVEL2[0]);
+        stop(LEVEL3[0]);
     },
     playAlert: function() {
         playMusic(ALERT[0]);

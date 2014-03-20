@@ -15,11 +15,10 @@ define (["./constants", "./audio" ,"require", "./scenes"], function(Constants, A
 // -----------------------------------------------------------------------------
 
 var CHARACTER;
-var QUESTIONS;
-var ANSWERS;
 var LEVEL;
 var STUDENT;
 var MULTIPLAYER;
+var ENEMYTOTAL = 0;
 var SIZE = Constants.getViewportSize('px');
 
 function setCharacter(entity) {
@@ -115,13 +114,14 @@ function clean(background) {
 }
 
 function drawLevel(data) {
+    ENEMYTOTAL = 0;
+    var multi = getMultiplayer();
     for (var i in data.map) {
         x = Math.floor(parseInt(i,10) % Constants.getLevelSize('tiles').width);
         y = Math.floor(parseInt(i,10) / Constants.getLevelSize('tiles').width);
         type = data.map[i];
         drawTile(x,y,data.map[i]);
     }
-    var multi = getMultiplayer();
     if (multi === "connector") {
         Crafty.e("Multiplayer").at(Crafty("Character").x/32,Crafty("Character").y/32);
         Crafty("Character").addComponent("Mimic").connectorMode();
@@ -349,7 +349,7 @@ function initScenes() {
 
 return {
 
-    loadGame: function(student, level, multi) {
+    newGame: function(student, level, multi) {
         setStudent(student);
         setLevel(level);
         MULTIPLAYER = multi;
@@ -400,8 +400,11 @@ return {
 
     setMultiplayer: function(multiplayer) {
         MULTIPLAYER = multiplayer;
+    },
+    generateMultiplayerId: function() {
+        ENEMYTOTAL++;
+        return ENEMYTOTAL;
     }
-
 };
 
 });

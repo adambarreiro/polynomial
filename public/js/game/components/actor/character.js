@@ -21,6 +21,8 @@ define (["./character/battle","./character/bonus","./character/camera","./charac
 // Private
 // -----------------------------------------------------------------------------
 
+var ENEMYTOTAL;
+
 /**
  * Registers all the child components.
  */
@@ -50,6 +52,8 @@ return {
             _orientation: "right",
             _health: 100, // Health of the character
             _shield: 0, // Shield of the character
+            _clocks: 0, // Extra time bonus
+            _power: 0, // Power bonus
             stopAll: function() {
                 // Kills exit events
                 Crafty("Exit").each(function() {
@@ -70,7 +74,6 @@ return {
                 this.unbind("EnterFrame");
                 this.unbind("Moved");
                 this.unbind("KeyDown");
-                
             },
             startAll: function() {
                 // Restarts components

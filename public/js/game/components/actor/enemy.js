@@ -25,7 +25,6 @@ var MAX_DAMAGE = 45;
 var POWERUP_MIN_DAMAGE = 45;
 var POWERUP_MAX_DAMAGE = 75;
 
-
 /**
  * Registers all the child components.
  */
@@ -59,8 +58,7 @@ return {
              */
             multiplayerDamage: function(damage) {
                 if (Crafty("Multiplayer").length > 0) {
-                    // this[0] is the enemy id
-                    Crafty("Character").multiplayerDamage(this[0], damage);
+                    Crafty("Character").multiplayerDamage(this._id, damage);
                 }
             },
             /**
@@ -91,7 +89,7 @@ return {
                     $($(".lifebox").children()[2]).hide();
                     $($(".lifebox").children()[3]).hide();
                     $('#enemybar').css({"width": "300px"});
-                    Crafty("Character").getEnemy().destroy();
+                    Crafty("Character")._detectionEnemy.destroy();
                     Crafty.audio.stop("battle");
                     Crafty.audio.play("level",-1);
                     return true;
@@ -117,6 +115,7 @@ return {
                 this.requires('Actor');
                 this.z=5;
                 if (!edition) {
+                    ENEMYTOTAL = 0;
                     this.gravity("Terrain").gravityConst(0.3);
                     this.startEnemy();
                 }

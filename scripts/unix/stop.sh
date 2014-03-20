@@ -1,0 +1,2 @@
+pkill node
+pkill mongod

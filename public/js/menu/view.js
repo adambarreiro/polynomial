@@ -203,10 +203,14 @@ return {
                     csrf(),
                     '<div class="separator">Ver los datos de un alumno</div>',
                     '<select class="field" name="name" id="student"><option value=" ">Selecciona el alumno</option></select>',
+                    '<div class="separator">Datos personales</div>',
                     '<input class="field" type="text" name="name" placeholder="Nombre" disabled/>',
                     '<input class="field" type="text" name="surname1" placeholder="Primer apellido" disabled/>',
                     '<input class="field" type="text" name="surname2" placeholder="Segundo apellido" disabled/>',
                     '<input class="field" type="text" name="group" placeholder="Grupo" disabled/>',
+                    '<div class="separator">Progreso en el juego</div>',
+                    '<input class="field" type="text" name="level" placeholder="Nivel actual" disabled/>',
+                    '<select class="field" type="text" name="stats"><option value="">Estadísticas</option></select>',
                     '<input class="button" type="button" value="Atr&aacute;s"/>',
                 '</form>'].join('\n');
     },
@@ -322,6 +326,21 @@ return {
         $('input[name=surname1]').val(unescape(data.surname1));
         $('input[name=surname2]').val(unescape(data.surname2));
         $('input[name=group]').val(unescape(data.group));
+        $('input[name=level]').val("Nivel " + unescape(data.savegame));
+        for (i = 0; i< data.stats.length; i++) {
+            $('select[name=stats]').append('<option disabled value="'+data.stats[i].level+'">Nivel '+data.stats[i].level+": "+data.stats[i].date+'</option>');
+        }
+    },
+    /**
+     * Draws a loading window
+     */
+    loadingPopup: function(content) {
+        var html = ['<div class="menu">',
+                        '<div class="separator">Cargando...</div>',
+                        '<p>Obteniendo información, espere...</p>',
+                    '</div>'].join("\n");
+        content.empty();
+        content.append(html);
     },
     /**
      * getFieldLimitsMaxPass
