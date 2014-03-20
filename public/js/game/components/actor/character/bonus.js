@@ -91,8 +91,6 @@ return {
      */
     createComponent: function() {
         Crafty.c('Bonus', {
-            _bonusPower: 0, // Power up bonus
-            _bonusTime: 0, // Extra time bonus
             /**
              * Obtains an item randomly
              */
@@ -150,11 +148,12 @@ return {
                             break;
                         case "power":
                             Audio.playPower();
-                            Crafty("Character")._bonusPower=Crafty("Character")._bonusPower+POWER;
+                            Crafty("Character")._power=Crafty("Character")._power+POWER;
                             break;
                         case "clock":
                             Audio.playClock();
-                            Crafty("Character")._bonusTime = Crafty("Character")._bonusTime+CLOCKS;
+                            Crafty("Character")._clocks = Crafty("Character")._clocks+CLOCKS;
+                            console.log(Crafty("Character")._clocks);
                             break;
                     }
                     Crafty("Character").startAll();

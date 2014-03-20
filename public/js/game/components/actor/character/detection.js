@@ -196,12 +196,6 @@ return {
                 }
             },
             /**
-             * Returns the enemy that triggers a battle
-             */
-            getEnemy: function() {
-                return this._detectionEnemy;
-            },
-            /**
              * Inits the component
              */
             init: function() {

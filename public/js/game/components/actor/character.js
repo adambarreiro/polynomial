@@ -49,10 +49,11 @@ return {
      */
     registerComponent: function(edition) {
         Crafty.c('Character', {
-            _enemyTotal: 0,
             _orientation: "right",
             _health: 100, // Health of the character
             _shield: 0, // Shield of the character
+            _clocks: 0, // Extra time bonus
+            _power: 0, // Power bonus
             stopAll: function() {
                 // Kills exit events
                 Crafty("Exit").each(function() {
@@ -70,10 +71,9 @@ return {
                 this.removeComponent("Battle");
                 this.removeComponent("Movement");
                 // Kills events
-                /*this.unbind("EnterFrame");
+                this.unbind("EnterFrame");
                 this.unbind("Moved");
-                this.unbind("KeyDown");*/
-                
+                this.unbind("KeyDown");
             },
             startAll: function() {
                 // Restarts components

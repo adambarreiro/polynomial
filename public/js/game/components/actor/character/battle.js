@@ -16,16 +16,16 @@ define (["../../../audio"], function(Audio) {
 // Polynomials configuration
 var MAX_COEFICIENT = 9; // Maximum coeficient per monomial.
 var MAX_DEGREE = 6; // Maximum degree of the polynomial.
-var MAX_ELEMENTS = 5; // Maximum number of monomials in the polynomial
+var MAX_ELEMENTS = 4; // Maximum number of monomials in the polynomial
 var SIGN_PROBABILITY = 0.5; // Monomial sign probability.
 var TERM_PROBABILITY = 0.75; // Probability that a term appears in the polynomial
 
 // Timeouts for battles
 var ADD_TIMEOUT = 2999;
 var SUB_TIMEOUT = 2999;
-var MUL_TIMEOUT = 14999;
-var NOT_TIMEOUT = 14999;
-var DIV_TIMEOUT = 15999;
+var MUL_TIMEOUT = 15999;
+var NOT_TIMEOUT = 2999;
+var DIV_TIMEOUT = 14999;
 
 // Timeout bonus
 var BONUS_TIMEOUT = 3000;
@@ -41,10 +41,10 @@ var NORMAL_SCREEN = "rgba(200,200,200,0.8)";
  * @return array - The polynomial array.
  */
 function polynomialArray() {
-    array = [];
+    var array = [];
     while (array.length === 0) {
         for (var i=0; i < MAX_DEGREE; i++) {
-            if (array.length <= MAX_ELEMENTS) {
+            if (array.length < MAX_ELEMENTS) {
                 if (Math.random() <= TERM_PROBABILITY) {
                     array[i] = Math.floor(Math.random()*(MAX_COEFICIENT)+1);
                     if (Math.random() <= SIGN_PROBABILITY) {
@@ -54,7 +54,7 @@ function polynomialArray() {
                     array[i] = 0;
                 }
             } else {
-                break;
+                array[i] = 0;
             }
         }
     }
@@ -74,23 +74,23 @@ function polynomialHtml(array) {
             // Sign
             if (array[i] > 0) {
                 html[i] += "+";
-            } else {
-                html[i] += "-";
             }
             // Coeficient
-            if (array[i] !== -1 && array[i] !== 1) {
+            if (array[i] === -1 && i !== 0) {
+                html[i] += "-";
+            } else if (!(array[i] === 1 && i !== 0)) {
                 html[i] += array[i];
             }
             // Exponent
             if (i > 0) {
-                html+="x";
+                html[i]+="x";
                 if (i > 1) {
-                    html += "<sup>" + i + "</sup>";
+                    html[i] += "<sup>" + i + "</sup>";
                 }
             }
         }
     }
-    return html;
+    return html.reverse().join(" ");
 }
 
 /**
@@ -102,7 +102,7 @@ function notableArray() {
     // Initialize arrays
     var result = [];
     var array = [];
-    for (var i=0; i<maxDegree; i++) {
+    for (var i=0; i<MAX_DEGREE; i++) {
         array[i] = 0;
         result[i] = 0;
     }
@@ -118,27 +118,33 @@ function notableArray() {
     array[exponents[0]] = coeficients[0];
     array[exponents[1]] = coeficients[1];
     // Build the result array
-    result[exponents[0]*2] = coeficients[0] * coeficients[0];
-    result[exponents[1]*2] = coeficients[1] * coeficients[1];
     switch(type) {
         case 1: // Square difference, +
-            result[exponents[0]+exponents[0]] = 2* coeficients[0] * coeficients[1];
+            result[exponents[0]*2] = coeficients[0] * coeficients[0];
+            result[exponents[1]*2] = coeficients[1] * coeficients[1];
+            result[exponents[0]+exponents[1]] = 2* coeficients[0] * coeficients[1];
             break;
         case 2: // Square difference, -
-            result[exponents[0]+exponents[0]] = -2* coeficients[0] * coeficients[1];
+            result[exponents[0]*2] = coeficients[0] * coeficients[0];
+            result[exponents[1]*2] = coeficients[1] * coeficients[1];
+            result[exponents[0]+exponents[1]] = -2* coeficients[0] * coeficients[1];
+            array[exponents[1]] = -coeficients[1];
             break;
         case 3: // Addition per substract
+            result[exponents[0]*2] = coeficients[0] * coeficients[0];
+            result[exponents[1]*2] = -coeficients[1] * coeficients[1];
+            array[exponents[1]] = -coeficients[1];
             break;
     }
-    return [array, result];
+    return [array, result, type];
 }
 /**
  * Creates an compressed notable product and its solution
  */
 function notableCompressed() {
     var notable = notableArray();
-    this._battleSolution = notable[1];
-    return notablePolynomialHtml(notable[0], type);
+    Crafty("Character")._battleSolution = notable[1];
+    return notablePolynomialHtml(notable[0], notable[2]);
 }
 
 /**
@@ -146,8 +152,8 @@ function notableCompressed() {
  */
 function notableUncompressed() {
     var notable = notableArray();
-    this._battleSolution = notable[0];
-    return polynomialHtml(notable[1], type);
+    Crafty("Character")._battleSolution = notable[0];
+    return polynomialHtml(notable[1]);
 }
 
 /**
@@ -160,27 +166,94 @@ function notablePolynomialHtml(array, type) {
     var html = "";
     switch(type) {
         case 3:
-            html = "(" + polynomialHtml(array) + ")(" + polynomialHtml(array) +")";
+            html += "(" + polynomialHtml(array) + ")";
+            for (var i=0; i<array.length;i++) {
+                if (array[i] < 0) array[i] = -array[i];
+            }
+            html += "(" + polynomialHtml(array) + ")";
             break;
         default: // Addition per substract
-            html = "(" + polynomialHtml(array) + ")<sup>2</sup>";
+            html += "(" + polynomialHtml(array) + ")<sup>2</sup>";
             break;
     }
+    return html;
 }
 
 /**
- * Draws the help panel that shows during battles
- * @returns String - The html code.
+ * Makes the HTML code for a notable product.
+ * @param array - The polynomial.
+ * @param type - Type of the notable product.
+ * @returns HTML code for the polynomial.
  */
-function dibujarAyuda() {
-    var html = "";
-    html += '<div id="btn_plus"><img src="/assets/img/game/keys/plus.png"/><p>Colocar +</p></div>';
-    html += '<div id="btn_minus"><img src="/assets/img/game/keys/minus.png"/><p>Colocar -</p></div>';
-    html += '<div id="btn_number"><img src="/assets/img/game/keys/number.png"/><p>Colocar números</p></div>';
-    html += '<div id="btn_x"><img src="/assets/img/game/keys/x.png"/><p>Colocar x</p></div>';
-    html += '<div id="btn_delete"><img src="/assets/img/game/keys/delete.png"/><p>Borrar</p></div>';
-    html += '<div id="btn_enter"><img src="/assets/img/game/keys/enter.png"/><p>Resolver</p></div>';
-    return '<div class="help"><p>Ayuda</p>' + html +'</div>';
+function divSimplify() {
+    var i;
+    var exponent = Math.floor(Math.random()*(MAX_DEGREE/2)+1);
+    var coeficient = Math.floor(Math.random()*(MAX_COEFICIENT/2)+1);
+    this._battleSolution = [];
+    for (i=0; i<MAX_DEGREE;i++) {
+        this._battleSolution[i] = 0;
+        if (i === exponent) {
+            this._battleSolution[exponent] = coeficient;
+        }
+    }
+    var maxElements=MAX_ELEMENTS; MAX_ELEMENTS = Math.floor(MAX_ELEMENTS/2);
+    var polynomial1 = polynomialArray(); MAX_ELEMENTS = maxElements;
+    var polynomial2 = [];
+    for (i=0; i<MAX_DEGREE; i++) {
+        for (j=0; j<MAX_DEGREE; j++) {
+            if (polynomial2[i+j] === undefined) {
+                polynomial2[i+j] = 0;
+            }
+            polynomial2[i+j] = polynomial2[i+j] + polynomial1[i]*this._battleSolution[j];
+        }
+    }
+    return [polynomialHtml(polynomial2), polynomialHtml(polynomial1)];
+}
+
+function divProduct() {
+    var maxElements = MAX_ELEMENTS;
+    MAX_ELEMENTS = 3;
+    // 1st polynomial
+    var polynomials = [polynomialArray(), polynomialArray(), polynomialArray(), polynomialArray()];
+    // Restore
+    MAX_ELEMENTS = maxElements;
+    // The solution
+    solution = [[],[]];
+    for (i=0; i<MAX_DEGREE; i++) {
+        for (j=0; j<MAX_DEGREE; j++) {
+            if (solution[0][i+j] === undefined || solution[1][i+j] === undefined) {
+                solution[0][i+j] = 0;
+                solution[1][i+j] = 0;
+            }
+            solution[0][i+j] = solution[0][i+j] + polynomials[0][i]*polynomials[2][j];
+            solution[1][i+j] = solution[1][i+j] + polynomials[1][i]*polynomials[3][j];
+        }
+    }
+    Crafty("Character")._battleSolution = solution;
+    return [polynomialHtml(polynomials[0]),polynomialHtml(polynomials[1]),polynomialHtml(polynomials[2]),polynomialHtml(polynomials[3])];
+}
+
+function divCocient() {
+    var maxElements = MAX_ELEMENTS;
+    MAX_ELEMENTS = 3;
+    // 1st polynomial
+    var polynomials = [polynomialArray(), polynomialArray(), polynomialArray(), polynomialArray()];
+    // Restore
+    MAX_ELEMENTS = maxElements;
+    // The solution
+    solution = [];
+    for (i=0; i<MAX_DEGREE; i++) {
+        for (j=0; j<MAX_DEGREE; j++) {
+            if (solution[0][i+j] === undefined || solution[1][i+j] === undefined) {
+                solution[0][i+j] = 0;
+                solution[1][i+j] = 0;
+            }
+            solution[0][i+j] = solution[0][i+j] + polynomials[0][i]*polynomials[3][j];
+            solution[1][i+j] = solution[1][i+j] + polynomials[1][i]*polynomials[2][j];
+        }
+    }
+    this._battleSolution = solution;
+    return [polynomialHtml(polynomials[0]),polynomialHtml(polynomials[1]),polynomialHtml(polynomials[2]),polynomialHtml(polynomials[3])];
 }
 
 /**
@@ -210,24 +283,81 @@ function keyMap(key) {
     return newKey;
 }
 
-function parseExponent(content) {
-    var symbol = content.indexOf("^");
-    return content.substring(0,symbol) + "<sup>" + content.substring(symbol+1, content.length) + "</sup>";
-}
-
-function parseSolution(content) {
-    var parsed = [];
-    var i;
-    var input = content.split("</sup>");
-    for (i=0; i<input.length;i++) {
-        var parts = input[i].split("<sup>");
-        if (parsed[parts[1]] === undefined) {
-            parsed[parts[1]] = parseInt(parts[0].replace("x",""),10);
+function parseTerm(term) {
+    var parsed = term.split("x");
+    var coeficient = 0;
+    var exponent = 0;
+    if (parsed.length === 1) {
+        // Term like "a"
+        coeficient = parseInt(parsed[0],10);
+        if (isNaN(coeficient)) {
+            coeficient = 0;
+        }
+        exponent = 0;
+    } else if (parsed.length === 2) {
+        // Term like "ax^b"
+        if (parsed[0] === "+") {
+            coeficient = 1;
+        } else if (parsed[0] === "-") {
+            coeficient = -1;
         } else {
-            parsed[parts[1]] += parseInt(parts[0].replace("x",""),10);
+            coeficient = parseInt(parsed[0],10);
+            if (isNaN(coeficient)) {
+                coeficient = 0;
+            }
+        }
+        if (parsed[1] === "") {
+            // Term like "ax"
+            exponent = 1;
+        } else {
+            // Term like "ax^b" with b>0
+            exponent = parseInt(parsed[1].replace("^",""),10);
+            if (isNaN(exponent)) {
+                exponent = -1;
+            }
         }
     }
-    return parsed;
+    return [exponent, coeficient];
+}
+
+function parsePolynomial(textFieldInput) {
+    var parsed = textFieldInput.replace(/[\+]/g,"%+").replace(/[\-]/g,"%-").split('%');
+    var result = [];
+    var term = [];
+    for (var i=0; i<parsed.length; i++) {
+        if (parsed[i] !== "+" || parsed[i] !== "-") {
+            term = parseTerm(parsed[i]);
+            result[term[0]] = term[1];
+        }
+    }
+    return result;
+}
+
+function parseSolution(textFieldInput) {
+    // First filter: We only allow: 0-9,x,+,-,(),^
+    var parsed = textFieldInput.replace(/[\ -\'|\*|\,|\.-\/|\:-\]|\_-w|y-\~]/g, "");
+    // Second filter: Brackets
+    parsed = parsed.replace(/\(/g,"").split(")");
+    solution = [];
+    if (parsed.length === 1) {
+        // No brackets, no notable
+        solution = parsePolynomial(parsed[0]);
+    } else {
+        // Brackets: Notable
+        if (parsed.length === 2 && parsed[1] === "^2") {
+            // Square
+            solution = parsePolynomial(parsed[0]);
+        } else if (parsed.length === 3 && parsed[2] === "") {
+            // Addition mult difference
+            solution = parsePolynomial(parsed[1]);
+        }
+    }
+    for (var i=0;i<MAX_DEGREE; i++){
+        if (solution[i] === undefined) {
+            solution[i] = 0;
+        }
+    }
+    return solution;
 }
 
 // -----------------------------------------------------------------------------
@@ -238,7 +368,7 @@ return {
     /**
      * Registers the component
      */
-    createComponent: function() {
+    createComponent: function() {
         Crafty.c('Battle', {
             _battleFighting: false, // If we're currently in a fight.
             _battleOperation: undefined, // Operation: +,-,*,**,/
@@ -246,7 +376,7 @@ return {
             _battleTimeout: undefined, // The timeout
             _battleTimer: undefined, // The setInterval variable
             _battleQuotient: [], //  The quotient if it's a quotient operation
-            _battleInput: [], // User input
+            _battleSolution: [], // The battle solution
             _battleResult: undefined,
             /**
              * Adds two polynomials and returns the HTML to draw them
@@ -255,11 +385,11 @@ return {
             addOperation: function() {
                 var polynomials = [polynomialArray(),polynomialArray()];
                 var solution = [];
-                for (var i=0; i<MAX_COEFICIENT; i++) {
+                for (var i=0; i<MAX_DEGREE; i++) {
                     solution[i] = polynomials[0][i] + polynomials[1][i];
                 }
                 this._battleSolution = solution;
-                return [polynomialHtml(array),polynomialHtml(array)];
+                return [polynomialHtml(polynomials[0]),polynomialHtml(polynomials[1])];
             },
             /**
              * Substracts two polynomials and returns the HTML to draw them
@@ -268,29 +398,67 @@ return {
             subOperation: function() {
                 var polynomials = [polynomialArray(),polynomialArray()];
                 var solution = [];
-                for (var i=0; i<MAX_COEFICIENT; i++) {
+                for (var i=0; i<MAX_DEGREE; i++) {
                     solution[i] = polynomials[0][i] - polynomials[1][i];
                 }
                 this._battleSolution = solution;
-                return [polynomialHtml(array),polynomialHtml(array)];
+                return [polynomialHtml(polynomials[0]),polynomialHtml(polynomials[1])];
             },
             /**
              * Generates a notable product and its solution.
-             * @return array - The polynomial array.
+             * @param type - Type of the division
              */
-            notableOperation: function() {
-                if (Math.random() < 0.49) {
-                    return notableCompressed();
-                } else {
-                    return notableUncompressed();
+            divOperation: function(type) {
+                switch(type) {
+                    case "simplify": return divSimplify();
+                    case "product": return divProduct();
+                    case "cocient": return divCocient();
                 }
+            },
+            /**
+             * Generates a notable product and its solution.
+             * @param type - Type of the notable product.
+             */
+            notableOperation: function(type) {
+                switch(type) {
+                    case "expand": return notableCompressed();
+                    case "compress": return notableUncompressed();
+                }
+            },
+            /**
+             * Generates a multiplication between polynomials and its solution
+             * The HTML code.
+             */
+            mulOperation: function() {
+                var polynomials = [];
+                // 1st polynomial
+                polynomials[0] = polynomialArray();
+                // Change the length of the 2nd polynomial
+                var maxDegree = MAX_DEGREE; var maxElements = MAX_ELEMENTS;
+                MAX_DEGREE = 3; MAX_ELEMENTS = 3;
+                polynomials[1] = polynomialArray();
+                // Restore
+                MAX_DEGREE = maxDegree;
+                MAX_ELEMENTS = maxElements;
+                // The solution
+                var solution = [];
+                for (i=0; i<MAX_DEGREE; i++) {
+                    for (j=0; j<MAX_DEGREE; j++) {
+                        if (solution[i+j] === undefined) {
+                            solution[i+j] = 0;
+                        }
+                        solution[i+j] = solution[i+j] + polynomials[0][i]*polynomials[1][j];
+                    }
+                }
+                this._battleSolution = solution;
+                return [polynomialHtml(polynomials[0]),polynomialHtml(polynomials[1])];
             },
             /**
              * Determines the battle operation depending on the enemy spotted. Stores
              * this operation in the entity.
              */
             whichOperation: function() {
-                var enemy = this.getEnemy();
+                var enemy = this._detectionEnemy;
                 if (enemy.has("Enemy1")) {
                     this._battleTimeout = ADD_TIMEOUT;
                     this._battleOperation = "+";
@@ -307,53 +475,55 @@ return {
                     this._battleTimeout = DIV_TIMEOUT;
                     this._battleOperation = "/";
                 }
-                if (this._bonusTime > 0) {
+                if (this._clocks > 0) {
                     this._battleTimeout += BONUS_TIMEOUT;
                 }
             },
             /**
-             * Generates the polynomials and HTML and inserts it into the
-             * game, controlling timing and all the events.
+             * Generates HTML code for the table with the two polynomials.
+             * @param operationString - The operation.
+             * @param htmlStrings - The strings with the polynomials.
              */
-            polynomialBattle: function() {
-                this.whichOperation();
-                var operationString;
-                switch (this._battleOperation) {
-                    case "*":
-                        operationString = "MULTIPLICACIÓN"; this._battlePolynomials[1] = this.polynomialArray(9,3); break;
-                    case "**":
-                        this.polynomialNotableArray(1);
-                        if (this._battleNotables[1] === "+") {
-                            operationString = "SUMA";
-                        } else {
-                            operationString = "RESTA";
-                        }
-                        break;
-                    case "/":
-                        operationString = "DIVISIÓN"; this.polynomialCocientArray(2); break;
-                    case "+":
-                        operationString = "SUMA"; this._battlePolynomials[1] = this.polynomialArray(9,6); break;
-                    case "-":
-                        operationString = "RESTA"; this._battlePolynomials[1] = this.polynomialArray(9,6); break;
-                }
+            createHtmlTable: function(operationString, htmlStrings) {
                 var html = ['<div class="battle"><h1>Batalla</h1>',
-                                '<h2 class="left">Operación: <span style="color:#FF0000">' + operationString + "</span></h2>",
-                                '<h2 class="right">Tiempo restante:</h2>',
-                                this.polynomialHtml(),
-                                '<table class="solutionbox"><tr id="solution"></tr></table>',
-                                '<div id="time">' + this._battleTimeout + '</div>',
-                                dibujarAyuda(),
-                            '</div>'].join('\n');
+                            '<div class="header">',
+                            '<h2 class="left">Operación: <span class="big">' + operationString + "</span></h2>",
+                            '<h2 class="right">Tiempo restante: <span id="time" class="big">' + this._battleTimeout + "</span></h2>",
+                            '</div>',
+                            '<table class="poly">'].join("\n");
+                if (this._battleOperation === "/2" || this._battleOperation === "/3") {
+                    html += ['<tr><td>' + htmlStrings[0] + '</td><td>' + htmlStrings[2] + '</td></tr>',
+                            '<tr><td><hr/></td><td><hr/></td></tr>',
+                             '<tr><td>' + htmlStrings[1] + '</td><td>' + htmlStrings[3] + '</td></tr></table>',
+                             '<input id="solution1" class="solution" type="text" placeholder="Introduce el numerador del resultado"/>',
+                             '<br/><input id="solution2" class="solution" type="text" placeholder="Introduce el denominador del resultado"/>',
+                             '</div>'].join("\n");
+                } else {
+                    html += '<tr><td>' + htmlStrings[0] + '</td></tr>';
+                    if (this._battleOperation === "/1") {
+                        html+= '<tr><td><hr/></td></tr>';
+                    }
+                    html += ['<tr><td>' + htmlStrings[1] + '</td></tr></table>',
+                             '<input id="solution" class="solution" type="text" placeholder="Introduce la solución"/>',
+                             '</div>'].join("\n");
+                }
                 $("#cr-stage").append(html);
-                $(".solutionbox").width($(".poly").width());
                 $('#enemybar').css({"width": (this._detectionEnemy._enemyHealth*3) + "px"});
                 $($(".lifebox").children()[2]).show();
                 $($(".lifebox").children()[3]).show();
+            },
+            /**
+             * Controls the time events
+             */
+            setTimeHandler: function() {
+                // It's not the first battle, we have a result
                 if (this._battleResult !== undefined) {
                     battleResultScreen = RESULT_SCREEN;
+                    // Correct or wrong
                     if (this._battleResult) $(".battle").css({"background": CORRECT_SCREEN});
                     else $(".battle").css({"background": WRONG_SCREEN});
                 }
+                // The battle is timed so we set the text val in the html.
                 if (this._battleTimed) {
                     var time = this._battleTimeout;
                     var battleResultScreen = 0;
@@ -361,8 +531,10 @@ return {
                 } else {
                     $("#time").css({"text": "#00FF00"}).text("∞");
                 }
+                // Set the timer
                 var before = new Date();
                 this._battleTimer = setInterval( function() {
+                    // Solves the "change tab" problem
                     var elapsedTime = (new Date().getTime() - before.getTime());
                     if (Crafty("Character")._battleTimed) {
                         if(elapsedTime > 100) {
@@ -395,432 +567,116 @@ return {
                     }
                     before = new Date();
                 },10);
-                
             },
-
             /**
-             * Generates HTML code for the table with the two polynomials.
-             * @return String - HTML code
+             * Generates the polynomials and HTML and inserts it into the
+             * game, controlling timing and all the events.
              */
-            polynomialHtml: function() {
-                console.log(this._bonusTime);
-                var html = "<table class='poly'><tr>";
-                var i;
-                var poly1 = this.buildPolynomial(0);
-                var poly2;
-                var length = poly1.length;
-                // If notable product, build the notable.
+            polynomialBattle: function() {
+                this.whichOperation();
+                var operationString;
+                var htmlStrings;
                 switch (this._battleOperation) {
-                    case "**": poly2 = this.buildNotable(); break;
-                    default:
-                        poly2 = this.buildPolynomial(1);
-                        // If poly2 is larger update the length in order
-                        // to print both correctly.
-                        if (length < poly2.length) length = poly2.length;
-                        break;
-                }
-                // Print the first polynomial
-                for (i=length;i>=0;i--) {
-                    if (poly1[i] !== undefined) {
-                        html += "<td>" + poly1[i] + "</td>";
-                    } else {
-                        html += "<td></td>";
-                    }
-                }
-                html += "</tr><tr>";
-                // If the second is a notable product, print it directly.
-                switch (this._battleOperation) {
-                    case "**":
-                        html += "<td colspan=" + length + ">" + poly2 + "</td>";
-                        break;
-                    default:
-                        for (i=length;i>=0;i--) {
-                            if (poly2[i] !== undefined) {
-                                html += "<td>" + poly2[i] + "</td>";
-                            } else {
-                                html += "<td></td>";
-                            }
-                        }
-                        break;
-                }
-                html += "</tr></table>";
-                return html;
-            },
-            /**
-             * Makes an array with HTML code for a term per element.
-             * @param position - The position in the array of polynomials.
-             * @return Array - HTML codes
-             */
-            buildPolynomial: function(position) {
-                var poly = [];
-                var i = this._battlePolynomials[position].length;
-                while (i > 0) {
-                    i--;
-                    if (this._battlePolynomials[position][i] !== undefined) {
-                        poly[i] = "";
-                        if (this._battlePolynomials[position][i] > 0) {
-                            poly[i] = "+";
-                        }
-                        if (this._battlePolynomials[position][i] !== 1 && this._battlePolynomials[position][i] !== -1) {
-                            poly[i] = poly[i] + this._battlePolynomials[position][i];
-                        }
-                        if (i > 1) {
-                            poly[i] = poly[i] + "x<sup>" + i + "</sup> ";
-                        } else {
-                            if (i === 1) {
-                                poly[i] = poly[i] + "x";
-                            }
-                        }
-                    }
-                }
-                return poly;
-            },
-            /**
-             * Builds an HTML string for a notable product with a polynomial array.
-             */
-            buildNotable: function() {
-                var html = "(";
-                var aux = [];
-                var i;
-                switch(this._battleNotables[2]) {
                     case "*":
-                        var mirror = "";
-                        for (i=this._battleNotables[0].length; i>0; i--) {
-                            if (this._battleNotables[0][i] !== undefined) {
-                                if (this._battleNotables[0][i] > 0) mirror+= "+";
-                                if (this._battleNotables[0][i] !== -1 && this._battleNotables[0][i] !== 1)
-                                    mirror+= this._battleNotables[0][i];
-                                if (i > 0) {
-                                    mirror+= "x";
-                                    if (i > 1) mirror+="<sup>" + i + "</sup>&nbsp;";
-                                    else mirror+="&nbsp;";
-                                }
-                                
-                            }
-                        }
-                        html+=mirror + ")(+" + mirror.replace("+","-").replace("+","-").substring(1,mirror.length)  + ")";
+                        operationString = "MULTIPLICACIÓN";
+                        htmlStrings = this.mulOperation();
                         break;
-                    default:
-                        for (i=this._battleNotables[0].length; i>0; i--) {
-                            if (this._battleNotables[0][i] !== undefined) {
-                                if (this._battleNotables[0][i] > 0) html+= "+";
-                                if ((this._battleNotables[0][i] !== -1) && (this._battleNotables[0][i] !== 1))
-                                    html+= this._battleNotables[0][i];
-                                if (this._battleNotables[0][i] === -1) html+= "-";
-                                if (i > 0) {
-                                    html+= "x";
-                                    if (i > 1) html+="<sup>" + i + "</sup>&nbsp;";
-                                    else html+="&nbsp;";
-                                }
-                            }
+                    case "**":
+                        if (Math.random() < 0.5) {
+                            operationString = "EXPANDE EL PRODUCTO NOTABLE";
+                            this._battleOperation = "**1";
+                            htmlStrings = this.notableOperation("expand");
+                        } else {
+                            operationString = "CONVIERTE EN PRODUCTO NOTABLE";
+                            this._battleOperation = "**2";
+                            htmlStrings = this.notableOperation("compress");
                         }
-                        html+=")<sup>2</sup>".replace(/\n/g, '');
                         break;
+                    case "/":
+                        var p = Math.random();
+                        if (p < 0.33) {
+                            operationString = "SIMPLIFICA";
+                            this._battleOperation = "/1";
+                            htmlStrings = this.divOperation("simplify");
+                        } else if (p >= 0.33 && p < 0.66) {
+                            operationString = "MULTIPLICA";
+                            this._battleOperation = "/2";
+                            htmlStrings = this.divOperation("product");
+                        } else {
+                            operationString = "DIVIDE";
+                            this._battleOperation = "/3";
+                            htmlStrings = this.divOperation("cocient");
+                        }
+                        break;
+                    case "+":
+                        operationString = "SUMA";
+                        htmlStrings = this.addOperation();
+                        break;
+                    case "-":
+                        operationString = "RESTA";
+                        htmlStrings = this.subOperation();
                 }
-                return html;
+                this.createHtmlTable(operationString, htmlStrings);
+                this.setTimeHandler();
             },
             /**
              * Creates a keyboard for introducing polynomials
              */
             polynomialKeyboard: function() {
-                var full = false;
-                var exponent = false;
-                var sign = false;
-                $('body').on("keydown",function(e) {
-                    if (!full) {
-                        var key = keyMap(e.keyCode || e.which);
-                        // Numbers
-                        if (key >= 48 && key <= 57) {
-                            $('#solution').append(+key-48);
-                            if (exponent) {
-                                $('#solution').html(parseExponent($('#solution').html()));
-                                exponent = false;
-                            }
-                            sign = false;
-                        }
-                        // X
-                        else if (key === 88) {
-                            if (!exponent) {
-                                $('#solution').append("x");
-                            }
-                            sign = false;
-                        }
-                        // ^
-                        else if (e.shiftKey && key === 192) {
-                            if (!exponent) {
-                                $('#solution').append("^");
-                                exponent = true;
-                            }
-                            sign = false;
-                        }
-                        // -
-                        else if (key === 173) {
-                            if (!exponent && !sign) {
-                                $('#solution').append("-");
-                                sign = true;
-                            }
-                        }
-                        // +
-                        else if (key === 171) {
-                            if (!exponent && !sign) {
-                                $('#solution').append("+");
-                                sign = true;
-                            }
-                        }
+                if (this._battleOperation === "/1" || this._battleOperation.charAt(0) !== "/") {
+                    $("#solution").focus();
+                    $('#solution').on("keydown",function(e) {
+                        var key = e.keyCode || e.which;
                         // Enter
-                        else if (key === 13) {
-                            if (!exponent) {
-                                Crafty("Character")._battleInput = parseSolution($('#solution').html());
-                            }
+                        if (key === 13) {
+                           if (this.value !== "") {
+                                Crafty("Character").checkSolution(parseSolution(this.value));
+                           }
                         }
-                        // Backspace
-                        if (key === 8) {
-                            e.preventDefault();
-                            var content = $('#solution').html();
-                            if ( content.lastIndexOf(">") === content.length-1) {
-                                $("#solution").html(content.substring(0,content.lastIndexOf("x")));
-                                exponent = false;
-                            } else {
-                                $("#solution").html(content.substring(0,content.length-1));
-                            }
-                            sign = false;
+                    });
+                    $('#solution').on("keyup",function(e) {
+                        var repl = this.value.replace(/[\!-\'|\*|\,|\.-\/|\:-\]|\_-w|y-\~]/g, "");
+                        if (this.value != repl) {
+                            this.value = repl;
                         }
-                        // Check fullness of the input box
-                        if ($(".solutionbox").outerWidth() <= $(".battle").outerWidth()) {
-                            $(".solutionbox").css({"border-color":"#000000"});
-                            full = false;
-                        } else {
-                            $(".solutionbox").css({"border-color":"#FF0000"});
-                            full = true;
+                    });
+                } else {
+                    // Quotients
+                    $("#solution1").focus();
+                    $('#solution1').on("keydown",function(e) {
+                        var key = e.keyCode || e.which;
+                        // Enter
+                        if (key === 13) {
+                           if (this.value !== "") {
+                                Crafty("Character").checkSolution(parseSolution(this.value),parseSolution($('#solution2').val()));
+                           }
                         }
-                    }
-
-                    
-                    
-                });
+                    });
+                    $('#solution2').on("keydown",function(e) {
+                        var key = e.keyCode || e.which;
+                        // Enter
+                        if (key === 13) {
+                           if (this.value !== "") {
+                                Crafty("Character").checkSolution(parseSolution($('#solution1').val()), parseSolution(this.value));
+                           }
+                        }
+                    });
+                    $('#solution1').on("keyup",function(e) {
+                        var repl = this.value.replace(/[\!-\'|\*|\,|\.-\/|\:-\]|\_-w|y-\~]/g, "");
+                        if (this.value != repl) {
+                            this.value = repl;
+                        }
+                    });
+                    $('#solution2').on("keyup",function(e) {
+                        var repl = this.value.replace(/[\!-\'|\*|\,|\.-\/|\:-\]|\_-w|y-\~]/g, "");
+                        if (this.value != repl) {
+                            this.value = repl;
+                        }
+                    });
+                }
+                
             },
             
-            /*
-            polynomialKeyboard: function() {
-                var first = true;
-                var full = false;
-                var sign = false;
-                var exponent = false;
-                var cursor = -1;
-                var inputArray = [], solCoeficient, solExponent;
-                $('body').on("keydown",function(e) {
-                   
-                    // Numbers
-                    if (!full) {
-                        var key = keyMap(e.keyCode || e.which);
-                       if (key > 47 && key < 58) {
-                            if (sign) {
-                                if (!exponent) {
-                                    if (key === 48) {
-                                        if ( ($('#poly' + cursor).text() !== "+") && ($('#poly' + cursor).text() !== "-") )  {
-                                            $('#poly' + cursor).append(+key-48);
-                                        }
-                                    } else {
-                                        $('#poly' + cursor).append(+key-48);
-                                    }
-                                } else {
-                                    if (key !== 48) {
-                                        $('#exp' + cursor).append(+key-48);
-                                    } else {
-                                        if ($('#exp' + cursor).text() !== "") {
-                                            $('#exp' + cursor).append(+key-48);
-                                        }
-                                    }
-                                }
-                            } else {
-                                // Only enters here once
-                                if (first) {
-                                    if (key !== 48) {
-                                        cursor++;
-                                        $('#solution').append("<td id='poly" + cursor +"'>+" + (+key-48) + "</td>");
-                                        first = false;
-                                        sign = true;
-                                    }
-                                }
-                            }
-                        }
-                        // Signs
-                        else if (key === 173 || key === 171) {
-                            // Only enters here once
-                            if (first) {
-                                cursor++;
-                                if (key === 173) $('#solution').append("<td id='poly" + cursor +"'>-</td>");
-                                else $('#solution').append("<td id='poly" + cursor +"'>+</td>");
-                                first = false;
-                                sign = true;
-                            }
-                            // If only has a + or -, doesn't do anything
-                            if ( !( ($("#poly" + cursor).text() === "+") || ($("#poly" + cursor).text() === "-") ) ) {
-                                if (exponent) {
-                                    exponent = false;
-                                }
-                                sign = false;
-                                // See if exponent is 1 and remove it
-                                if ($('#exp' + cursor).text() === "1") {
-                                    $('#exp' + cursor).text("");
-                                }
-                                // See if coeficient is 1 and hide it
-                                var number1 = $('#poly' + cursor).html();
-                                var ini1 = number1.indexOf("+");
-                                var ini2 = number1.indexOf("-");
-                                if (ini1 < 0) {
-                                    number1 = number1.substring(ini2,number1.indexOf("x"));
-                                } else {
-                                    number1 = number1.substring(ini1,number1.indexOf("x"));
-                                }
-                                if (number1 === "+1" || number1 === "-1") {
-                                    $('#poly' + cursor).html(number1.substring(0,1) + $('#poly' + cursor).html().substring( $('#poly' + cursor).html().indexOf("x") , $('#poly' + cursor).html().length ));
-                                }
-                                // Simplify
-                                var aux = cursor-1;
-                                while (aux > -1) {
-                                    // Equal exponents
-                                    if ($('#exp' + aux).html() === $('#exp' + cursor).html()) {
-                                        // Actual number
-                                        number1 = $('#poly' + cursor).html();
-                                        ini1 = number1.indexOf("+");
-                                        ini2 = number1.indexOf("-");
-                                        if (ini1 < 0) {
-                                            number1 = number1.substring(ini2,number1.indexOf("x"));
-                                        } else {
-                                            number1 = number1.substring(ini1,number1.indexOf("x"));
-                                        }
-                                        // Last number
-                                        number2 = $('#poly' + aux).html();
-                                        ini1 = number2.indexOf("+");
-                                        ini2 = number2.indexOf("-");
-                                        var html = "";
-                                        if (ini1 < 0) {
-                                            number2 = number2.substring(ini2,number2.indexOf("x"));
-                                            html = "-";
-                                        } else {
-                                            number2 = number2.substring(ini1,number2.indexOf("x"));
-                                            html = "+";
-                                        }
-                                        if (number1 === "+" || number1 === "-") number1 += "1";
-                                        if (number2 === "+" || number2 === "-") number2 += "1";
-                                        var total = (+parseInt(number1,10) + parseInt(number2,10));
-                                        if (total < 0) {
-                                            html="";
-                                        }
-                                        $('#poly' + cursor).remove();
-
-                                        if (total !== 0) {
-                                            if (total !== 1) html += total;
-                                            var exponential = $('#exp' + aux).text();
-                                            if (exponential !== "0") {
-                                                html += "x<sup id='exp" + aux+ "'>" + exponential +"</sup>";
-                                            }
-                                            $('#poly' + aux).html(html);
-                                            $('#poly' + cursor).remove();
-                                            cursor--;
-                                        } else {
-                                            $('#poly' + aux).remove();
-                                        }
-                                    }
-                                    aux--;
-                                }
-                                if (!sign) {
-                                    // Solution saving
-                                    var ps = $('#poly' + cursor).text().indexOf("x");
-                                    if (ps < 0) {
-                                        aux = parseInt($('#poly' + cursor).text(),10);
-                                    } else {
-                                        aux = $('#poly' + cursor).text().substring(0,ps);
-                                        if (aux === "+") {
-                                            aux = 1;
-                                        } else if (aux === "-") {
-                                            aux = -1;
-                                        } else {
-                                            aux = parseInt(aux,10);
-                                        }
-                                    }
-                                    solCoeficient = aux;
-                                    aux = parseInt($('#exp' + cursor).text(),10);
-                                    if (isNaN(aux)) {
-                                        if ($('#poly' + cursor).text().indexOf("x") < 0) aux = 0;
-                                        else aux = 1;
-                                    }
-                                    solExponent = aux;
-                                    inputArray[solExponent] = solCoeficient;
-                                    cursor++;
-                                    var op;
-                                    if (key === 173) op = "-";
-                                    else op = "+";
-                                    $('#solution').append("<td id='poly" + cursor +"'>" + op + "</td>");
-                                    sign = true;
-                                }
-                            }
-                        } // X 
-                        else if (key === 88) {
-                            // Only enters here once
-                            if (first) {
-                                cursor++;
-                                $('#solution').append("<td id='poly" + cursor +"'>+</td>");
-                                first = false;
-                                sign = true;
-                            }
-                            if (exponent === false) {
-                                $('#poly' + cursor).append("x<sup id='exp" + cursor +"'></sup>");
-                                exponent = true;
-                            }
-                        } // Enter 
-                    }
-                    if (key === 13) {
-                        if ($("#solution").text() !== "\n" && $("#solution").text() !== "") {
-                            // Solution saving
-                            var ps2 = $('#poly' + cursor).text().indexOf("x");
-                            var aux2;
-                            if (ps2 < 0) {
-                                aux2 = parseInt($('#poly' + cursor).text(),10);
-                            } else {
-                                aux2 = $('#poly' + cursor).text().substring(0,ps2);
-                                if (aux2 === "+") {
-                                    aux2 = 1;
-                                } else if (aux2 === "-") {
-                                    aux2 = -1;
-                                } else {
-                                    aux2 = parseInt(aux2,10);
-                                }
-                            }
-                            solCoeficient = aux2;
-                            aux2 = parseInt($('#exp' + cursor).text(),10);
-                            if (isNaN(aux2)) {
-                                if ($('#poly' + cursor).text().indexOf("x") < 0) aux2 = 0;
-                                else aux2 = 1;
-                            }
-                            solExponent = aux2;
-                            inputArray[solExponent] = solCoeficient;
-                            Crafty("Character")._battleInput = inputArray;
-                            Crafty("Character").polynomialSolution();
-                        }
-                    } // Backspace
-                    else if (key === 8) {
-                        e.preventDefault();
-                        if (cursor > -1) {
-                            $('#poly' + cursor).remove();
-                            if ($('#solution').html() === "\n" || $('#solution').html() === "") {
-                                first = true;
-                            }
-                            cursor--;
-                            exponent = false;
-                            sign = false;
-                        }
-                    }
-                    if ($(".solutionbox").outerWidth() <= $(".battle").outerWidth()) {
-                        $(".solutionbox").css({"border-color":"#000000"});
-                        full = false;
-                    } else {
-                        $(".solutionbox").css({"border-color":"#FF0000"});
-                        full = true;
-                    }
-                });
-            },*/
             /**
              * Given a polynomial, makes another by multiplying it to another
              * random polynomial, and stores this random polynomial.
@@ -849,90 +705,61 @@ return {
             /**
              * Checks the input with the solution.
              */
-            polynomialSolution: function() {
-                var i, j;
-                var solution = [];
+            checkSolution: function(solution, solution2) {
                 var correct = true;
-                switch(this._battleOperation) {
-                    case "*":
-                        for (i=0; i<MAX_COEFICIENT; i++) {
-                            if (this._battlePolynomials[0][i] !== undefined) {
-                                for (j=0; j<MAX_COEFICIENT; j++) {
-                                    if (this._battlePolynomials[1][j] !== undefined) {
-                                        if (solution[i+j] === undefined) solution[i+j] = 0;
-                                        solution[i+j] = solution[i+j] + this._battlePolynomials[0][i]*this._battlePolynomials[1][j];
-                                        correct = (solution[i+j] === this._battleInput[i+j]);
-                                    }
-                                }
-                            }
-                        }
-                        break;
-                    case "**":
-                        switch(this._battleNotables[1]) {
-                            case "+":
-                                for (i=0; i<MAX_COEFICIENT; i++) {
-                                    if (this._battlePolynomials[0][i] === undefined) this._battlePolynomials[0][i] = 0;
-                                    if (this._battlePolynomials[1][i] === undefined) this._battlePolynomials[1][i] = 0;
-                                    if (this._battleInput[i] === undefined) this._battleInput[i] = 0;
-                                    solution[i] = this._battlePolynomials[0][i] + this._battlePolynomials[1][i];
-                                    correct = (solution[i] === this._battleInput[i]);
-                                    if (!correct) break;
-                                }
-                                break;
-                            case "-":
-                                for (i=0; i<MAX_COEFICIENT; i++) {
-                                    if (this._battlePolynomials[0][i] === undefined) this._battlePolynomials[0][i] = 0;
-                                    if (this._battlePolynomials[1][i] === undefined) this._battlePolynomials[1][i] = 0;
-                                    if (this._battleInput[i] === undefined) this._battleInput[i] = 0;
-                                    solution[i] = this._battlePolynomials[0][i] - this._battlePolynomials[1][i];
-                                    correct = (solution[i] === this._battleInput[i]);
-                                    if (!correct) break;
-                                }
-                                break;
-                            default: break;
-                        }
-                        break;
-                    case "/":
-                        for (i=0; i<MAX_COEFICIENT; i++) {
-                            if (this._battleQuotient[i] !== undefined) {
-                                correct = (this._battleQuotient[i] === this._battleInput[i]);
-                            }
-                        }
-                        break;
-                    case "+":
-                        for (i=0; i<MAX_COEFICIENT; i++) {
-                            if (this._battlePolynomials[0][i] === undefined) this._battlePolynomials[0][i] = 0;
-                            if (this._battlePolynomials[1][i] === undefined) this._battlePolynomials[1][i] = 0;
-                            if (this._battleInput[i] === undefined) this._battleInput[i] = 0;
-                            solution[i] = this._battlePolynomials[0][i] + this._battlePolynomials[1][i];
-                            correct = (solution[i] === this._battleInput[i]);
-                            if (!correct) {
+                var correct1 = true, correct2 = true;
+                var i=0;
+                switch (this._battleOperation) {
+                    case "/2":
+                        for (i=0; i<this._battleSolution[0].length; i++) {
+                            if (this._battleSolution[0][i] !== solution[i]) {
+                                correct1 = false;
                                 break;
                             }
                         }
+                        for (i=0; i<this._battleSolution[1].length; i++) {
+                            if (this._battleSolution[1][i] !== solution2[i]) {
+                                correct2 = false;
+                                break;
+                            }
+                        }
+                        correct = correct1 && correct2;
                         break;
-                    case "-":
-                        for (i=0; i<MAX_COEFICIENT; i++) {
-                            if (this._battlePolynomials[0][i] === undefined) this._battlePolynomials[0][i] = 0;
-                            if (this._battlePolynomials[1][i] === undefined) this._battlePolynomials[1][i] = 0;
-                            if (this._battleInput[i] === undefined) this._battleInput[i] = 0;
-                            solution[i] = this._battlePolynomials[0][i] - this._battlePolynomials[1][i];
-                            correct = (solution[i] === this._battleInput[i]);
-                            if (!correct) break;
+                    case "/3":
+                        for (i=0; i<this._battleSolution[0].length; i++) {
+                            if (this._battleSolution[0][i] !== solution[i]) {
+                                correct1 = false;
+                                break;
+                            }
+                        }
+                        for (i=0; i<this._battleSolution[1].length; i++) {
+                            if (this._battleSolution[1][i] !== solution2[i]) {
+                                correct2 = false;
+                                break;
+                            }
+                        }
+                        correct = correct1 && correct2;
+                        break;
+                    default:
+                        for (i=0; i<this._battleSolution.length; i++) {
+                            if (this._battleSolution[i] !== solution[i]) {
+                                correct = false;
+                                break;
+                            }
                         }
                         break;
                 }
                 this.clearBattle();
                 if (correct) {
                     this._battleResult = true;
-                    var endBattle = this.getEnemy().damage();
+                    var endBattle = this._detectionEnemy.damage();
                     if (endBattle) {
                         Audio.stopAlert();
                         Audio.stopHidden();
                         Audio.playLevel();
-                        if (this._bonusTime > 0) {
-                            this._bonusTime--;
-                            if (this._bonusTime === 0) {
+                        if (this._clocks > 0) {
+                            this._clocks--;
+                            if (this._clocks === 0) {
                                 this.removeBonus("clock");
                             }
                         }
