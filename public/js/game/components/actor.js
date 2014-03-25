@@ -42,7 +42,7 @@ return {
              * Inits the component
              */
             init: function() {
-                this.requires('Grid, SpriteAnimation, Gravity, Collision');
+                this.requires('Grid, Sprite, SpriteAnimation, Gravity, Collision');
             }
         });
         createChildComponents(edition);

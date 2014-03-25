@@ -44,7 +44,7 @@ var drawLava = {
     gravity: { x: 0, y: 0.1 },
     // sensible values are 0-3
     jitter: 0
-}
+};
 
 var LAVA_MAX = 2; // CAUTION: Incresing this parameter means CPU usage to the max.
 
@@ -62,6 +62,7 @@ return {
             _lavaInterval: undefined,
             _lavaFloor: undefined,
             _lavaParticles: 0,
+            _lavaScreams: 0,
             /**
              * Draws the lava and controls the damage.
              */
@@ -71,16 +72,16 @@ return {
                     if (this._lavaFloor[0].has("Abyss")) {
                         if (this._lavaInterval === undefined) {
                             this._lavaParticles = 0;
+                            this._lavaScreams = 0;
                             this._lavaInterval = setInterval( function() {
                                 Crafty.e("2D, Canvas, Particles").attr({"x": Crafty("Character").x, "y": Crafty("Character").y+16}).particles(drawLava);
                                 Crafty("Character")._lavaParticles++;
+                                Crafty("Character")._lavaScreams++;
                                 Crafty("Character").damage("lava");
                                 if (Crafty("Character")._lavaParticles % LAVA_MAX === 0) {
-                                    Audio.playDamage();
                                     Crafty('Particles').each(function() { this.destroy(); });
                                 }
                             }, 100);
-
                         }
                     } else {
                         this.clearLava();

@@ -7,9 +7,9 @@
 
 /**
  * enemy3.js
- * @dependency /public/js/game/scenes.js
+ * @dependency /public/js/game/multi.js
  */
-define (["../../../scenes"],function(Scenes) {
+define (["../../../multi"],function(Multi) {
 
 // -----------------------------------------------------------------------------
 // Public
@@ -29,7 +29,7 @@ return {
                 if (!edition) {
                     this.reel("EnemyAnimationLeft",600,0,0,6);
                     this.reel("EnemyAnimationRight",600,0,1,6);
-                    this._id = Scenes.generateMultiplayerId();
+                    this._id = Multi.generateMultiplayerId();
                 }
             }
         });

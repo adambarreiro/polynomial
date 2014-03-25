@@ -22,57 +22,40 @@ return {
     registerComponent: function(edition) {
         Crafty.c('Multiplayer', {
             _orientation: "right",
+            _started: false,
+            _up: false,
             init: function() {
                 this.requires("Actor, spr_multiplayer");
-                this.gravity("Terrain").gravityConst(0.3);
                 this.reel("MultiplayerMoveLeft",800,0,1,8);
                 this.reel("MultiplayerMoveRight",800,0,2,8);
-                this.reel("MultiplayerJumpLeft",300,0,3,3);
-                this.reel("MultiplayerJumpRight",300,0,4,3);
-                this.bind("EnterFrame", function () {
-                    if (!this._up && !this.isPlaying("MultiplayerMoveRight") && !this.isPlaying("MultiplayerMoveLeft")) {
-                        this.pauseAnimation();
-                        if (this._orientation == "left") {
-                            this.sprite(1,0);
-                        } else {
-                            this.sprite(0,0);
-                        }
-                    }
-                    if (this._up) {
-                        if (this._orientation === "right") {
-                            if (!this.isPlaying("MultiplayerJumpRight")) {
-                                this.animate("MultiplayerJumpRight",1);
-                            }
-                        }
-                        else {
-                            if (!this.isPlaying("MultiplayerJumpLeft")) {
-                                this.animate("MultiplayerJumpLeft",1);
-                            }
-                        }
-                    }
-                });
                 this.bind("Move", function(from) {
-                    if(from.x < this.x) {
-                        this._orientation="right";
-                        if (!this._up) {
+                    if (this._started) {
+                        this._up = from._y > this.y;
+                        if(from._x < this.x) {
+                            this._orientation="right";
                             if (!this.isPlaying("MultiplayerMoveRight")){
-                                this.animate("MultiplayerMoveRight",-1);
+                               this.animate("MultiplayerMoveRight",-1);
                             }
-                        }
-                    } else if (from.x > this.x) {
-                        this._orientation="left";
-                        if (!this._up) {
+                        } else if (from._x > this.x) {
+                            this._orientation="left";
                             if (!this.isPlaying("MultiplayerMoveLeft")){
                                 this.animate("MultiplayerMoveLeft",-1);
                             }
                         }
-                    } else {
-                        if (this._orientation == "left") {
-                            this.sprite(1,0);
-                        } else {
-                            this.sprite(0,0);
+                        if (this._up) {
+                            if (this._orientation === "right") {
+                                this.pauseAnimation();
+                                this.sprite(1,4);
+                            }
+                            else {
+                                this.pauseAnimation();
+                                this.sprite(1,3);
+                            }
                         }
+                    } else {
+                        this.sprite(0,0);
                     }
+                    
                 });
             }
         });

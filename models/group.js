@@ -80,9 +80,20 @@ exports.addGroup = addGroup;
  */
 function editGroup(o, n, callback) {
     console.log("$ Editar grupo " + o + " y llamarlo " + n + ".");
+    var nothing = function() {};
+    studentModel.searchStudentsByGroup(o, function(students) {
+        if (students) {
+            for (var i = 0; i < students.length; i++) {
+                studentModel.setGroup(students[i].email, n, nothing);
+            }
+        }
+    });
     Group.update({name: o}, { $set: { name: n }}, function(error, numberAffected) {
-        if (numberAffected === 1) callback(true);
+        if (numberAffected === 1) {
+            callback(true);
+        }
         else callback(false);
+
     });
 }
 exports.editGroup = editGroup;
@@ -95,10 +106,11 @@ exports.editGroup = editGroup;
 function deleteGroup(n, callback) {
     console.log("$ Borrar grupo " + n + ".");
     // First, update references.
+    var nothing = function() {};
     studentModel.searchStudentsByGroup(n, function(students) {
         if (students) {
             for (var i = 0; i < students.length; i++) {
-                Student.update({email: students[i].name},{$set: { unassigned: true} },function() { /*Do nothing*/ });
+                studentModel.setGroup(students[i].email, "", nothing);
             }
         }
     });

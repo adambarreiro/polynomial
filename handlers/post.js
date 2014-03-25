@@ -20,9 +20,8 @@ function postLogin() {
         studentModel.loginStudent(escape(req.body.email), escape(req.body.password), function(ok, student) {
             if (ok) {
                 if (student) {
-                    if (student.assigned) {
+                    if (student.group !== "") {
                         req.session.regenerate(function(){
-                            res.cookie('savegame', student.savegame);
                             res.cookie('student', student.email);
                             req.session.user = student;
                             req.session.admin = false;
@@ -60,7 +59,7 @@ exports.postLogin = postLogin;
  */
 function postRegister(){
     app.post('/signup', function (req, res){
-        studentModel.addStudent(escape(req.body.email),escape(req.body.password),escape(req.body.name),escape(req.body.surname1),escape(req.body.surname2),escape(req.body.group), function(ok) {
+        studentModel.addStudent(escape(req.body.email),escape(req.body.password),escape(req.body.name),escape(req.body.surname1),escape(req.body.surname2), function(ok) {
             if (ok) res.redirect('/login?registered');
             else res.redirect('/register?exists');
         });

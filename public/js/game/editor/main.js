@@ -21,8 +21,8 @@ require(['./menu','./engine', '../components'], function(Menu, Engine, Component
     $(document).ready(function() {
         $('input[type!="button"][type!="submit"], select, textarea').val('').blur();
     });
-    Components.setEditor(true);
-    Components.init();
-    Engine.init();
-    Menu.init();
+    Components.loadEditorGraphics(function() {
+        Engine.init();
+        Menu.init();
+    });
 });

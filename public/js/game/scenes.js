@@ -8,7 +8,7 @@
 /**
  * Main file - RequireJS
  */
-define (["./constants", "./audio" ,"require", "./scenes"], function(Constants, Audio, Require) {
+define (["./constants", "./audio" ,"./components", "./multi"], function(Constants, Audio, Components, Multi) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -17,8 +17,6 @@ define (["./constants", "./audio" ,"require", "./scenes"], function(Constants, A
 var CHARACTER;
 var LEVEL;
 var STUDENT;
-var MULTIPLAYER;
-var ENEMYTOTAL = 0;
 var SIZE = Constants.getViewportSize('px');
 
 function setCharacter(entity) {
@@ -43,10 +41,6 @@ function setStudent(student) {
 
 function getStudent() {
     return STUDENT;
-}
-
-function getMultiplayer() {
-    return MULTIPLAYER;
 }
 
 /**
@@ -82,10 +76,6 @@ function saveGame(callback) {
     });
 }
 
-function updateSavegameCookie(level) {
-    document.cookie = "savegame=" + level;
-}
-
 function drawTile(x,y,type) {
     switch (type) {
         default: break;
@@ -114,8 +104,8 @@ function clean(background) {
 }
 
 function drawLevel(data) {
-    ENEMYTOTAL = 0;
-    var multi = getMultiplayer();
+    Multi.setEnemyTotal(0);
+    var multi = Multi.getMultiplayer();
     for (var i in data.map) {
         x = Math.floor(parseInt(i,10) % Constants.getLevelSize('tiles').width);
         y = Math.floor(parseInt(i,10) / Constants.getLevelSize('tiles').width);
@@ -140,7 +130,6 @@ function resize() {
     $('.bottom').css({'width': Constants.getViewportSize('px').width});
     $('canvas').remove();
     Crafty.canvas.init();
-    $("#cr-stage").css({"overflow": "visible"});
     Crafty.trigger("InvalidateViewport");
 }
 
@@ -163,6 +152,7 @@ function initCrafty() {
 
 function drawElements() {
     var html = ['<div id="back">Salir</div>',
+                '<div id="music" name="si">Sonido: SÍ</div>',
                 '<div class="bottom">',
                     '<div class="lifebox">',
                         '<span id="vidatext">Vida</span><div class="bar"><div id="lifebar"></div></div>',
@@ -180,6 +170,17 @@ function drawElements() {
         if (confirm("¿Quieres salir del juego?")) {
             clean();
             window.location = "/game";
+        }
+    });
+    $('#music').on("click", function() {
+        if ($('#music').attr("name") === "si") {
+            $("#music").text("Sonido: NO");
+            $('#music').attr("name", "no");
+            Crafty.audio.mute();
+        } else {
+            $("#music").text("Sonido: SÍ");
+            $('#music').attr("name", "si");
+            Crafty.audio.unmute();
         }
     });
     $('.bottom').css({'width': Constants.getViewportSize('px').width});
@@ -203,6 +204,7 @@ function nextScene() {
         Audio.stopLevel();
         $('.bottom').remove();
         $('#back').remove();
+        $('#music').remove();
         $('#cr-stage').fadeOut(1000, function() {
             $('body').append(html);
             $('.button').on("click", function() {
@@ -219,7 +221,7 @@ function endScene() {
     Crafty.scene("End", function() {
         var html = ['<div id="exp">',
                 '<h1>¡Enhorabuena, destruiste a tus enemigos y saliste con vida!<br/>',
-                '<p>Ahora eres un experto resolviendo polinomios : )</p>',
+                '<p>Ahora eres un experto resolviendo polinomios :)</p>',
                 '<input class="button" type="button" value="Volver al menu"/></div>',
                 ].join('\n');
         $('body').append(html);
@@ -253,6 +255,7 @@ function deathScene() {
         '</div>'].join('\n');
         $('.bottom').remove();
         $('#back').remove();
+        $('#music').remove();
         $('#cr-stage').fadeOut(1000, function() {
             $('body').append(html);
             $('.button').on("click", function() {
@@ -265,78 +268,70 @@ function deathScene() {
     });
 }
 
-function explanationScene() {
-    Crafty.scene("Explanation", function(data) {
-        var html = ['<div id="exp">',
-                '<h1>Fuiste designado a la lejana luna Europa en una expedición bélica...<br/>',
-                'Algo salió mal...<br/>Miras a tu alrededor y sólo hay extrañas criaturas y ni rastro de tus compañeros...<br/>',
-                'Es hora de luchar por sobrevivir.<br/>¡Vamos!</h1>',
-                '<img src="/assets/img/controls.png"/>',
-                '<p>Los enemigos pueden descubrirte. ¡Escóndete para atacar tranquilamente!</p>',
-                '<p>Si te descubren, ¡empezará una cuenta atrás que podría destruirte!</p>',
-                '<p>Sólo podrás atacar cuando estés lo suficientemente cerca, así que ten cuidado.</p>',
-                '<p>Haz caso a tu radar. Si está en amarillo, será mejor que te escondas. Si está en verde estarás a salvo.</p>',
-                '<input class="button" type="button" value="¡Empezar!"/></div>'].join('\n');
-        $('#cr-stage').hide();
-        $('body').append(html);
-        $('h1').css({
-            "text-align" : "center",
-            "color" : "white",
-            "border-bottom" : "solid 1px #999999",
-            "line-height" : "150%",
-            "padding" : "10px"
-        });
-        $('img').css({
-            "float" : "left",
-        });
-        $('p').css({
-            "color" : "white",
-            "text-align" : "left",
-            "margin-left" : "50%",
-            "padding-top" : "20px",
-        });
-        $('.button').css({
-            "clear" : "both",
-            "float" : "left",
-            "margin-left" : "45%"});
-        $('.button').on('click', function() {
-            $('#exp').remove();
-            clean();
-            $('#cr-stage').show();
-            Crafty.scene("Game", data);
-        });
-    });
-}
-
 function loadingScene() {
     Crafty.scene("Loading", function(data){
-        var html = ['<div class="popup">',
-                '<div class="separator">Cargando...</div>',
-                '<p>Cargando gráficos, música y sonidos.<br/>Por favor, espere.</p>',
-            '</div>'].join('\n');
-        var assets = ['/assets/img/controls.png',
-                    '/assets/img/backgrounds/wall1.jpg',
-                    '/assets/img/backgrounds/wall2.jpg',
-                    '/assets/img/backgrounds/wall3.jpg',
-                    '/assets/img/backgrounds/wall4.jpg',
-                    '/assets/img/backgrounds/wall5.jpg'];
-        assets.join(Audio.loadAudio());
-        Crafty.load(assets, function() {
-            $('.popup').remove();
-            clean();
-            if (getLevel() === 1) {
-                Crafty.scene('Explanation', data);
-            } else {
-                Crafty.scene('Game', data);
-            }
-        });
+        var html = ['<div id="exp">',
+                '<h1>Cargando...</h1>',
+                '<div id="loading"><div id="progress"></div></div>',
+                '<table><tr>',
+                '<td class="ltuto"><img src="/assets/img/tutorial/tutorial1.jpg"/></td>',
+                '</tr><tr>',
+                '<td class="rtuto"><img src="/assets/img/tutorial/tutorial2.jpg"/></td>',
+                '</tr><tr>',
+                '<td class="ltuto"><img src="/assets/img/tutorial/tutorial3.jpg"/></td>',
+                '</tr></table>'].join('\n');
+        $('#cr-stage').hide();
         $('body').append(html);
+        $('h1').css({"text-align":"center", "color":"white"});
+        $('table').css({"width":"80%", "margin":"0px auto"});
+        $('.ltuto').css({"margin-top":"30px","float":"left","box-shadow":"10px 10px 10px #111111"});
+        $('.rtuto').css({"margin-top":"30px","float":"right","box-shadow":"10px 10px 10px #111111"});
+        $('#loading').css({"margin":"0 auto","border":"1px solid #FFF","background-color":"#000","width":"500px","height":"10px","box-shadow":"10px 10px 10px #111111"});
+        $('#progress').css({"border":"0px","background-color":"#999","width":"100px","height":"10px"});
+        var assets = ['/assets/img/backgrounds/wall1.jpg',
+                      '/assets/img/backgrounds/wall2.jpg',
+                      '/assets/img/backgrounds/wall3.jpg',
+                      '/assets/img/backgrounds/wall4.jpg',
+                      '/assets/img/backgrounds/wall5.jpg'];
+        var loaded = false;
+        var i = 444;
+        var interval = setInterval(function() {
+            if (!loaded) {
+                if (i === 999) i = 444;
+                i=i+111;
+                $('#progress').css({"background-color":"#"+i});
+
+            } else {
+                clearInterval(interval);
+            }
+        },100);
+        var gi = Components.getGameGraphics();
+        Audio.addAudio();
+        assets.join(Audio.loadAudio());
+        assets.join(gi);
+        Crafty.load(assets,
+        function() {
+            loaded=true;
+            Components.setGameGraphics(gi);
+            $('#loading').remove();
+            $("h1").text("¡Todo listo!");
+            $('table').before('<div id="cont"><input class="button" type="button" value="¡Empezar!"/></div>');
+            $('#cont').css({"margin": "0 auto", "text-align": "center"});
+            $('.button').on("click", function() {
+                $('#exp').remove();
+                clean();
+                $('#cr-stage').show();
+                Crafty.scene('Game', data);
+            });
+        },
+        function(e) {
+            $("#progress").width(e.percent*5);
+        });
     });
 }
 
 function initScenes() {
     gameScene();
-    explanationScene();
     loadingScene();
     deathScene();
     endScene();
@@ -352,17 +347,15 @@ return {
     newGame: function(student, level, multi) {
         setStudent(student);
         setLevel(level);
-        MULTIPLAYER = multi;
+        Multi.setMultiplayer(multi);
         loadLevel(function(data) {
             initScenes();
             if (data.map) {
                 initCrafty();
                 if (multi === "connector") { // In multiplayer the connector doesn't save the game
-                    updateSavegameCookie(getLevel());
                     Crafty.scene('Loading',data);
                 } else {
                     saveGame(function(ok) {
-                        updateSavegameCookie(getLevel());
                         Crafty.scene('Loading',data);
                     });
                 }
@@ -375,12 +368,10 @@ return {
         setLevel(getLevel()+1);
         loadLevel(function(data) {
             if (data.map) {
-                if (getMultiplayer() === "connector") { // In multiplayer the connector doesn't save the game
-                    updateSavegameCookie(getLevel());
+                if (Multi.getMultiplayer() === "connector") { // In multiplayer the connector doesn't save the game
                     Crafty.scene('Next',data);
                 } else {
                     saveGame(function(ok) {
-                        updateSavegameCookie(getLevel());
                         Crafty.scene('Next',data);
                     });
                 }
@@ -389,21 +380,12 @@ return {
             }
         });
     },
-
     restartLevel: function() {
         loadLevel(function(data) {
             if (data.map) {
                 Crafty.scene("Death",data);
             }
         });
-    },
-
-    setMultiplayer: function(multiplayer) {
-        MULTIPLAYER = multiplayer;
-    },
-    generateMultiplayerId: function() {
-        ENEMYTOTAL++;
-        return ENEMYTOTAL;
     }
 };
 

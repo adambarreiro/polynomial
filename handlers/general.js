@@ -60,7 +60,9 @@ function setAjaxHandlers() {
     ajax.ajaxLevelDelete();
     ajax.ajaxLevelMove();
     ajax.ajaxSaveGame();
+    ajax.ajaxLoadGame();
     ajax.ajaxGetQuestions();
+    ajax.ajaxGetTimeouts();
 }
 exports.setAjaxHandlers = setAjaxHandlers;
 

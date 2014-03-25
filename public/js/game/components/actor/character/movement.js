@@ -9,7 +9,7 @@
  * movement.js
  * @dependency /public/js/game/constants.js
  */
-define (["../../../constants"], function(Constants) {
+define (["../../../constants", "../../../audio"], function(Constants, Audio) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -65,9 +65,11 @@ return {
                         this.y -= JUMPY;
                         this._falling = true;
                         if (this._orientation === "right") {
+                            this.pauseAnimation();
                             this.sprite(1,4);
                         }
                         else {
+                            this.pauseAnimation();
                             this.sprite(1,3);
                         }
                         this.trigger('Moved', { x: this._x, y: this._y + JUMPY });
@@ -108,8 +110,6 @@ return {
                         if (!this._up && !this._falling && !this.isPlaying("CharMoveLeft")){
                             this.animate("CharMoveLeft",-1);
                         }
-                    } else if (this.isDown("DOWN_ARROW")) {
-                        this.trigger('Moved', { x: this._x, y: this._y });
                     }
                 });
                 this.bind("KeyUp", function(e) {
@@ -137,12 +137,6 @@ return {
                         this._orientation="left";
                         if (!this._up && !this._falling && !this.isPlaying("CharMoveLeft")){
                             this.animate("CharMoveLeft",-1);
-                        }
-                    } else {
-                        if (!this._up && !this._falling && this._orientation == "left") {
-                            this.sprite(1,0);
-                        } else if (!this._up && !this._falling && this._orientation == "right") {
-                            this.sprite(0,0);
                         }
                     }
                 });

@@ -16,3 +16,11 @@ Links
 - CraftyJS: http://craftyjs.com
 - node.js: http://nodejs.org
 - MongoDB: http://www.mongodb.org
+
+Special thanks to
+-------------------------
+- My mates for supporting me, testing the game and giving advices about it.
+- Maxstack for "The Client", "Bazaarnet" and "Restoration Completed" tracks used as level music: http://opengameart.org/content/freelance
+- Zander Noriega for "Perpetual Tension": https://soundcloud.com/zander-noriega
+- Matthew Pablo for "Thrust Sequence": http://www.matthewpablo.com
+- Steeve-the-fox for the main character spritesheet: http://steeve-the-fox.deviantart.com/art/Vigo-Mars-Sprite-Sheet-138994241

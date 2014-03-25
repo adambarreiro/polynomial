@@ -99,7 +99,6 @@ return {
                 var icon;
                 var description;
                 var p = Math.random();
-                p=0.99;
                 if (p < 0.70) {
                     bonus = "SALUD";
                     icon = "health";
@@ -153,7 +152,6 @@ return {
                         case "clock":
                             Audio.playClock();
                             Crafty("Character")._clocks = Crafty("Character")._clocks+CLOCKS;
-                            console.log(Crafty("Character")._clocks);
                             break;
                     }
                     Crafty("Character").startAll();
@@ -177,6 +175,7 @@ return {
                             this.stopAll();
                             Audio.playChest();
                             chest._opened = true;
+                            chest.sprite(1,0);
                             if (QUESTIONS.length === 0 || ANSWERS.length === 0) return;
                             var index = (Math.floor(Math.random()*QUESTIONS.length));
                             var html = ['<div class="popup">',

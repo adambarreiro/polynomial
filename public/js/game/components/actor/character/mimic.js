@@ -10,8 +10,9 @@
  * @dependency /public/js/game/network/connector.js
  * @dependency /public/js/game/network/creator.js
  * @dependency /public/js/game/network/scenes.js
+ * @dependency /public/js/game/network/multi.js
  */
-define (["../../../network/connector", "../../../network/creator", "../../../scenes"], function(Connector, Creator, Scenes) {
+define (["../../../network/connector", "../../../network/creator", "../../../scenes", "../../../multi",], function(Connector, Creator, Scenes, Multi) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -25,14 +26,44 @@ function onReceiveMovement() {
     switch(TYPE) {
         case "connector":
             Connector.onReceiveMovement(function(data) {
-                Crafty("Multiplayer").x = data.x;
-                Crafty("Multiplayer").y = data.y;
+                if (data.x === 666 && data.y === 666) {
+                    Crafty("Multiplayer").pauseAnimation();
+                    Crafty("Multiplayer").sprite(0,0);
+                } else if (data.x === -666 && data.y === -666) {
+                    Crafty("Multiplayer").pauseAnimation();
+                    Crafty("Multiplayer").sprite(1,0);
+                } else if (data.x === 333 && data.y === 333) {
+                    Crafty("Multiplayer")._up = false;
+                    if (Crafty("Multiplayer")._orientation == "left") {
+                        Crafty("Multiplayer").sprite(1,0);
+                    } else {
+                        Crafty("Multiplayer").sprite(0,0);
+                    }
+                } else {
+                    Crafty("Multiplayer").x = data.x;
+                    Crafty("Multiplayer").y = data.y;
+                }
             });
             break;
         case "creator":
             Creator.onReceiveMovement(function(data) {
-                Crafty("Multiplayer").x = data.x;
-                Crafty("Multiplayer").y = data.y;
+                if (data.x === 666 && data.y === 666) {
+                    Crafty("Multiplayer").pauseAnimation();
+                    Crafty("Multiplayer").sprite(0,0);
+                } else if (data.x === -666 && data.y === -666) {
+                    Crafty("Multiplayer").pauseAnimation();
+                    Crafty("Multiplayer").sprite(1,0);
+                } else if (data.x === 333 && data.y === 333) {
+                    Crafty("Multiplayer")._up = false;
+                    if (Crafty("Multiplayer")._orientation == "left") {
+                        Crafty("Multiplayer").sprite(1,0);
+                    } else {
+                        Crafty("Multiplayer").sprite(0,0);
+                    }
+                } else {
+                    Crafty("Multiplayer").x = data.x;
+                    Crafty("Multiplayer").y = data.y;
+                }
             });
             break;
         default: break;
@@ -147,6 +178,7 @@ return {
      */
     createComponent: function(edition) {
         Crafty.c('Mimic', {
+            _multiJumped: false,
             /**
              * Function called to retransmit the damage of an enemy
              */
@@ -171,15 +203,57 @@ return {
              * Function called to retransmit the character movement.
              */
             multiplayerMove: function() {
+                var oldx, oldy, newx, newy;
+                var jumped = false;
                 switch(TYPE) {
                     case "connector":
+                        this.bind("EnterFrame", function() {
+                            if (this._up) {
+                                jumped = true;
+                            }
+                            if (!this._up && jumped) {
+                                Connector.sendMovement(333,333);
+                                jumped = false;
+                            }
+                        });
                         this.bind("Moved", function() {
-                            Connector.sendMovement(this.x, this.y);
+                            Crafty("Multiplayer")._started=true;
+                            Connector.sendMovement(Math.floor(this.x),Math.floor(this.y));
+                        });
+                        this.bind("KeyUp", function(e) {
+                            if(e.key === Crafty.keys.LEFT_ARROW) {
+                                Connector.sendMovement(-666,-666);
+                                this.pauseAnimation();
+                                this.sprite(1,0);
+                            } else if (e.key === Crafty.keys.RIGHT_ARROW) {
+                                Connector.sendMovement(666,666);
+                                this.sprite(0,0);
+                            }
                         });
                         break;
                     case "creator":
+                        this.bind("EnterFrame", function() {
+                            if (this._up) {
+                                jumped = true;
+                            }
+                            if (!this._up && jumped) {
+                                Creator.sendMovement(333,333);
+                                jumped = false;
+                            }
+                        });
                         this.bind("Moved", function() {
-                            Creator.sendMovement(this.x, this.y);
+                            Crafty("Multiplayer")._started=true;
+                            Creator.sendMovement(Math.floor(this.x),Math.floor(this.y));
+                        });
+                        this.bind("KeyUp", function(e) {
+                            if(e.key === Crafty.keys.LEFT_ARROW) {
+                                Creator.sendMovement(-666,-666);
+                                this.pauseAnimation();
+                                this.sprite(1,0);
+                            } else if (e.key === Crafty.keys.RIGHT_ARROW) {
+                                Creator.sendMovement(666,666);
+                                this.sprite(0,0);
+                            }
                         });
                         break;
                     default: break;
@@ -210,9 +284,8 @@ return {
             },
             stopMultiplayer: function() {
                 Crafty("Multiplayer").destroy();
-                Scenes.setMultiplayer("single");
+                Multi.setMultiplayer("single");
                 this.removeComponent("Mimic");
-
             }
         });
     }

@@ -31,9 +31,7 @@ return {
      */
     registerComponent: function(edition) {
         Crafty.c('Patrol', {
-            patrolSpeed: 1,
-            _patrolOrientationStart: true,
-            _patrolOrientation: "left",
+            _patrolSpeed: 1,
             _patrolWall: undefined,
             _patrolFloor: undefined,
             /**
@@ -45,7 +43,7 @@ return {
                     if (this._patrolWall[0].has("Terrain")) {
                         this._patrolOrientation = "left";
                     } else {
-                        this.x += this.patrolSpeed;
+                        this.x += this._patrolSpeed;
                     }
                 }
                 else {
@@ -54,7 +52,7 @@ return {
                         this._patrolOrientation = "left";
                     } else {
                         if (!this._patrolFloor[0].has("Actor")) {
-                            this.x += this.patrolSpeed;
+                            this.x += this._patrolSpeed;
                         } else {
                             this._patrolOrientation = "left";
                         }
@@ -70,7 +68,7 @@ return {
                     if (this._patrolWall[0].has("Terrain")) {
                         this._patrolOrientation = "right";
                     } else {
-                        this.x -= this.patrolSpeed;
+                        this.x -= this._patrolSpeed;
                     }
                 }
                 else {
@@ -79,43 +77,34 @@ return {
                         this._patrolOrientation = "right";
                     } else {
                         if (!this._patrolFloor[0].has("Actor")) {
-                            this.x -= this.patrolSpeed;    
+                            this.x -= this._patrolSpeed;
                         } else {
                             this._patrolOrientation = "right";
                         }
                     }
                 }
             },
+            getOrientation: function() {
+                return this._patrolOrientation;
+            },
             /**
              * Starts the component
              */
             startPatrol: function() {
-                if (this._patrolOrientationStart) {
-                    // Only enters here when the entity is created in order
-                    // to give a random orientation only at start and then
-                    // resume it when all events are stopped.
-                    this._patrolOrientation = randOrientation();
-                    this._patrolOrientationStart = false;
-                }
+                this._patrolOrientation = randOrientation(); // Local for each enemy
                 this.bind("EnterFrame", function(e) {
                     if (this._patrolOrientation === "right") {
                         if (!this.isPlaying("EnemyAnimationRight")) {
-                            this.animate("EnemyAnimationRight",-1);    
+                            this.animate("EnemyAnimationRight",-1);
                         }
                         this.goRight();
                     } else if (this._patrolOrientation === "left") {
                         if (!this.isPlaying("EnemyAnimationLeft")) {
-                            this.animate("EnemyAnimationLeft",-1);    
+                            this.animate("EnemyAnimationLeft",-1);
                         }
                         this.goLeft();
                     }
                 });
-            },
-            /**
-             * Returns the patrol orientation
-             */
-            getOrientation: function() {
-                return this._patrolOrientation;
             },
             /**
              * Inits the component.

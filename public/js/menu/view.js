@@ -60,8 +60,6 @@ return {
                     '<input class="field" type="text" name="name" placeholder="Nombre"/>',
                     '<input class="field" type="text" name="surname1" placeholder="Primer apellido"/>',
                     '<input class="field" type="text" name="surname2" placeholder="Segundo apellido"/>',
-                    '<div class="separator">Escoge tu grupo</div>',
-                    '<select class="field" name="group" id="group"><option value=" ">Selecciona tu grupo</option>',
                     '</select>',
                     '<input class="button" type="submit" value="Registrar"/>',
                     '<input class="button" type="button" value="Atr&aacute;s"/>',
@@ -88,8 +86,6 @@ return {
             help = "Tu primer apellido.";
         else if (type === 'surname2')
             help = "Tu segundo apellido.<br/>Puedes dejarlo en blanco si no tienes.";
-        else if (type === 'group')
-            help = "El grupo al que correspondes.";
         $('<div class="popup">' + help + '</div>').insertBefore(field);
     },
 
@@ -281,13 +277,13 @@ return {
     showMessage: function(parameters) {
         if (parameters !== "") {
             if (parameters == "nogroup")
-                $('body').append('<div class="msg" id="error">Tu profesor a&uacute;n no te<br/>ha confirmado en el grupo.<br/>Vuelve m&aacute;s tarde o contacta con &eacute;l.</div>');
+                $('body').append('<div class="msg" id="error">Tu profesor a&uacute;n no te<br/>ha asignado ning&uacute;n grupo.<br/>Vuelve m&aacute;s tarde o contacta con &eacute;l.</div>');
             else if (parameters == "lerror")
                 $('body').append('<div class="msg" id="error">Ese usuario con esa contrase&ntilde;a no existe.</div>');
             else if (parameters == "exists")
                 $('body').append('<div class="msg" id="error">Este usuario ya está registrado...<br/>Usa otro correo y vuelve a intentarlo.</div>');
             else if (parameters == "registered")
-                $('body').append('<div class="msg" id="ok">Registrado con éxito.<br/>Espera a que tu profesor te confirme en el grupo.</div>');
+                $('body').append('<div class="msg" id="ok">Registrado con éxito.<br/>Espera a que tu profesor te asigne un grupo.</div>');
             else if (parameters == "gexists")
                 $('body').append('<div class="msg" id="error">El grupo ya existe.<br/>Escoge otro nombre.</div>');
             else if (parameters == "error")

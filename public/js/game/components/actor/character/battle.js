@@ -21,6 +21,7 @@ var SIGN_PROBABILITY = 0.5; // Monomial sign probability.
 var TERM_PROBABILITY = 0.75; // Probability that a term appears in the polynomial
 
 // Timeouts for battles
+var TIMEOUT_SET = false;
 var ADD_TIMEOUT = 2999;
 var SUB_TIMEOUT = 2999;
 var MUL_TIMEOUT = 15999;
@@ -36,19 +37,55 @@ var CORRECT_SCREEN = "rgba(0,255,0,0.8)";
 var WRONG_SCREEN = "rgba(255,0,0,0.8)";
 var NORMAL_SCREEN = "rgba(200,200,200,0.8)";
 
+function getTimeouts(callback) {
+    $.ajax({
+        url: '/getTimeoutsFile',
+        type: 'POST',
+        dataType: 'html',
+        success: function(data) {
+            var array = data.split(/\n/);
+            for (var i=0; i<array.length; i++) {
+                var option = array[i].split(":");
+                if (option[1] !== undefined && option[1] !== "") {
+                    var value = parseInt(option[1],10);
+                    if (!isNaN(value)) {
+                        switch(option[0]) {
+                            case "SUMA": ADD_TIMEOUT = value; break;
+                            case "RESTA": SUB_TIMEOUT = value; break;
+                            case "MULTIPLICACION": MUL_TIMEOUT = value; break;
+                            case "NOTABLE": NOT_TIMEOUT = value; break;
+                            case "DIVISION": DIV_TIMEOUT = value; break;
+                        }
+                    }
+                }
+            }
+            callback();
+        }
+    });
+}
+
 /**
  * Makes an array with a coeficient per element, being the element the i-th exponent.
  * @return array - The polynomial array.
  */
 function polynomialArray() {
     var array = [];
-    while (array.length === 0) {
-        for (var i=0; i < MAX_DEGREE; i++) {
+    var vacio = true;
+    var unidad = true;
+    while (vacio || unidad) {
+        array = [];
+        unidad = true;
+        vacio = true;
+        for (i=0; i < MAX_DEGREE; i++) {
             if (array.length < MAX_ELEMENTS) {
                 if (Math.random() <= TERM_PROBABILITY) {
                     array[i] = Math.floor(Math.random()*(MAX_COEFICIENT)+1);
                     if (Math.random() <= SIGN_PROBABILITY) {
                         array[i] = -array[i];
+                    }
+                    vacio = false;
+                    if (i > 0) {
+                        unidad = false;
                     }
                 } else {
                     array[i] = 0;
@@ -90,7 +127,7 @@ function polynomialHtml(array) {
             }
         }
     }
-    return html.reverse().join(" ");
+    return html.reverse().join(" ").trim();
 }
 
 /**
@@ -163,17 +200,16 @@ function notableUncompressed() {
  * @returns HTML code for the polynomial.
  */
 function notablePolynomialHtml(array, type) {
-    var html = "";
     switch(type) {
         case 3:
-            html += "(" + polynomialHtml(array) + ")";
+            html = "(" + polynomialHtml(array) + ")".replace(/\n/g,"");
             for (var i=0; i<array.length;i++) {
                 if (array[i] < 0) array[i] = -array[i];
             }
-            html += "(" + polynomialHtml(array) + ")";
+            html += "(" + polynomialHtml(array) + ")".replace(/\n/g,"");
             break;
         default: // Addition per substract
-            html += "(" + polynomialHtml(array) + ")<sup>2</sup>";
+            html = "("+polynomialHtml(array)+")<sup>2</sup>".replace(/\n/g,"");
             break;
     }
     return html;
@@ -212,7 +248,7 @@ function divSimplify() {
 
 function divProduct() {
     var maxElements = MAX_ELEMENTS;
-    MAX_ELEMENTS = 3;
+    MAX_ELEMENTS = 2;
     // 1st polynomial
     var polynomials = [polynomialArray(), polynomialArray(), polynomialArray(), polynomialArray()];
     // Restore
@@ -221,10 +257,12 @@ function divProduct() {
     solution = [[],[]];
     for (i=0; i<MAX_DEGREE; i++) {
         for (j=0; j<MAX_DEGREE; j++) {
-            if (solution[0][i+j] === undefined || solution[1][i+j] === undefined) {
-                solution[0][i+j] = 0;
-                solution[1][i+j] = 0;
-            }
+            solution[0][i+j*MAX_DEGREE]=0;
+            solution[1][i+j*MAX_DEGREE]=0;
+        }
+    }
+    for (i=0; i<MAX_DEGREE; i++) {
+        for (j=0; j<MAX_DEGREE; j++) {
             solution[0][i+j] = solution[0][i+j] + polynomials[0][i]*polynomials[2][j];
             solution[1][i+j] = solution[1][i+j] + polynomials[1][i]*polynomials[3][j];
         }
@@ -235,24 +273,26 @@ function divProduct() {
 
 function divCocient() {
     var maxElements = MAX_ELEMENTS;
-    MAX_ELEMENTS = 3;
+    MAX_ELEMENTS = 2;
     // 1st polynomial
     var polynomials = [polynomialArray(), polynomialArray(), polynomialArray(), polynomialArray()];
     // Restore
     MAX_ELEMENTS = maxElements;
     // The solution
-    solution = [];
+    solution = [[],[]];
     for (i=0; i<MAX_DEGREE; i++) {
         for (j=0; j<MAX_DEGREE; j++) {
-            if (solution[0][i+j] === undefined || solution[1][i+j] === undefined) {
-                solution[0][i+j] = 0;
-                solution[1][i+j] = 0;
-            }
+            solution[0][i+j*MAX_DEGREE]=0;
+            solution[1][i+j*MAX_DEGREE]=0;
+        }
+    }
+    for (i=0; i<MAX_DEGREE; i++) {
+        for (j=0; j<MAX_DEGREE; j++) {
             solution[0][i+j] = solution[0][i+j] + polynomials[0][i]*polynomials[3][j];
             solution[1][i+j] = solution[1][i+j] + polynomials[1][i]*polynomials[2][j];
         }
     }
-    this._battleSolution = solution;
+    Crafty("Character")._battleSolution = solution;
     return [polynomialHtml(polynomials[0]),polynomialHtml(polynomials[1]),polynomialHtml(polynomials[2]),polynomialHtml(polynomials[3])];
 }
 
@@ -434,23 +474,22 @@ return {
                 // 1st polynomial
                 polynomials[0] = polynomialArray();
                 // Change the length of the 2nd polynomial
-                var maxDegree = MAX_DEGREE; var maxElements = MAX_ELEMENTS;
-                MAX_DEGREE = 3; MAX_ELEMENTS = 3;
+                var maxElements = MAX_ELEMENTS;
+                MAX_ELEMENTS = 2;
                 polynomials[1] = polynomialArray();
                 // Restore
-                MAX_DEGREE = maxDegree;
                 MAX_ELEMENTS = maxElements;
                 // The solution
-                var solution = [];
                 for (i=0; i<MAX_DEGREE; i++) {
                     for (j=0; j<MAX_DEGREE; j++) {
-                        if (solution[i+j] === undefined) {
-                            solution[i+j] = 0;
-                        }
-                        solution[i+j] = solution[i+j] + polynomials[0][i]*polynomials[1][j];
+                        this._battleSolution[i+j*MAX_DEGREE]=0;
                     }
                 }
-                this._battleSolution = solution;
+                for (i=0; i<MAX_DEGREE; i++) {
+                    for (j=0; j<MAX_DEGREE; j++) {
+                        this._battleSolution[i+j] = this._battleSolution[i+j] + polynomials[0][i]*polynomials[1][j];
+                    }
+                }
                 return [polynomialHtml(polynomials[0]),polynomialHtml(polynomials[1])];
             },
             /**
@@ -487,7 +526,7 @@ return {
             createHtmlTable: function(operationString, htmlStrings) {
                 var html = ['<div class="battle"><h1>Batalla</h1>',
                             '<div class="header">',
-                            '<h2 class="left">Operación: <span class="big">' + operationString + "</span></h2>",
+                            '<h2 class="left">Operación: <span style="color: #F00; line-height: 30px">' + operationString + "</span></h2>",
                             '<h2 class="right">Tiempo restante: <span id="time" class="big">' + this._battleTimeout + "</span></h2>",
                             '</div>',
                             '<table class="poly">'].join("\n");
@@ -497,6 +536,10 @@ return {
                              '<tr><td>' + htmlStrings[1] + '</td><td>' + htmlStrings[3] + '</td></tr></table>',
                              '<input id="solution1" class="solution" type="text" placeholder="Introduce el numerador del resultado"/>',
                              '<br/><input id="solution2" class="solution" type="text" placeholder="Introduce el denominador del resultado"/>',
+                             '</div>'].join("\n");
+                } else if (this._battleOperation === "**1" || this._battleOperation === "**2") {
+                    html += ['<tr><td>' + htmlStrings + '</td></tr></table>',
+                             '<input id="solution" class="solution" type="text" placeholder="Introduce la solución"/>',
                              '</div>'].join("\n");
                 } else {
                     html += '<tr><td>' + htmlStrings[0] + '</td></tr>';
@@ -582,6 +625,7 @@ return {
                         htmlStrings = this.mulOperation();
                         break;
                     case "**":
+                        p = 0.3;
                         if (Math.random() < 0.5) {
                             operationString = "EXPANDE EL PRODUCTO NOTABLE";
                             this._battleOperation = "**1";
@@ -712,13 +756,13 @@ return {
                 switch (this._battleOperation) {
                     case "/2":
                         for (i=0; i<this._battleSolution[0].length; i++) {
-                            if (this._battleSolution[0][i] !== solution[i]) {
+                            if ((solution[i] !== undefined) && (this._battleSolution[0][i] !== solution[i])) {
                                 correct1 = false;
                                 break;
                             }
                         }
                         for (i=0; i<this._battleSolution[1].length; i++) {
-                            if (this._battleSolution[1][i] !== solution2[i]) {
+                            if ((solution2[i] !== undefined) && (this._battleSolution[1][i] !== solution2[i])) {
                                 correct2 = false;
                                 break;
                             }
@@ -727,18 +771,26 @@ return {
                         break;
                     case "/3":
                         for (i=0; i<this._battleSolution[0].length; i++) {
-                            if (this._battleSolution[0][i] !== solution[i]) {
+                            if ((solution[i] !== undefined) && (this._battleSolution[0][i] !== solution[i])) {
                                 correct1 = false;
                                 break;
                             }
                         }
                         for (i=0; i<this._battleSolution[1].length; i++) {
-                            if (this._battleSolution[1][i] !== solution2[i]) {
+                            if ((solution2[i] !== undefined) && (this._battleSolution[1][i] !== solution2[i])) {
                                 correct2 = false;
                                 break;
                             }
                         }
                         correct = correct1 && correct2;
+                        break;
+                    case "*":
+                        for (i=0; i<this._battleSolution.length; i++) {
+                            if ((solution[i] !== undefined) && (this._battleSolution[i] !== solution[i])) {
+                                correct = false;
+                                break;
+                            }
+                        }
                         break;
                     default:
                         for (i=0; i<this._battleSolution.length; i++) {
@@ -749,7 +801,9 @@ return {
                         }
                         break;
                 }
-                this.clearBattle();
+                console.log(this._battleSolution);
+                console.log(solution);
+                /*this.clearBattle();
                 if (correct) {
                     this._battleResult = true;
                     var endBattle = this._detectionEnemy.damage();
@@ -782,7 +836,7 @@ return {
                     if (this._health > 0) {
                         this.battle(this._battleTimed);
                     }
-                }
+                }*/
             },
             /**
              * Trigger for entering a battle
@@ -812,6 +866,11 @@ return {
              */
             init: function() {
                 this.requires('Character');
+                if (!TIMEOUT_SET) {
+                    getTimeouts(function() {
+                        TIMEOUT_SET = true;
+                    });
+                }
             }
         });
     }

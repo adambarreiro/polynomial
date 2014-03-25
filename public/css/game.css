@@ -199,9 +199,26 @@ body, html {
     text-align: center;
 }
 
+#music {
+    position: absolute;
+    top: 70px;
+    left: 10px;
+    width: 80px;
+    padding: 8px 0px 8px 0px;
+    color: #EEEEEE;
+    background: #111155;
+    border: 1px solid #000000;
+    text-align: center;
+}
+
 #back:focus, #back:hover {
     color: #FFFFFF;
     background: #991111;
+}
+
+#music:focus, #music:hover {
+    color: #FFFFFF;
+    background: #111199;
 }
 
 .popup {

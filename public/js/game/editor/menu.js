@@ -8,7 +8,7 @@
 /**
  * Main file - RequireJS
  */
-define (["../constants", "engine"], function(Constants, Engine) {
+define (["../constants", "engine", "../components"], function(Constants, Engine, Components) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -79,7 +79,8 @@ function setPainting(painting) {
 
 function drawTile(x,y,type) {
     if ((x >= 0 && x < Constants.getLevelSize('tiles').width) && (y >= 0 && y < Constants.getLevelSize('tiles').height)) {
-        if (LOADEDLEVEL.map[(x+y*Constants.getLevelSize('tiles').width).toString()] !== type) {
+        if (NEWMAP[(x+y*Constants.getLevelSize('tiles').width).toString()] !== undefined ||
+            LOADEDLEVEL.map[(x+y*Constants.getLevelSize('tiles').width).toString()] !== type) {
             if (!NEWMAP[(x+y*Constants.getLevelSize('tiles').width).toString()] ||
                 (NEWMAP[(x+y*Constants.getLevelSize('tiles').width).toString()] !== type)) {
                 Engine.drawTile(x,y,getBrush());
@@ -99,7 +100,6 @@ function drawLevel(level) {
     }
     var character = Crafty("Character");
     if ( character.length > 0) {
-        console.log(character);
         Crafty.viewport.centerOn(character,0);
     } else {
         Crafty.viewport.x = 0;
@@ -117,6 +117,7 @@ function resize() {
     $(".palette").css({"height" : (size.height + 20) + "px"});
     $('canvas').remove();
     Crafty.canvas.init();
+    Crafty.trigger("InvalidateViewport");
 }
 
 function resizeController() {

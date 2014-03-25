@@ -1,2 +1,0 @@
-pkill node
-pkill mongod

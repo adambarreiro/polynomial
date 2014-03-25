@@ -31,7 +31,7 @@ function onRegister() {
     });
     CREATOR_SOCKET.on("readyERROR", function() {
         alert("ERROR: Este nombre ya se está usando en una partida ahora mismo.");
-        Menu.creatorPanel();
+        Menu.createPanel();
     });
 }
 
@@ -44,7 +44,7 @@ function emitRegister() {
     CREATOR_SOCKET.emit("ready", {
         host: CREATOR_ADDRESS,
         student: Menu.readStudentCookie(),
-        level: Menu.readSavegameCookie()
+        level: Menu.getLevel()
     });
 }
 
@@ -56,7 +56,7 @@ function onJoin() {
         var Menu = Require("menu");
         CREATOR_CONNECTORADDRESS = data.friend;
         emitEngaged();
-        Menu.startGame(Menu.readStudentCookie(), Menu.readSavegameCookie(),{multi: "creator"});
+        Menu.startGame(Menu.readStudentCookie(), Menu.getLevel(),{multi: "creator"});
     });
 }
 

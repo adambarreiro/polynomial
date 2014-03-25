@@ -22,9 +22,7 @@ window.onload = function(){
  * @dependency /public/js/menu/view.js
  * @dependency /public/js/menu/controller.js
  */
-require(['./constants', './menu', './components'], function(Constants, Menu, Components) {
-
-
+require(['./constants', './menu'], function(Constants, Menu) {
     var pri = document.cookie.indexOf("token=")+"token=".length;
     var fin = document.cookie.indexOf(";", pri);
     if (fin < 0) {
@@ -37,8 +35,5 @@ require(['./constants', './menu', './components'], function(Constants, Menu, Com
     content = $('.container');
     // Draws the game selector panel.
     content.html(Menu.getGamePanel());
-    // Sets all the handlers.
-    Components.setEditor(false);
-    Components.init();
     Menu.menuHandler();
 });

@@ -16,8 +16,22 @@ define (["./scenes", "./network/connector", "./network/creator", "require", "./m
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
+var START_LEVEL = 1; // Loaded level
+var FIRST_LEVEL = 1; // Start of the game
 
-var START_LEVEL = 1;
+function  getSavegame(callback) {
+    var Menu = Require("./menu");
+    student = Menu.readStudentCookie();
+    $.ajax({
+        url: '/loadGame',
+        type: 'POST',
+        data: {email: student},
+        dataType: 'json',
+        success: function(data) {
+            callback(data);
+        }
+    });
+}
 
 function csrf() {
     var pri = document.cookie.indexOf("token=")+"token=".length;
@@ -65,7 +79,7 @@ function checkText(text, allowEmpty, allowNumbers) {
 function getOnePlayerPanel() {
     var cont = '';
     var Menu = Require("menu");
-    if (Menu.readSavegameCookie() > 1) {
+    if (START_LEVEL > 1) {
         cont = '<div class="buttonext" id="continue">Continuar</div>';
     }
     return ['<div class="menu">',
@@ -126,26 +140,48 @@ return {
     },
     menuHandler: function() {
         var Menu = Require("menu");
-        $('#edbutton').bind('click',function() {
-           $('.container').empty();
-           $('.container').append(Menu.getGamePanel());
-           Menu.menuHandler();
-        });
-        $('#one').bind('click',function() {
-            $('.container').empty();
-            $('.container').append(getOnePlayerPanel());
-            $('#new').bind('click', function() {
-                Menu.startGame(Menu.readStudentCookie(),START_LEVEL);
+        getSavegame(function(data) {
+            if (data) START_LEVEL = data.level;
+            $('#one').bind('click',function() {
+                $('.container').empty();
+                $('.container').append(getOnePlayerPanel());
+                $('#new').bind('click', function() {
+                    var save = START_LEVEL;
+                    if (save > 1) {
+                        $("#edbutton").hide();
+                        $(".menu").hide();
+                        $('.container').before(['<div class="menu" id="sure">',
+                                                '<div class="separator">¿Empezar de nuevo?</div>',
+                                                '<p>Vas por el nivel ' + save + ', seguro que quieres empezar desde el nivel 1?</p>',
+                                                '<div class="buttonext" id="yes">Sí</div>',
+                                                '<div class="buttonext" id="no">No</div>',
+                                            '</div>'].join('\n'));
+                        $('#yes').bind('click', function() {
+                            Menu.startGame(Menu.readStudentCookie(),FIRST_LEVEL);
+                        });
+                        $('#no').bind('click', function() {
+                            $("#sure").remove();
+                            $('.menu').show();
+                            $("#edbutton").show();
+                        });
+                    } else {
+                        Menu.startGame(Menu.readStudentCookie(),FIRST_LEVEL);
+                    }
+                });
+                $('#continue').bind('click', function() {
+                    Menu.startGame(Menu.readStudentCookie(), START_LEVEL);
+                });
+                $('#edbutton').bind('click',function() {
+                    $('.container').empty();
+                    $('.container').append(Menu.getGamePanel());
+                    Menu.menuHandler();
+                });
             });
-            $('#continue').bind('click', function() {
-                Menu.startGame(Menu.readStudentCookie(), Menu.readSavegameCookie());
+            $('#two').bind('click',function() {
+                $('.container').empty();
+                $('.container').append(getTwoPlayerPanel());
+                twoPlayerMenuHandler();
             });
-            Menu.menuHandler();
-        });
-       $('#two').bind('click',function() {
-            $('.container').empty();
-            $('.container').append(getTwoPlayerPanel());
-            twoPlayerMenuHandler();
         });
     },
     createPanel: function() {
@@ -254,14 +290,6 @@ return {
         if (multi === undefined) multi = {multi: "single"}; // No multiplayer trick.
         Scenes.newGame(student, level, multi.multi);
     },
-    readSavegameCookie: function() {
-        var pri = document.cookie.indexOf("savegame=")+"savegame=".length;
-        var fin = document.cookie.indexOf(";", pri);
-        if (fin < 0) {
-            fin = document.cookie.length;
-        }
-        return parseInt(document.cookie.substring(pri,fin),10);
-    },
     readStudentCookie: function() {
         var pri = document.cookie.indexOf("student=")+"student=".length;
         var fin = document.cookie.indexOf(";", pri);
@@ -269,6 +297,9 @@ return {
             fin = document.cookie.length;
         }
         return document.cookie.substring(pri,fin);
+    },
+    getLevel: function() {
+        return START_LEVEL;
     }
 };
 

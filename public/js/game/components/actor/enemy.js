@@ -105,6 +105,7 @@ return {
              * Stops all the components attached.
              */
             stopEnemy: function() {
+                this.pauseAnimation();
                 this.removeComponent("Patrol");
                 this.unbind("EnterFrame");
             },

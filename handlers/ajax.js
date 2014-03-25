@@ -141,6 +141,18 @@ function ajaxSaveGame() {
 exports.ajaxSaveGame = ajaxSaveGame;
 
 /**
+ * Responds to the AJAX petition which asks for saving a game.
+ */
+function ajaxLoadGame() {
+    app.post('/loadGame', function (req, res) {
+        modelStudent.getLevelStudent(req.body.email, function(data) {
+            res.send(data);
+        });
+    });
+}
+exports.ajaxLoadGame = ajaxLoadGame;
+
+/**
  * Responds to the AJAX petition which asks for the questions file.
  */
 function ajaxGetQuestions() {
@@ -149,3 +161,13 @@ function ajaxGetQuestions() {
     });
 }
 exports.ajaxGetQuestions = ajaxGetQuestions;
+
+/**
+ * Responds to the AJAX petition which asks for the timeouts file.
+ */
+function ajaxGetTimeouts() {
+    app.post('/getTimeoutsFile', function (req, res) {
+        res.sendfile('public/assets/timeouts.txt');
+    });
+}
+exports.ajaxGetTimeouts = ajaxGetTimeouts;

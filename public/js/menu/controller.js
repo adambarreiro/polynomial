@@ -304,12 +304,12 @@ return {
         });
         content.find("#assignGroup").bind('click',function() {
             View.loadingPopup(content);
-            Controller.ajaxGetStudents(false, function(data) {
-                Controller.ajaxGetGroups(function(data) {
+            Controller.ajaxGetStudents(false, function(data1) {
+                Controller.ajaxGetGroups(function(data2) {
                     content.empty();
                     content.append(View.adminAssignGroup());
-                    View.setGroupList(data);
-                    View.setStudentList(data);
+                    View.setGroupList(data2);
+                    View.setStudentList(data1);
                     adminSetSubmenuHandlers(content);
                 });
             });

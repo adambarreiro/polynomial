@@ -10,7 +10,7 @@
  * @dependency /public/js/game/scenes.js
  * @dependency /public/js/game/audio.js
  */
-define (["../../../scenes", "../../../audio"], function(Scenes, Audio) {
+define (["../../../audio", "require", "../../../scenes"], function(Audio, Require) {
 
 // -----------------------------------------------------------------------------
 // Private
@@ -44,7 +44,6 @@ return {
                         }
                         break;
                     case "enemy":
-                        Audio.playDamage();
                         if (this._shield > 0) {
                             this._shield = this._shield - Math.floor(Math.random()*(MAX_DAMAGE_SHIELD-MIN_DAMAGE_SHIELD+1)+MIN_DAMAGE_SHIELD);
                         } else {
@@ -54,14 +53,28 @@ return {
                 }
                 if (this._shield <= 0) {
                     this._shield = 0;
-                    $('#lifebar').css({"width": "300px", "background" : "rgb(50,200,50)"});
+                    $('#lifebar').css({"width": (this._health*3) + "px", "background" : "rgb(50,200,50)"});
                     $('#vidatext').html("Vida:");
                     this.removeBonus("shield");
                 }
                 if (this._shield > 0) {
+                    if (cause == "lava") {
+                        if (this._shield % 20 === 0) {
+                            Audio.playShield();
+                        }
+                    } else {
+                        Audio.playShield();
+                    }
                     $('#lifebar').css({"width": (this._shield*3) + "px"});
                 } else {
                     if (this._health > 0) {
+                        if (cause == "lava") {
+                            if (this._health % 10 === 0) {
+                                Audio.playDamage();
+                            }
+                        } else {
+                            Audio.playDamage();
+                        }
                         $('#lifebar').css({"width": (this._health*3) + "px"});
                     } else {
                         this.die(cause);
@@ -73,6 +86,8 @@ return {
              * @param cause - The cause of death (lava or enemy)
              */
             die: function(cause) {
+                Scenes = Require("../../../scenes");
+                Audio.playCharDeath();
                 this._health = 0;
                 Audio.stopLevel();
                 Audio.stopAlert();
