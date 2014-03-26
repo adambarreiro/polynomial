@@ -6,15 +6,6 @@
 // Updated: 23-10-2013
 // -----------------------------------------------------------------------------
  
-/**
- *
- * TEST MAIN.JS
- *
- * DEPLOYMENT IN HEROKU.
- * 
- */
-
-
 // -----------------------------------------------------------------------------
 // Modules
 // ----------------------------------------------------------------------------- 
@@ -54,7 +45,7 @@ function startNodeServer(port, securePort) {
     console.log("(i) INFO: Creando servidor HTTP.");
     // Create the two different servers
     var unsecure = http.createServer(app);
-    unsecure.listen(process.env.PORT || 5000);
+    unsecure.listen(process.env.PORT || port);
     /*console.log("(i) INFO: Creando servidor HTTPS.");
     var secure = https.createServer(options, app);
     secure.listen(securePort);*/
@@ -63,7 +54,7 @@ function startNodeServer(port, securePort) {
     router.createRouter(unsecure);
     // Opens the database connection
     console.log("(i) INFO: Conectando a la base de datos.");
-    mongoose.connect('mongodb://pepperonni:cacadevaca@ds061188.mongolab.com:61188/poly');
+    mongoose.connect(config.databaseConfiguration());
     // Starts all the handlers
     console.log("(i) INFO: Iniciando los manejadores GET");
     handlers.setGetHandlers();
@@ -80,5 +71,7 @@ function startNodeServer(port, securePort) {
 }
 console.log("%%% ARRANCANDO EL SERVIDOR DE POLYNOMIAL %%%");
 if (config.checkConfiguration()) {
+    startNodeServer(config.httpConfiguration(), config.httpsConfiguration());
+}onfiguration()) {
     startNodeServer(config.httpConfiguration(), config.httpsConfiguration());
 }

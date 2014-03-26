@@ -801,9 +801,7 @@ return {
                         }
                         break;
                 }
-                console.log(this._battleSolution);
-                console.log(solution);
-                /*this.clearBattle();
+                this.clearBattle();
                 if (correct) {
                     this._battleResult = true;
                     var endBattle = this._detectionEnemy.damage();
@@ -836,7 +834,7 @@ return {
                     if (this._health > 0) {
                         this.battle(this._battleTimed);
                     }
-                }*/
+                }
             },
             /**
              * Trigger for entering a battle

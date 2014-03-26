@@ -218,7 +218,7 @@ function deleteStudent(e, callback) {
     console.log("$ Borrar el estudiante " + e + ".");
     Student.findOne({email: e}, function(error, student){
         if (!error) {
-            if (student.assigned) {
+            if (student.group !== "") {
                 groupModel.popStudent(student, function(ok) {
                     if (ok) {
                         student.remove(function(error) {

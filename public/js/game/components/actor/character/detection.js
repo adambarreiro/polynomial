@@ -186,7 +186,7 @@ return {
                 }
                 if (this._detectionSpotted && !this._battleFighting) {
                     this._detectionSpotted = false;
-                    Audio.stopLevel();
+                    Audio.playLevel();
                     Audio.playAlert();
                     this.battle(true);
                 } else {
@@ -203,7 +203,7 @@ return {
                 this.bind("KeyDown", function () {
                     if (this.isDown("A")) {
                         if (this._detectionReachable) {
-                            Audio.stopLevel();
+                            Audio.playLevel();
                             if (!this._detectionHidden) {
                                 Audio.playAlert();
                                 this.battle(true);

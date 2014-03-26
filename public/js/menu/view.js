@@ -300,6 +300,8 @@ return {
      * @param data - The groups data.
      */
     setGroupList: function(data) {
+        $('select[id=group]').html('<option value="">Selecciona el grupo</option>');
+        $('select[id=group]').val("");
         for (i = 0; i< data.length; i++) {
             $('select[id=group]').append('<option value=' + data[i].name + '>' + unescape(data[i].name) + '</option>');
         }
@@ -309,6 +311,8 @@ return {
      * @param data - The students data.
      */
     setStudentList: function(data) {
+        $('select[id=student]').html('<option value="">Selecciona el alumno</option>');
+        $('select[id=student]').val("");
         for (i = 0; i< data.length; i++) {
             $('select[id=student]').append('<option value=' + data[i].email + '>' + unescape(data[i].email) +  '</option>');
         }
@@ -323,6 +327,8 @@ return {
         $('input[name=surname2]').val(unescape(data.surname2));
         $('input[name=group]').val(unescape(data.group));
         $('input[name=level]').val("Nivel " + unescape(data.savegame));
+        $('select[name=stats]').html('<option value="">Estadísticas</option>');
+        $('select[name=stats]').val("");
         for (i = 0; i< data.stats.length; i++) {
             $('select[name=stats]').append('<option disabled value="'+data.stats[i].level+'">Nivel '+data.stats[i].level+": "+data.stats[i].date+'</option>');
         }

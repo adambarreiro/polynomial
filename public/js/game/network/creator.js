@@ -157,6 +157,32 @@ return {
         });
     },
     /**
+     * Sends the connector a request for recover the enemy healths
+     */
+    sendUpdateHealth: function() {
+        CREATOR_SOCKET.emit("updateHealthCreatorToConnector", {
+            friend: CREATOR_CONNECTORADDRESS
+        });
+    },
+    /**
+     * Receives the enemy healths
+     */
+    onReceiveUpdateHealth: function(callback) {
+        CREATOR_SOCKET.on("updateHealthConnectorToCreator", function() {
+            var healths = [];
+            Crafty("Enemy").each(function() {
+                healths.push(this._enemyHealth);
+            });
+            CREATOR_SOCKET.emit("updateHealthCreatorToConnectorACK", {
+                friend: CREATOR_CONNECTORADDRESS,
+                healths: healths
+            });
+        });
+        CREATOR_SOCKET.on("updateHealthConnectorToCreatorACK", function(data) {
+            callback(data);
+        });
+    },
+    /**
      * Sends the connector the change of a level
      */
     sendExit: function() {

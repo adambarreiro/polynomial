@@ -11,6 +11,7 @@
 var studentModel = require('../models/student.js');
 var groupModel = require('../models/group.js');
 var adminModel = require('../models/admin.js');
+var config = require('../configuration.js');
 
 /**
  * Sets the response to the login request.
@@ -20,14 +21,24 @@ function postLogin() {
         studentModel.loginStudent(escape(req.body.email), escape(req.body.password), function(ok, student) {
             if (ok) {
                 if (student) {
-                    if (student.group !== "") {
+                    if (config.groupsNeededConfiguration()) {
+                        if (student.group !== "") {
+                            req.session.regenerate(function(){
+                                res.cookie('student', student.email);
+                                req.session.user = student;
+                                req.session.admin = false;
+                                res.redirect('/');
+                            });
+                        } else res.redirect('/login?nogroup');
+                    } else {
                         req.session.regenerate(function(){
                             res.cookie('student', student.email);
                             req.session.user = student;
                             req.session.admin = false;
                             res.redirect('/');
                         });
-                    } else res.redirect('/login?nogroup');
+                    }
+                   
                 } else {
                     res.redirect('/login?lerror');
                 }

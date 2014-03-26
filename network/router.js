@@ -117,6 +117,23 @@ function responseSender(socket) {
         if (checkFriend(data))
             io.sockets.socket(connections[data.friend].id).emit("damageConnectorToCreator", {enemy: data.enemy, damage: data.damage});
     });
+    // Health update response
+    socket.on("updateHealthCreatorToConnector", function (data) {
+        if (checkFriend(data))
+            io.sockets.socket(connections[data.friend].id).emit("updateHealthCreatorToConnector");
+    });
+    socket.on("updateHealthConnectorToCreator", function (data) {
+        if (checkFriend(data))
+            io.sockets.socket(connections[data.friend].id).emit("updateHealthConnectorToCreator");
+    });
+    socket.on("updateHealthCreatorToConnectorACK", function (data) {
+        if (checkFriend(data))
+            io.sockets.socket(connections[data.friend].id).emit("updateHealthCreatorToConnectorACK", {healths: data.healths});
+    });
+    socket.on("updateHealthConnectorToCreatorACK", function (data) {
+        if (checkFriend(data))
+            io.sockets.socket(connections[data.friend].id).emit("updateHealthConnectorToCreatorACK", {healths: data.healths});
+    });
     // Exit response
     socket.on("exitCreatorToConnector", function (data) {
         if (checkFriend(data))
