@@ -68,7 +68,7 @@ function editAdmin(u, p, callback) {
 }
 exports.editAdmin = editAdmin;
 
-function initAdmin(callback) {
+/*function initAdmin(callback) {
     console.log("$ Inicialización de administrador.");
     var sha256 = crypto.createHash("sha256");
     sha256.update("1234567890", "utf8");
@@ -80,4 +80,4 @@ function initAdmin(callback) {
         callback(false);
     });
 }
-exports.initAdmin = initAdmin;
+exports.initAdmin = initAdmin;*/

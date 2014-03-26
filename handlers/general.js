@@ -26,7 +26,7 @@ function setGetHandlers() {
     get.getEditor();
     get.getGame();
     get.getLogout();
-    get.initAdmin();
+    //get.initAdmin();
 }
 exports.setGetHandlers = setGetHandlers;
 
