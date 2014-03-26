@@ -310,6 +310,7 @@ body, html {
     width: 90%;
     font-weight: bold;
     text-align: left;
+    color: black;
     font-family: Courier;
     background: rgba(255,255,255,0);
     border-bottom: 1px dotted #000;
