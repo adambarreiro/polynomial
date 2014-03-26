@@ -839,8 +839,8 @@ return {
                                 correct = false;
                             }
                         } else {
-                            for (i=0; i<this._battleSolution[0].length; i++) {
-                                if (this._battleSolution[0][i] !== solution[i]) {
+                            for (i=0; i<this._battleSolution.length; i++) {
+                                if (this._battleSolution[i] !== solution[i]) {
                                     correct = false;
                                     break;
                                 }
