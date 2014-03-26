@@ -12,12 +12,74 @@
  * @dependency /public/js/game/network/scenes.js
  * @dependency /public/js/game/network/multi.js
  */
-define (["../../../network/connector", "../../../network/creator", "../../../scenes", "../../../multi",], function(Connector, Creator, Scenes, Multi) {
+define (["../../../network/connector", "../../../network/creator", "../../../multi", "require", "../../../scenes"], function(Connector, Creator, Multi, Require) {
 
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
 var TYPE;
+var X,Y;
+
+function movement(data) {
+    if (data.x === 666 && data.y === 666) {
+        Crafty("Multiplayer").pauseAnimation();
+        Crafty("Multiplayer").sprite(0,0);
+    } else if (data.x === -666 && data.y === -666) {
+        Crafty("Multiplayer").pauseAnimation();
+        Crafty("Multiplayer").sprite(1,0);
+    } else if (data.x === 333 && data.y === 333) {
+        Crafty("Multiplayer")._up = false;
+        if (Crafty("Multiplayer")._orientation == "left") {
+            Crafty("Multiplayer").sprite(1,0);
+        } else {
+            Crafty("Multiplayer").sprite(0,0);
+        }
+    } else {
+        Crafty("Multiplayer").x = X = data.x;
+
+        Crafty("Multiplayer").y = Y = data.y;
+    }
+}
+
+function damage(data) {
+    Crafty.audio.play("attack");
+    Crafty.audio.play("monster_scream");
+    var enemy;
+    Crafty("Enemy").each(function() {
+        if (this._id === data.enemy) {
+            enemy = this[0];
+            return;
+        }
+    });
+    Crafty(enemy)._enemyHealth = Crafty(enemy)._enemyHealth - data.damage;
+    if (Crafty(enemy)._enemyHealth > 0) {
+        // We're fighting the same enemy
+        if (Crafty("Character")._battleFighting && Crafty("Character")._detectionEnemy._id === Crafty(enemy)._id) {
+            $('#enemybar').css({"width": Crafty(enemy)._enemyHealth*3 + "px"});
+        }
+    } else {
+        Crafty.audio.play("enemy_death");
+        // We're fighting the same enemy
+        if (Crafty("Character")._battleFighting && Crafty("Character")._detectionEnemy !== undefined && Crafty("Character")._detectionEnemy._id === Crafty(enemy)._id) {
+            $($(".lifebox").children()[2]).hide();
+            $($(".lifebox").children()[3]).hide();
+            $('#enemybar').css({"width": "300px"});
+            Crafty("Character").clearBattle();
+            Crafty.audio.stop("alert");
+            Crafty.audio.stop("hidden");
+            Crafty.audio.play("level",-1);
+            if (Crafty("Character")._extraTime > 0) {
+                Crafty("Character")._extraTime--;
+                if (Crafty("Character")._extraTime === 0) {
+                    Crafty("Character").removeBonus("clock");
+                }
+            }
+            Crafty("Character")._battleFighting = false;
+            Crafty("Character").startAll();
+        }
+        Crafty(enemy).destroy();
+    }
+}
 
 /**
  * Function fired when we receive that the other player has moved.
@@ -25,46 +87,10 @@ var TYPE;
 function onReceiveMovement() {
     switch(TYPE) {
         case "connector":
-            Connector.onReceiveMovement(function(data) {
-                if (data.x === 666 && data.y === 666) {
-                    Crafty("Multiplayer").pauseAnimation();
-                    Crafty("Multiplayer").sprite(0,0);
-                } else if (data.x === -666 && data.y === -666) {
-                    Crafty("Multiplayer").pauseAnimation();
-                    Crafty("Multiplayer").sprite(1,0);
-                } else if (data.x === 333 && data.y === 333) {
-                    Crafty("Multiplayer")._up = false;
-                    if (Crafty("Multiplayer")._orientation == "left") {
-                        Crafty("Multiplayer").sprite(1,0);
-                    } else {
-                        Crafty("Multiplayer").sprite(0,0);
-                    }
-                } else {
-                    Crafty("Multiplayer").x = data.x;
-                    Crafty("Multiplayer").y = data.y;
-                }
-            });
+            Connector.onReceiveMovement(movement);
             break;
         case "creator":
-            Creator.onReceiveMovement(function(data) {
-                if (data.x === 666 && data.y === 666) {
-                    Crafty("Multiplayer").pauseAnimation();
-                    Crafty("Multiplayer").sprite(0,0);
-                } else if (data.x === -666 && data.y === -666) {
-                    Crafty("Multiplayer").pauseAnimation();
-                    Crafty("Multiplayer").sprite(1,0);
-                } else if (data.x === 333 && data.y === 333) {
-                    Crafty("Multiplayer")._up = false;
-                    if (Crafty("Multiplayer")._orientation == "left") {
-                        Crafty("Multiplayer").sprite(1,0);
-                    } else {
-                        Crafty("Multiplayer").sprite(0,0);
-                    }
-                } else {
-                    Crafty("Multiplayer").x = data.x;
-                    Crafty("Multiplayer").y = data.y;
-                }
-            });
+            Creator.onReceiveMovement(movement);
             break;
         default: break;
     }
@@ -74,6 +100,7 @@ function onReceiveMovement() {
  * Function fired when we receive a next level event.
  */
 function onReceiveExit() {
+    var Scenes = Require("../../../scenes");
     switch(TYPE) {
         case "connector":
             Connector.onReceiveExit(function() {
@@ -97,71 +124,34 @@ function onReceiveExit() {
 function onReceiveDamage() {
     switch(TYPE) {
         case "connector":
-            Connector.onReceiveDamage(function(data) {
-                Crafty.audio.play("attack");
-                Crafty.audio.play("monster_scream");
-                Crafty(data.enemy)._enemyHealth = Crafty(data.enemy)._enemyHealth - data.damage;
-                if (Crafty(data.enemy)._enemyHealth > 0) {
-                    // We're fighting the same enemy
-                    if (Crafty("Character")._battleFighting && Crafty("Character")._detectionEnemy[0] === data.enemy) {
-                        $('#enemybar').css({"width": (Crafty(data.enemy)._enemyHealth*3) + "px"});
-                    }
-                } else {
-                    Crafty.audio.play("enemy_death");
-                    // We're fighting the same enemy
-                    if (Crafty("Character")._battleFighting && Crafty("Character")._detectionEnemy !== undefined && Crafty("Character")._detectionEnemy[0] === data.enemy) {
-                        $($(".lifebox").children()[2]).hide();
-                        $($(".lifebox").children()[3]).hide();
-                        $('#enemybar').css({"width": "300px"});
-                        Crafty("Character").clearBattle();
-                        Crafty.audio.stop("alert");
-                        Crafty.audio.stop("hidden");
-                        Crafty.audio.play("level",-1);
-                        if (Crafty("Character")._extraTime > 0) {
-                            Crafty("Character")._extraTime--;
-                            if (Crafty("Character")._extraTime === 0) {
-                                Crafty("Character").removeBonus("clock");
-                            }
-                        }
-                        Crafty("Character")._battleFighting = false;
-                        Crafty("Character").startAll();
-                    }
-                    Crafty(data.enemy).destroy();
-                }
+            Connector.onReceiveDamage(damage);
+            break;
+        case "creator":
+            Creator.onReceiveDamage(damage);
+            break;
+        default: break;
+    }
+}
+
+/**
+ * Function fired when we receive the healths of the other player's enemies.
+ */
+function onReceiveUpdateHealths() {
+    switch(TYPE) {
+        case "connector":
+            Connector.onReceiveUpdateHealth(function(data) {
+                Crafty("Enemy").each(function() {
+                    this._enemyHealth = data.healths[this._id];
+                    if (this._enemyHealth <= 0) this.destroy();
+                });
             });
             break;
         case "creator":
-            Creator.onReceiveDamage(function(data) {
-                Crafty.audio.play("attack");
-                Crafty.audio.play("monster_scream");
-                Crafty(data.enemy)._enemyHealth = Crafty(data.enemy)._enemyHealth - data.damage;
-                if (Crafty(data.enemy)._enemyHealth > 0) {
-                    // We're fighting the same enemy
-                    if (Crafty("Character")._battleFighting && Crafty("Character")._detectionEnemy !== undefined && Crafty("Character")._detectionEnemy[0] === data.enemy) {
-                        $('#enemybar').css({"width": (Crafty(data.enemy)._enemyHealth*3) + "px"});
-                    }
-                } else {
-                    Crafty.audio.play("enemy_death");
-                    // We're fighting the same enemy
-                    if (Crafty("Character")._battleFighting && Crafty("Character")._detectionEnemy !== undefined && Crafty("Character")._detectionEnemy[0] === data.enemy) {
-                        $($(".lifebox").children()[2]).hide();
-                        $($(".lifebox").children()[3]).hide();
-                        $('#enemybar').css({"width": "300px"});
-                        Crafty("Character").clearBattle();
-                        Crafty.audio.stop("alert");
-                        Crafty.audio.stop("hidden");
-                        Crafty.audio.play("level",-1);
-                        if (Crafty("Character")._extraTime > 0) {
-                            Crafty("Character")._extraTime--;
-                            if (Crafty("Character")._extraTime === 0) {
-                                Crafty("Character").removeBonus("clock");
-                            }
-                        }
-                        Crafty("Character")._battleFighting = false;
-                        Crafty("Character").startAll();
-                    }
-                    Crafty(data.enemy).destroy();
-                }
+            Creator.onReceiveUpdateHealth(function(data) {
+                Crafty("Enemy").each(function() {
+                    this._enemyHealth = data.healths[this._id];
+                    if (this._enemyHealth <= 0) this.destroy();
+                });
             });
             break;
         default: break;
@@ -196,6 +186,16 @@ return {
                 switch(TYPE) {
                     case "connector": Connector.sendExit(); break;
                     case "creator": Creator.sendExit(); break;
+                    default: break;
+                }
+            },
+            /**
+             * Function called to ask for the enemy healths of the other player
+             */
+            multiplayerUpdateHealth: function() {
+                switch(TYPE) {
+                    case "connector": Connector.sendUpdateHealth(); break;
+                    case "creator": Creator.sendUpdateHealth(); break;
                     default: break;
                 }
             },
@@ -267,6 +267,7 @@ return {
                 onReceiveMovement();
                 onReceiveExit();
                 onReceiveDamage();
+                onReceiveUpdateHealths();
                 this.multiplayerMove();
             },
             /**
@@ -277,10 +278,18 @@ return {
                 onReceiveMovement();
                 onReceiveExit();
                 onReceiveDamage();
+                onReceiveUpdateHealths();
                 this.multiplayerMove();
             },
             init: function() {
                 this.requires('Character');
+            },
+            getMultiPosition: function() {
+                if (X !== undefined && Y !== undefined) {
+                    return [X/32,Y/32];
+                } else {
+                    return [this.x/32, this.y/32];
+                }
             },
             stopMultiplayer: function() {
                 Crafty("Multiplayer").destroy();

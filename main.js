@@ -72,4 +72,6 @@ function startNodeServer(port, securePort) {
 console.log("%%% ARRANCANDO EL SERVIDOR DE POLYNOMIAL %%%");
 if (config.checkConfiguration()) {
     startNodeServer(config.httpConfiguration(), config.httpsConfiguration());
+}onfiguration()) {
+    startNodeServer(config.httpConfiguration(), config.httpsConfiguration());
 }

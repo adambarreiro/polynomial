@@ -100,6 +100,9 @@ return {
              */
             startEnemy: function() {
                 this.addComponent("Patrol");
+                if (Crafty("Multiplayer").length > 0) {
+                    this._enemyHealth = 1;
+                }
             },
             /**
              * Stops all the components attached.
@@ -116,7 +119,7 @@ return {
                 this.requires('Actor');
                 this.z=5;
                 if (!edition) {
-                    ENEMYTOTAL = 0;
+                    
                     this.gravity("Terrain").gravityConst(0.3);
                     this.startEnemy();
                 }

@@ -29,7 +29,7 @@ return {
                 if (!edition) {
                     this.reel("EnemyAnimationRight",600,0,0,6);
                     this.reel("EnemyAnimationLeft",600,0,1,6);
-                    this._id = Multi.generateMultiplayerId();
+                    this._id = Multi.generateMultiId();
                 }
             }
         });

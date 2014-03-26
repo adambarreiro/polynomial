@@ -8,11 +8,12 @@
 define (function() {
 
 var VOLUME = 0.5;
-var ALERT =          ["alert", "/assets/music/alert1.ogg"];
-var HIDDEN =         ["hidden", "/assets/music/hidden1.ogg"];
-var LEVEL1 =         ["level1", "/assets/music/level12.ogg"];
-var LEVEL2 =         ["level2", "/assets/music/level22.ogg"];
-var LEVEL3 =         ["level3", "/assets/music/level32.ogg"];
+var SONG;
+var ALERT =          ["alert", "/assets/music/alert.ogg"];
+var HIDDEN =         ["hidden", "/assets/music/hidden.ogg"];
+var LEVEL1 =         ["level1", "/assets/music/level1.ogg"];
+var LEVEL2 =         ["level2", "/assets/music/level2.ogg"];
+var LEVEL3 =         ["level3", "/assets/music/level3.ogg"];
 var CHEST =          ["chest", "/assets/sfx/chest.ogg"];
 var SHIELD =         ["shield", "/assets/sfx/shield.ogg"];
 var CLOCK =          ["clock", "/assets/sfx/clock.ogg"];
@@ -35,6 +36,12 @@ function supports() {
 function playMusic(music) {
     if (supports()) {
         Crafty.audio.play(music, -1, VOLUME);
+    }
+}
+
+function toggleMusic(music) {
+    if (supports()) {
+        Crafty.audio.togglePause(music);
     }
 }
 
@@ -96,18 +103,28 @@ return {
      * Music tracks
      */
     playLevel: function() {
-        var song = Math.floor(Math.random()*(3)+1);
-        switch(song) {
-            case 2: playMusic(LEVEL2[0]); break;
-            case 3: playMusic(LEVEL3[0]); break;
-            default: playMusic(LEVEL1[0]); break;
+        if (SONG === undefined) {
+            SONG = Math.floor(Math.random()*(3)+1);
+            switch(SONG) {
+                case 2: playMusic(LEVEL2[0]); break;
+                case 3: playMusic(LEVEL3[0]); break;
+                default: playMusic(LEVEL1[0]); break;
+            }
+        } else {
+            switch(SONG) {
+                case 2: toggleMusic(LEVEL2[0]); break;
+                case 3: toggleMusic(LEVEL3[0]); break;
+                default: toggleMusic(LEVEL1[0]); break;
+            }
         }
-        
     },
     stopLevel: function() {
-        stop(LEVEL1[0]);
-        stop(LEVEL2[0]);
-        stop(LEVEL3[0]);
+        switch(SONG) {
+            case 2: stop(LEVEL2[0]); break;
+            case 3: stop(LEVEL3[0]); break;
+            default: stop(LEVEL1[0]); break;
+        }
+        SONG = undefined;
     },
     playAlert: function() {
         playMusic(ALERT[0]);

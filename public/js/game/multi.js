@@ -17,8 +17,6 @@ define (function() {
 var MULTIPLAYER;
 var ENEMYTOTAL = 0;
 
-
-
 // -----------------------------------------------------------------------------
 // Public
 // -----------------------------------------------------------------------------
@@ -27,15 +25,14 @@ return {
     getMultiplayer: function() {
         return MULTIPLAYER;
     },
-    setMultiplayer: function(multiplayer) {
-        MULTIPLAYER = multiplayer;
-    },
     setEnemyTotal: function(n) {
         ENEMYTOTAL = n;
     },
-    generateMultiplayerId: function() {
-        ENEMYTOTAL++;
-        return ENEMYTOTAL;
+    setMultiplayer: function(multiplayer) {
+        MULTIPLAYER = multiplayer;
+    },
+    generateMultiId: function() {
+        return ENEMYTOTAL++;
     }
 };
 

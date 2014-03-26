@@ -18,6 +18,8 @@ var CERT_PATH = 'certificates/server-crt.pem';
 var HTTP_CONF = 'configuration/http_port.txt';
 var HTTPS_CONF = 'configuration/https_port.txt';
 var DATABASE_CONF = 'configuration/database.txt';
+var GROUPS_NEEDED = 'configuration/groups_needed.txt';
+var ENCODING = "utf8";
 
 /**
  * Checks the existance of a file
@@ -31,16 +33,11 @@ function check(path) {
 /**
  * Returns the content of a file if exists. Empty string in other case.
  * @param path - Path of the file
- * @param encoding - Encoding of the file. UTF-8 by default.
  * @return String - The file content
  */
-function read(path, encoding) {
+function read(path) {
     if (check(path)) {
-        if (encoding) {
-            return fs.readFileSync(path, encoding);
-        } else {
-            return fs.readFileSync(path);
-        }
+        return fs.readFileSync(path, ENCODING);
     } else return "";
 }
 
@@ -71,7 +68,9 @@ exports.certConfiguration = certConfiguration;
  * @return String - Path to the HTTP configuration
  */
 function httpConfiguration() {
-    return read(HTTP_CONF, 'utf8');
+    var port = parseInt(read(HTTP_CONF),10);
+    if (isNaN(port)) return 80;
+    else return port;
 }
 exports.httpConfiguration = httpConfiguration;
 
@@ -80,7 +79,9 @@ exports.httpConfiguration = httpConfiguration;
  * @return String - Path to the HTTPS configuration
  */
 function httpsConfiguration() {
-    return read(HTTPS_CONF, 'utf8');
+    var port = parseInt(read(HTTPS_CONF),10);
+    if (isNaN(port)) return 443;
+    else return port;
 }
 exports.httpsConfiguration = httpsConfiguration;
 
@@ -89,9 +90,19 @@ exports.httpsConfiguration = httpsConfiguration;
  * @return String - Path to the database configuration
  */
 function databaseConfiguration() {
-    return read(DATABASE_CONF, 'utf8');
+    return read(DATABASE_CONF);
 }
 exports.databaseConfiguration = databaseConfiguration;
+
+/**
+ * groupsNeededConfiguration
+ * @return String - Path to the group needed configuration
+ */
+function groupsNeededConfiguration() {
+    if (read(GROUPS_NEEDED) === "false") return false;
+    else return true;
+}
+exports.groupsNeededConfiguration = groupsNeededConfiguration;
 
 /**
  * Checks all the configuration files
@@ -122,6 +133,11 @@ function checkConfiguration() {
     ok = check(DATABASE_CONF);
     if (!ok) {
         console.log("(!) ERROR: Falta archivo " + DATABASE_CONF);
+        return false;
+    }
+    ok = check(GROUPS_NEEDED);
+    if (!ok) {
+        console.log("(!) ERROR: Falta archivo " + GROUPS_NEEDED);
         return false;
     }
     console.log("(i) INFO: Ficheros de configuración encontrados.");

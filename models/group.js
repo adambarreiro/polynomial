@@ -141,6 +141,7 @@ exports.pushStudent = pushStudent;
  * @param callback(ok) - Function to call when the query finishes
  */
 function popStudent(student, callback) {
+    console.log(student);
     Group.update({name: student.group}, { $pop: { students: student}}, function(error, numberAffected) {
         if (numberAffected === 1) callback(true);
         else callback(false);

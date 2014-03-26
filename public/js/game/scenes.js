@@ -112,16 +112,22 @@ function drawLevel(data) {
         type = data.map[i];
         drawTile(x,y,data.map[i]);
     }
+    var pos;
     if (multi === "connector") {
-        Crafty.e("Multiplayer").at(Crafty("Character").x/32,Crafty("Character").y/32);
         Crafty("Character").addComponent("Mimic").connectorMode();
+        pos = Crafty("Character").getMultiPosition();
+        Crafty.e("Multiplayer").at(pos[0],pos[1]);
     } else if (multi === "creator"){
-        Crafty.e("Multiplayer").at(Crafty("Character").x/32,Crafty("Character").y/32);
         Crafty("Character").addComponent("Mimic").creatorMode();
+        pos = Crafty("Character").getMultiPosition();
+        Crafty.e("Multiplayer").at(pos[0],pos[1]);
     }
     Crafty.viewport.centerOn(getCharacter(),0);
     Crafty.viewport.follow(getCharacter(), 0, 0);
     resizeController();
+    if (Crafty("Multiplayer").length>0) {
+        Crafty("Character").multiplayerUpdateHealth();
+    }
 }
 
 function resize() {
