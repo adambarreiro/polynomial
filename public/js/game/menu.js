@@ -17,7 +17,7 @@ define (["./scenes", "./network/connector", "./network/creator", "require", "./m
 // Private
 // -----------------------------------------------------------------------------
 var START_LEVEL = 1; // Loaded level
-var FIRST_LEVEL = 10; // Start of the game
+var FIRST_LEVEL = 1; // Start of the game
 
 function  getSavegame(callback) {
     var Menu = Require("./menu");
