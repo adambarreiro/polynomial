@@ -69,9 +69,7 @@ function startNodeServer(port, securePort) {
     });
     console.log("(i) INFO: A partir de ahora se mostrará una traza de cualquier evento.");
 }
-console.log("%%% ARRANCANDO EL SERVIDOR DE POLYNOMIAL %%%");
+console.log("--> ARRANCANDO EL SERVIDOR DE POLYNOMIAL");
 if (config.checkConfiguration()) {
-    startNodeServer(config.httpConfiguration(), config.httpsConfiguration());
-}onfiguration()) {
     startNodeServer(config.httpConfiguration(), config.httpsConfiguration());
 }
