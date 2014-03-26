@@ -17,7 +17,7 @@ define (["../../../audio"], function(Audio) {
 var QUESTIONS = [];
 var ANSWERS = [];
 var CURATION = 70;
-var POWER = 5;
+var POWER = 3;
 var CLOCKS = 1;
 
 function parseQuestion(question) {
@@ -99,22 +99,22 @@ return {
                 var icon;
                 var description;
                 var p = Math.random();
-                if (p < 0.70) {
+                if (p < 0.50) {
                     bonus = "SALUD";
                     icon = "health";
                     description = "¡Notas como tu vida se restablece!";
-                } else if (p > 0.70 && p < 0.8) {
+                } else if (p >= 0.50 && p < 0.666) {
                     bonus = "POTENCIA";
                     icon = "power";
-                    description = "¡Puedes derrotar a tus enemigos más fácilmente!";
-                } else if (p > 0.8 && p < 0.9) {
+                    description = "¡Tus próximos " + POWER +" ataques serán críticos!";
+                } else if (p >= 0.666 && p < 0.835) {
                     bonus = "ESCUDO";
                     icon = "shield";
                     description = "¡Puedes soportar más daño!";
-                } else {
+                } else{
                     bonus = "TIEMPO EXTRA";
                     icon = "clock";
-                    description = "¡Tienes más tiempo para realizar operaciones!";
+                    description = "¡En el próximo combate tendrás más tiempo!";
                 }
                 $('.popup').remove();
                 var html = ['<div class="popup">',

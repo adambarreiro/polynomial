@@ -170,7 +170,6 @@ function notableArray() {
         case 3: // Addition per substract
             result[exponents[0]*2] = coeficients[0] * coeficients[0];
             result[exponents[1]*2] = -coeficients[1] * coeficients[1];
-            array[exponents[1]] = -coeficients[1];
             break;
     }
     return [array, result, type];
@@ -180,7 +179,8 @@ function notableArray() {
  */
 function notableCompressed() {
     var notable = notableArray();
-    Crafty("Character")._battleSolution = notable[1];
+    Crafty("Character")._battleSolution[0] = notable[1];
+    Crafty("Character")._battleSolution[1] = notable[2];
     return notablePolynomialHtml(notable[0], notable[2]);
 }
 
@@ -189,7 +189,8 @@ function notableCompressed() {
  */
 function notableUncompressed() {
     var notable = notableArray();
-    Crafty("Character")._battleSolution = notable[0];
+    Crafty("Character")._battleSolution[0] = notable[0];
+    Crafty("Character")._battleSolution[1] = notable[2];
     return polynomialHtml(notable[1]);
 }
 
@@ -203,8 +204,11 @@ function notablePolynomialHtml(array, type) {
     switch(type) {
         case 3:
             html = "(" + polynomialHtml(array) + ")".replace(/\n/g,"");
-            for (var i=0; i<array.length;i++) {
-                if (array[i] < 0) array[i] = -array[i];
+            // Reflect
+            var posFound = false;
+            for (var i=array.length-1; i>=0;i--) {
+                if (!posFound && array[i] > 0) posFound = true;
+                else if (posFound && array[i] > 0) array[i] = -array[i];
             }
             html += "(" + polynomialHtml(array) + ")".replace(/\n/g,"");
             break;
@@ -340,6 +344,8 @@ function parseTerm(term) {
             coeficient = 1;
         } else if (parsed[0] === "-") {
             coeficient = -1;
+        } else if (parsed[0] === ""){
+            coeficient = 1;
         } else {
             coeficient = parseInt(parsed[0],10);
             if (isNaN(coeficient)) {
@@ -374,6 +380,7 @@ function parsePolynomial(textFieldInput) {
 }
 
 function parseSolution(textFieldInput) {
+    var i=0;
     // First filter: We only allow: 0-9,x,+,-,(),^
     var parsed = textFieldInput.replace(/[\ -\'|\*|\,|\.-\/|\:-\]|\_-w|y-\~]/g, "");
     // Second filter: Brackets
@@ -389,10 +396,26 @@ function parseSolution(textFieldInput) {
             solution = parsePolynomial(parsed[0]);
         } else if (parsed.length === 3 && parsed[2] === "") {
             // Addition mult difference
-            solution = parsePolynomial(parsed[1]);
+            var solution1 = parsePolynomial(parsed[0]);
+            var solution2 = parsePolynomial(parsed[1]);
+            if (solution1 === solution2) {
+                solution = [];
+            } else {
+                solution[0] = solution1;
+                solution[1] = solution2;
+                for (i=0;i<MAX_DEGREE; i++){
+                    if (solution[0][i] === undefined) {
+                        solution[0][i] = 0;
+                    }
+                    if (solution[1][i] === undefined) {
+                        solution[1][i] = 0;
+                    }
+                }
+                return solution;
+            }
         }
     }
-    for (var i=0;i<MAX_DEGREE; i++){
+    for (i=0;i<MAX_DEGREE; i++){
         if (solution[i] === undefined) {
             solution[i] = 0;
         }
@@ -415,7 +438,6 @@ return {
             _battleTimed: false, // If has a timeout
             _battleTimeout: undefined, // The timeout
             _battleTimer: undefined, // The setInterval variable
-            _battleQuotient: [], //  The quotient if it's a quotient operation
             _battleSolution: [], // The battle solution
             _battleResult: undefined,
             /**
@@ -625,7 +647,6 @@ return {
                         htmlStrings = this.mulOperation();
                         break;
                     case "**":
-                        p = 0.3;
                         if (Math.random() < 0.5) {
                             operationString = "EXPANDE EL PRODUCTO NOTABLE";
                             this._battleOperation = "**1";
@@ -752,7 +773,8 @@ return {
             checkSolution: function(solution, solution2) {
                 var correct = true;
                 var correct1 = true, correct2 = true;
-                var i=0;
+                var signUsed1 = false, signUsed2 = false;
+                var i=0, j=0;
                 switch (this._battleOperation) {
                     case "/2":
                         for (i=0; i<this._battleSolution[0].length; i++) {
@@ -792,6 +814,90 @@ return {
                             }
                         }
                         break;
+                    case "**1":
+                        if (this._battleSolution[1] === 3) {
+                            // Check there is only one -
+                            var negativeFound = false;
+                            for (i=0; i<MAX_DEGREE; i++) {
+                                if (negativeFound && solution[i] < 0) {
+                                    correct = false;
+                                    break;
+                                }
+                                if (!negativeFound && solution[i] < 0) {
+                                    negativeFound = true;
+                                }
+                            }
+                            // Check the coeficients
+                            if (correct && negativeFound) {
+                                for (i=0; i<this._battleSolution[0].length; i++) {
+                                    if (Math.abs(this._battleSolution[0][i]) !== Math.abs(solution[i])) {
+                                        correct = false;
+                                        break;
+                                    }
+                                }
+                            } else {
+                                correct = false;
+                            }
+                        } else {
+                            for (i=0; i<this._battleSolution[0].length; i++) {
+                                if (this._battleSolution[0][i] !== solution[i]) {
+                                    correct = false;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    case "**2":
+                        if (this._battleSolution[1] === 2) {
+                            for (i=0; i<this._battleSolution[0].length; i++) {
+                                if (this._battleSolution[0][i] === solution[i]) {
+                                    continue;
+                                } else if (!signUsed1 && this._battleSolution[0][i] === -solution[i]) {
+                                    if (this._battleSolution[0][i] !== 0) signUsed1 = true;
+                                    continue;
+                                } else {
+                                    correct = false;
+                                    break;
+                                }
+                            }
+                        } else if (this._battleSolution[1] === 3) {
+                            var oneNegativeFound = false;
+                            for (i=0; i<MAX_DEGREE; i++) {
+                                if (oneNegativeFound && solution[0][i] < 0) {
+                                    correct = false;
+                                    break;
+                                }
+                                if (!oneNegativeFound && solution[0][i] < 0) {
+                                    oneNegativeFound = true;
+                                }
+                                if (oneNegativeFound && solution[1][i] < 0) {
+                                    correct = false;
+                                    break;
+                                }
+                                if (!oneNegativeFound && solution[1][i] < 0) {
+                                    oneNegativeFound = true;
+                                }
+                            }
+                            if (correct && oneNegativeFound) {
+                                for (i=0; i<this._battleSolution[0].length; i++) {
+                                    if (this._battleSolution[0][i] !== Math.abs(solution[0][i])) {
+                                        correct = false;
+                                        break;
+                                    }
+                                }
+                            } else {
+                                correct = false;
+                            }
+                        }
+                        else {
+                            for (i=0; i<this._battleSolution[0].length; i++) {
+                                if (this._battleSolution[0][i] !== solution[i]) {
+                                    correct = false;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
                     default:
                         for (i=0; i<this._battleSolution.length; i++) {
                             if (this._battleSolution[i] !== solution[i]) {
@@ -809,10 +915,12 @@ return {
                         Audio.stopAlert();
                         Audio.stopHidden();
                         Audio.playLevel();
-                        if (this._clocks > 0) {
-                            this._clocks--;
-                            if (this._clocks === 0) {
-                                this.removeBonus("clock");
+                        if (this._battleTimed) {
+                            if (this._clocks > 0) {
+                                this._clocks--;
+                                if (this._clocks === 0) {
+                                    this.removeBonus("clock");
+                                }
                             }
                         }
                         this._battleFighting = false;
