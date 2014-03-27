@@ -125,9 +125,6 @@ function drawLevel(data) {
     Crafty.viewport.centerOn(getCharacter(),0);
     Crafty.viewport.follow(getCharacter(), 0, 0);
     resizeController();
-    if (Crafty("Multiplayer").length > 0) {
-        Crafty("Character").multiplayerUpdateHealth();
-    }
 }
 
 function resize() {
