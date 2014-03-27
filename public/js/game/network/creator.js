@@ -182,10 +182,10 @@ return {
                     healths.push(0);
                 }
             }
-        });
-        CREATOR_SOCKET.emit("updateHealthCreatorToConnectorACK", {
-            friend: CREATOR_CONNECTORADDRESS,
-            healths: healths
+            CREATOR_SOCKET.emit("updateHealthCreatorToConnectorACK", {
+                friend: CREATOR_CONNECTORADDRESS,
+                healths: healths
+            });
         });
         CREATOR_SOCKET.on("updateHealthConnectorToCreatorACK", function(data) {
             callback(data);
