@@ -146,26 +146,28 @@ function onReceiveUpdateHealths() {
     switch(TYPE) {
         case "connector":
             Connector.onReceiveUpdateHealth(function(data) {
-                Crafty("Enemy").each(function() {
-                    this._enemyHealth = data.healths[this._id];
-                    console.log(this._id + ": " + data.healths[this._id]);
-                    if (this._enemyHealth <= 0) {
-                        console.log("Mato "+ this._id);
-                        this.destroy();
-                    }
-                });
+                console.log(data);
+                if (data !== undefined) {
+                   Crafty("Enemy").each(function() {
+                        this._enemyHealth = data.healths[this._id];
+                        if (this._enemyHealth <= 0) {
+                            this.destroy();
+                        }
+                    });
+                }
             });
             break;
         case "creator":
             Creator.onReceiveUpdateHealth(function(data) {
-                Crafty("Enemy").each(function() {
-                    this._enemyHealth = data.healths[this._id];
-                    console.log(this._id + ": " + data.healths[this._id]);
-                    if (this._enemyHealth <= 0) {
-                        console.log("Mato "+ this._id);
-                        this.destroy();
-                    }
-                });
+                console.log(data);
+                if (data !== undefined) {
+                    Crafty("Enemy").each(function() {
+                        this._enemyHealth = data.healths[this._id];
+                        if (this._enemyHealth <= 0) {
+                            this.destroy();
+                        }
+                    });
+                }
             });
             break;
         default: break;
