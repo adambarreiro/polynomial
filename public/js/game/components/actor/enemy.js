@@ -119,7 +119,6 @@ return {
                 this.requires('Actor');
                 this.z=5;
                 if (!edition) {
-                    
                     this.gravity("Terrain").gravityConst(0.3);
                     this.startEnemy();
                 }

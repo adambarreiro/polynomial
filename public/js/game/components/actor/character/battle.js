@@ -923,8 +923,8 @@ return {
                                 }
                             }
                         }
-                        this._battleFighting = false;
                         this.startAll();
+                        this._battleFighting = false;
                     } else {
                         if (this._health > 0) this.battle(this._battleTimed);
                     }

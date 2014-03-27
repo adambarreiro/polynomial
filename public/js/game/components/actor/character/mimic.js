@@ -19,8 +19,13 @@ define (["../../../network/connector", "../../../network/creator", "../../../mul
 // -----------------------------------------------------------------------------
 var TYPE;
 var X,Y;
+var FIRSTMOVEMENT = true;
 
 function movement(data) {
+    if (FIRSTMOVEMENT) {
+        Crafty("Character").multiplayerUpdateHealth();
+        FIRSTMOVEMENT = false;
+    }
     if (data.x === 666 && data.y === 666) {
         Crafty("Multiplayer").pauseAnimation();
         Crafty("Multiplayer").sprite(0,0);
@@ -137,12 +142,17 @@ function onReceiveDamage() {
  * Function fired when we receive the healths of the other player's enemies.
  */
 function onReceiveUpdateHealths() {
+    console.log(TYPE);
     switch(TYPE) {
         case "connector":
             Connector.onReceiveUpdateHealth(function(data) {
                 Crafty("Enemy").each(function() {
                     this._enemyHealth = data.healths[this._id];
-                    if (this._enemyHealth <= 0) this.destroy();
+                    console.log(this._id + ": " + data.healths[this._id]);
+                    if (this._enemyHealth <= 0) {
+                        console.log("Mato "+ this._id);
+                        this.destroy();
+                    }
                 });
             });
             break;
@@ -150,7 +160,11 @@ function onReceiveUpdateHealths() {
             Creator.onReceiveUpdateHealth(function(data) {
                 Crafty("Enemy").each(function() {
                     this._enemyHealth = data.healths[this._id];
-                    if (this._enemyHealth <= 0) this.destroy();
+                    console.log(this._id + ": " + data.healths[this._id]);
+                    if (this._enemyHealth <= 0) {
+                        console.log("Mato "+ this._id);
+                        this.destroy();
+                    }
                 });
             });
             break;
@@ -218,7 +232,7 @@ return {
                         });
                         this.bind("Moved", function() {
                             Crafty("Multiplayer")._started=true;
-                            Connector.sendMovement(Math.floor(this.x),Math.floor(this.y));
+                            Connector.sendMovement(this.x,this.y);
                         });
                         this.bind("KeyUp", function(e) {
                             if(e.key === Crafty.keys.LEFT_ARROW) {
@@ -243,7 +257,7 @@ return {
                         });
                         this.bind("Moved", function() {
                             Crafty("Multiplayer")._started=true;
-                            Creator.sendMovement(Math.floor(this.x),Math.floor(this.y));
+                            Creator.sendMovement(this.x,this.y);
                         });
                         this.bind("KeyUp", function(e) {
                             if(e.key === Crafty.keys.LEFT_ARROW) {
@@ -295,6 +309,12 @@ return {
                 Crafty("Multiplayer").destroy();
                 Multi.setMultiplayer("single");
                 this.removeComponent("Mimic");
+            },
+            restartMultiFlags: function() {
+                FIRSTMOVEMENT = false;
+            },
+            getMulti: function() {
+                return Multi.getMultiplayer();
             }
         });
     }

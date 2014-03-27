@@ -155,9 +155,18 @@ return {
     onReceiveUpdateHealth: function(callback) {
         CONNECTOR_SOCKET.on("updateHealthCreatorToConnector", function() {
             var healths = [];
-            Crafty("Enemy").each(function() {
-                healths.push(this._enemyHealth);
-            });
+            var enemyArray = Crafty("Enemy");
+            for (var i=0; i<enemyArray.length; i++) {
+                if (enemyArray[i] !== undefined) {
+                    if (this._id === i) {
+                        healths.push(this._enemyHealth);
+                    } else {
+                        healths.push(0);
+                    }
+                }  else {
+                    healths.push(0);
+                }
+            }
             CONNECTOR_SOCKET.emit("updateHealthConnectorToCreatorACK", {
                 friend: CONNECTOR_CREATORADDRESS,
                 healths: healths

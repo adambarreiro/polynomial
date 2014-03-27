@@ -96,10 +96,12 @@ return {
                     this.clearLava();
                 }
                 if (cause === "enemy") {
-                    this.stopAll();
                     this.clearBattle();
                 }
                 if ($(".battle").length > 0) $(".battle").remove();
+                if (Crafty("Multiplayer").length > 0) {
+                    this.restartMultiFlags();
+                }
                 Crafty('obj').each(function() { this.destroy(); });
                 Scenes.restartLevel();
             },

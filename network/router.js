@@ -194,7 +194,7 @@ function createRouter(server) {
     io.configure( function(){
         io.set('log level', 1);
         // heroku labs:enable websockets -a myapp
-        io.set('transports',['xhr-polling','websocket','flashsocket','htmlfile', 'jsonp-polling']);
+        io.set('transports',['websocket','xhr-polling','flashsocket','htmlfile', 'jsonp-polling']);
         io.set('polling duration',10);
     });
     // Connection events

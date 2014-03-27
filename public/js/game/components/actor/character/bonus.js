@@ -106,7 +106,7 @@ return {
                 } else if (p >= 0.50 && p < 0.666) {
                     bonus = "POTENCIA";
                     icon = "power";
-                    description = "¡Tus próximos " + POWER +" ataques serán críticos!";
+                    description = "¡Tus próximos " + (+this._power + POWER) +" ataques serán críticos!";
                 } else if (p >= 0.666 && p < 0.835) {
                     bonus = "ESCUDO";
                     icon = "shield";

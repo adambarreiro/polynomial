@@ -21,7 +21,7 @@ define (["./character/battle","./character/bonus","./character/camera","./charac
 // Private
 // -----------------------------------------------------------------------------
 
-var ENEMYTOTAL;
+var MULTI;
 
 /**
  * Registers all the child components.
@@ -70,6 +70,11 @@ return {
                 this.removeComponent("Bonus");
                 this.removeComponent("Battle");
                 this.removeComponent("Movement");
+                if (Crafty("Multiplayer").length>0) {
+                    MULTI = this.getMulti();
+                    this.removeComponent("Mimic");
+                }
+                
                 // Kills events
                 this.unbind("EnterFrame");
                 this.unbind("Moved");
@@ -83,6 +88,13 @@ return {
                 this.addComponent("Lava");
                 this.addComponent("Battle");
                 this.addComponent("Movement");
+                if (Crafty("Multiplayer").length>0) {
+                    if (MULTI === "connector") {
+                        Crafty("Character").addComponent("Mimic").connectorMode();
+                    } else if (MULTI === "creator"){
+                        Crafty("Character").addComponent("Mimic").creatorMode();
+                    }
+                }
                 // Restarts enemy events
                 Crafty('Enemy').each(function() {
                     this.startEnemy();
