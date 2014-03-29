@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
 // Name: /public/js/game/components/actor/character/bonus.js
 // Author: Adam Barreiro
-// Description: Bonus component
-// Updated: 01-03-2014
+// Description: Bonus and item generator, questions file handler.
 // -----------------------------------------------------------------------------
 
 /**

@@ -2,7 +2,6 @@
 // Name: /public/js/game/components/grid.js
 // Author: Adam Barreiro Costa
 // Description: Contains the parent component.
-// Updated: 24-02-2014
 // -----------------------------------------------------------------------------
 
 /**

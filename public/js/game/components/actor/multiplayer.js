@@ -2,7 +2,6 @@
 // Name: /public/js/game/components/actor/multiplayer.js
 // Author: Adam Barreiro
 // Description: Multiplayer character component
-// Updated: 25-02-2014
 // -----------------------------------------------------------------------------
 
 define (function() {

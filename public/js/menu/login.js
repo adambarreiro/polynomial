@@ -2,7 +2,6 @@
 // Name: /public/js/menu/login.js
 // Author: Adam Barreiro Costa
 // Description: Main module for the login screen that unites view and controller.
-// Updated: 23-10-2013
 // -----------------------------------------------------------------------------
 
 /**

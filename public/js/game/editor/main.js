@@ -2,7 +2,6 @@
 // Name: main.js
 // Author: Adam Barreiro
 // Description: Executes the editor
-// Updated: 19-07-2013
 // -----------------------------------------------------------------------------
 
 /**

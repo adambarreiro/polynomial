@@ -2,7 +2,6 @@
 // Name: /public/js/game/components/actor/enemy.js
 // Author: Adam Barreiro Costa
 // Description: Registers the enemy component
-// Updated: 24-02-2014
 // -----------------------------------------------------------------------------
 
 /**
@@ -52,7 +51,6 @@ return {
      */
     registerComponent: function(edition) {
         Crafty.c('Enemy', {
-            _enemyHealth: 100, // Health of the enemy
             /**
              * Sends the other player the amount of damage dealt to the enemy
              */
@@ -100,9 +98,6 @@ return {
              */
             startEnemy: function() {
                 this.addComponent("Patrol");
-                if (Crafty("Multiplayer").length > 0) {
-                    this._enemyHealth = 1;
-                }
             },
             /**
              * Stops all the components attached.
@@ -120,6 +115,7 @@ return {
                 this.z=5;
                 if (!edition) {
                     this.gravity("Terrain").gravityConst(0.3);
+                    this._enemyHealth = 100;
                     this.startEnemy();
                 }
             }

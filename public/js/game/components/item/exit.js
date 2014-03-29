@@ -2,7 +2,6 @@
 // Name: /public/js/game/components/item/exit.js
 // Author: Adam Barreiro
 // Description: Exit component.
-// Updated: 25-02-2014
 // -----------------------------------------------------------------------------
 
 /**

@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
 // Name: /public/js/game/components/actor/character/damage.js
 // Author: Adam Barreiro
-// Description: 
-// Updated: 28-10-2013
+// Description: Damage system, with bonus, multiplayer damage, etc.
 // -----------------------------------------------------------------------------
 
 /**

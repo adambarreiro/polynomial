@@ -1,3 +1,11 @@
+/**
+ * -----------------------------------------------------------------------------
+ * Name: /public/css/game.css
+ * Author: Adam Barreiro Costa
+ * Description: Stylesheet applied in all the game.
+ * -----------------------------------------------------------------------------
+ */
+
 * {
     cursor: url(/assets/img/cursor.gif), pointer;
 }

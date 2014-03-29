@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
 // Name: /public/js/game/audio.js
 // Author: Adam Barreiro
-// Description: 
-// Updated: 28-10-2013
+// Description: Sets, loads and manages all the sound files.
 // -----------------------------------------------------------------------------
 
 define (function() {
@@ -21,7 +20,6 @@ var POWER =          ["power", "/assets/sfx/power.ogg"];
 var HEALTH =         ["health", "/assets/sfx/health.ogg"];
 var ATTACK =         ["attack", "/assets/sfx/attack.ogg"];
 var DAMAGE =         ["damage", "/assets/sfx/damage.ogg"];
-var LAND =           ["land", "/assets/sfx/land.ogg"];
 var ENEMY_DEATH =    ["enemy_death", "/assets/sfx/enemy_death.ogg"];
 var CHAR_DEATH =    ["char_death", "/assets/sfx/char_death.ogg"];
 var MONSTER_SCREAM = ["monster_scream", "/assets/sfx/monster_scream.ogg"];
@@ -76,7 +74,6 @@ return {
             Crafty.audio.add(SHIELD[0],SHIELD[1]);
             Crafty.audio.add(CLOCK[0], CLOCK[1] );
             Crafty.audio.add(POWER[0], POWER[1] );
-            Crafty.audio.add(LAND[0], LAND[1] );
             Crafty.audio.add(HEALTH[0],HEALTH[1]);
             Crafty.audio.add(ATTACK[0],ATTACK[1]);
             Crafty.audio.add(DAMAGE[0],DAMAGE[1]);
@@ -91,7 +88,7 @@ return {
     loadAudio: function() {
         if (supports()) {
             return [ALERT[1],HIDDEN[1],LEVEL1[1],LEVEL2[1], LEVEL3[1],
-                    ATTACK[1],CHEST[1],CLOCK[1], LAND[1], CHAR_DEATH[1],
+                    ATTACK[1],CHEST[1],CLOCK[1], CHAR_DEATH[1],
                     DAMAGE[1], ENEMY_DEATH[1], HEALTH[1], MONSTER_SCREAM[1],
                     POWER[1], SHIELD[1]];
         } else {
@@ -158,9 +155,6 @@ return {
     },
     playCharDeath: function() {
         playEffect(CHAR_DEATH[0]);
-    },
-    playLand: function() {
-        playEffect(LAND[0]);
     },
     playHealth: function() {
         playEffect(HEALTH[0]);

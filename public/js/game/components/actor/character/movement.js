@@ -2,21 +2,19 @@
 // Name: /public/js/game/components/actor/character/movement.js
 // Author: Adam Barreiro
 // Description: Component for giving the character the ability to move.
-// Updated: 24-02-2013
 // -----------------------------------------------------------------------------
 
 /**
  * movement.js
  * @dependency /public/js/game/constants.js
  */
-define (["../../../constants", "../../../audio"], function(Constants, Audio) {
+define (["../../../constants"], function(Constants) {
 
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
 
 var JUMPY = 7; // Pixels that the character will move with every jump
-var TIMEFALLING = 20; // Time falling
 
 // -----------------------------------------------------------------------------
 // Public

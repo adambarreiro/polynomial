@@ -3,7 +3,6 @@
 // Author: Adam Barreiro Costa
 // Description: Module with all the functions needed to handle events on the
 // screen.
-// Updated: 23-10-2013
 // -----------------------------------------------------------------------------
 
 /**

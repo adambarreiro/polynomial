@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
 // Name: /public/js/game/components/actor/character/lava.js
 // Author: Adam Barreiro Costa
-// Description: 
-// Updated: 28-10-2013
+// Description: Lava component wich draws the particles and generates damage.
 // -----------------------------------------------------------------------------
 
 /**

@@ -2,7 +2,6 @@
 // Name: /public/js/game/components/actor/enemy/enemy1.js
 // Author: Adam Barreiro
 // Description: Enemy 1 component.
-// Updated: 25-02-2014
 // -----------------------------------------------------------------------------
 
 /**

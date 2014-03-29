@@ -2,7 +2,6 @@
 // Name: /handlers/ajax.js
 // Author: Adam Barreiro Costa
 // Description: Sets all the AJAX handlers
-// Updated: 23-10-2013
 // -----------------------------------------------------------------------------
 var modelGroup = require('../models/group.js');
 var modelStudent = require('../models/student.js');

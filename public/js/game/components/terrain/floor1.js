@@ -2,7 +2,6 @@
 // Name: /public/js/game/components/terrain/floor1.js
 // Author: Adam Barreiro
 // Description: Floor 1 component.
-// Updated: 25-02-2014
 // -----------------------------------------------------------------------------
 
 /**

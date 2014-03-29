@@ -2,7 +2,6 @@
 // Name: /models/admin.js
 // Author: Adam Barreiro
 // Description: Module with functions to manipulate administrators in the database.
-// Updated: 23-10-2013
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------

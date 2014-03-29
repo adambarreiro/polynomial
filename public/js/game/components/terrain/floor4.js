@@ -2,7 +2,6 @@
 // Name: /public/js/game/components/terrain/floor4.js
 // Author: Adam Barreiro
 // Description: Floor 4 component.
-// Updated: 25-02-2014
 // -----------------------------------------------------------------------------
 
 /**

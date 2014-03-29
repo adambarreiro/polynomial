@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
 // Name: /public/js/game/components/actor/character/battle.js
 // Author: Adam Barreiro
-// Description: 
-// Updated: 28-10-2013
+// Description: All the battle handlers, polynomials generators.
 // -----------------------------------------------------------------------------
 /**
  * battle.js
@@ -739,7 +738,6 @@ return {
                         }
                     });
                 }
-                
             },
             
             /**
@@ -839,8 +837,8 @@ return {
                                 correct = false;
                             }
                         } else {
-                            for (i=0; i<this._battleSolution.length; i++) {
-                                if (this._battleSolution[i] !== solution[i]) {
+                            for (i=0; i<this._battleSolution[0].length; i++) {
+                                if (this._battleSolution[0][i] !== solution[i]) {
                                     correct = false;
                                     break;
                                 }
@@ -849,16 +847,25 @@ return {
                         break;
                     case "**2":
                         if (this._battleSolution[1] === 2) {
-                            for (i=0; i<this._battleSolution[0].length; i++) {
-                                if (this._battleSolution[0][i] === solution[i]) {
-                                    continue;
-                                } else if (!signUsed1 && this._battleSolution[0][i] === -solution[i]) {
-                                    if (this._battleSolution[0][i] !== 0) signUsed1 = true;
-                                    continue;
-                                } else {
+                            var oneNegativeFound = false;
+                            for (i=0; i<MAX_DEGREE; i++) {
+                                if (oneNegativeFound && solution[i] < 0) {
                                     correct = false;
                                     break;
                                 }
+                                if (!oneNegativeFound && solution[i] < 0) {
+                                    oneNegativeFound = true;
+                                }
+                            }
+                            if (correct && oneNegativeFound) {
+                                for (i=0; i<this._battleSolution[0].length; i++) {
+                                    if (Math.abs(this._battleSolution[0][i]) !== Math.abs(solution[i])) {
+                                        correct = false;
+                                        break;
+                                    }
+                                }
+                            } else {
+                                correct = false;
                             }
                         } else if (this._battleSolution[1] === 3) {
                             var oneNegativeFound = false;
@@ -880,7 +887,7 @@ return {
                             }
                             if (correct && oneNegativeFound) {
                                 for (i=0; i<this._battleSolution[0].length; i++) {
-                                    if (this._battleSolution[0][i] !== Math.abs(solution[0][i])) {
+                                    if (Math.abs(this._battleSolution[0][i]) !== Math.abs(solution[0][i])) {
                                         correct = false;
                                         break;
                                     }

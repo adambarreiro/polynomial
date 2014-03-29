@@ -2,7 +2,6 @@
 // Name: /models/student.js
 // Author: Adam Barreiro Costa
 // Description: Module with functions to manipulate students in the database.
-// Updated: 23-10-2013
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------

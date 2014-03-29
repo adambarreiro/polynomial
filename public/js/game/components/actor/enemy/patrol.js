@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
 // Name: /public/js/game/components/patrol.js
 // Author: Adam Barreiro
-// Description: 
-// Updated: 28-10-2013
+// Description: The patrol algorithm.
 // -----------------------------------------------------------------------------
 
 

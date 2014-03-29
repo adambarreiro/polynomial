@@ -2,7 +2,6 @@
 // Name: /public/js/game/components/actor.js
 // Author: Adam Barreiro Costa
 // Description: Registers all the actor components.
-// Updated: 24-02-2014
 // -----------------------------------------------------------------------------
 
 /**

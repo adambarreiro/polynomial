@@ -2,7 +2,6 @@
 // Name: /public/js/game/components/item/chest.js
 // Author: Adam Barreiro
 // Description: Chest component.
-// Updated: 25-02-2014
 // -----------------------------------------------------------------------------
 
 /**

@@ -3,7 +3,6 @@
 // Author: Adam Barreiro Costa
 // Description: Starts the server and all its handlers in order to serve the
 // game.
-// Updated: 23-10-2013
 // -----------------------------------------------------------------------------
  
 // -----------------------------------------------------------------------------

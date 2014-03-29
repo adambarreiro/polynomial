@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
 // Name: /public/js/game/menu.js
 // Author: Adam Barreiro
-// Description: Draws the game menu with single and multi player options.
-// Updated: 28-10-2013
+// Description: Draws and manages the game menu with single and multi player options.
 // -----------------------------------------------------------------------------
 
 /**

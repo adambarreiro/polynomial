@@ -1,8 +1,8 @@
 // -----------------------------------------------------------------------------
 // Name: /public/js/game/editor/engine.js
 // Author: Adam Barreiro
-// Description: 
-// Updated: 28-10-2013
+// Description: Controls the events triggered in the level editor and the 
+// Crafty stuff.
 // -----------------------------------------------------------------------------
 
 /**

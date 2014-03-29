@@ -2,7 +2,6 @@
 // Name: /handlers/general.js
 // Author: Adam Barreiro Costa
 // Description: Reunites all the server handlers in one file
-// Updated: 23-10-2013
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------

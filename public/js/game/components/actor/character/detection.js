@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
 // Name: /public/js/game/components/actor/character/detection.js
 // Author: Adam Barreiro
-// Description: Detection component
-// Updated: 02-02-2014
+// Description: Detection algorithm which triggers battles.
 // -----------------------------------------------------------------------------
 
 /**

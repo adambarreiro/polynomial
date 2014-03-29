@@ -2,7 +2,6 @@
 // Name: /public/js/menu/admin.js
 // Author: Adam Barreiro Costa
 // Description: Main module for the admin screen that unites view and controller.
-// Updated: 23-10-2013
 // -----------------------------------------------------------------------------
 
 /**

@@ -2,7 +2,6 @@
 // Name: /public/js/game/components/terrain/floor3.js
 // Author: Adam Barreiro
 // Description: Floor 3 component.
-// Updated: 25-02-2014
 // -----------------------------------------------------------------------------
 
 /**

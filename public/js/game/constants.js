@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
-// Name: constants.js
+// Name: /public/js/game/constants.js
 // Author: Adam Barreiro
 // Description: Gives some constants
-// Updated: 10-07-2013
 // -----------------------------------------------------------------------------
 define(function() {
 

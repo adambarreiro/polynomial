@@ -2,7 +2,6 @@
 // Name: /public/js/game/components/terrain.js
 // Author: Adam Barreiro Costa
 // Description: Registers all the terrain components.
-// Updated: 24-02-2014
 // -----------------------------------------------------------------------------
 
 /**

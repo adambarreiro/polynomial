@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
-// Name: configuration.js
+// Name: /configuration.js
 // Author: Adam Barreiro Costa
 // Description: Contains the functions to resolve some paths and config files.
-// Updated: 03-03-2014
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------

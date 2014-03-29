@@ -2,7 +2,6 @@
 // Name: /handlers/post.js
 // Author: Adam Barreiro Costa
 // Description: Sets all the POST request handlers
-// Updated: 23-10-2013
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------

@@ -2,7 +2,6 @@
 // Name: /handlers/get.js
 // Author: Adam Barreiro Costa
 // Description: Sets all the GET request handlers
-// Updated: 23-10-2013
 // -----------------------------------------------------------------------------
 var handler = require('./general.js');
 

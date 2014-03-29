@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
 // Name: /errors.js
 // Author: Adam Barreiro Costa
-// Description: 
-// Updated: 03-03-2014
+// Description: File to handle error pages.
 // -----------------------------------------------------------------------------
  
 function handle403(err, req, res, next) {

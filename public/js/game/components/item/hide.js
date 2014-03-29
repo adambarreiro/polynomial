@@ -2,7 +2,6 @@
 // Name: /public/js/game/components/item/hide.js
 // Author: Adam Barreiro
 // Description: Hide component
-// Updated: 25-02-2014
 // -----------------------------------------------------------------------------
 
 /**

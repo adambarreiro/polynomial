@@ -2,7 +2,6 @@
 // Name: /public/js/game/editor/menu.js
 // Author: Adam Barreiro
 // Description: Draws the editor and sets all its functionalities.
-// Updated: 28-10-2013
 // -----------------------------------------------------------------------------
 
 /**

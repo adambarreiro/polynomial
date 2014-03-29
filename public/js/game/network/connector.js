@@ -2,7 +2,6 @@
 // Name: /public/js/game/network/connector.js
 // Author: Adam Barreiro
 // Description: Networking module for the multiplayer mode.
-// Updated: 03-03-2014
 // -----------------------------------------------------------------------------
 
 /**
@@ -144,27 +143,22 @@ return {
     /**
      * Sends the creator a request for recover the enemy healths
      */
-    sendUpdateHealth: function() {
+    sendUpdateHealth: function(total) {
         CONNECTOR_SOCKET.emit("updateHealthConnectorToCreator", {
-            friend: CONNECTOR_CREATORADDRESS
+            friend: CONNECTOR_CREATORADDRESS,
+            total: total
         });
     },
     /**
      * Receives the enemy healths
      */
     onReceiveUpdateHealth: function(callback) {
-        CONNECTOR_SOCKET.on("updateHealthCreatorToConnector", function() {
+        CONNECTOR_SOCKET.on("updateHealthCreatorToConnector", function(data) {
             var healths = [];
             var enemyArray = Crafty("Enemy");
-            for (var i=0; i<enemyArray.length; i++) {
-                if (enemyArray[i] !== undefined) {
-                    if (this._id === i) {
-                        healths.push(this._enemyHealth);
-                    } else {
-                        healths.push(0);
-                    }
-                }  else {
-                    healths.push(0);
+            for (var i=0; i<data.total; i++) {
+                if (Crafty(enemyArray[i]).length > 0) {
+                    healths[Crafty(enemyArray[i])._id] = Crafty(enemyArray[i])._enemyHealth;
                 }
             }
             CONNECTOR_SOCKET.emit("updateHealthConnectorToCreatorACK", {

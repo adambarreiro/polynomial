@@ -2,7 +2,6 @@
 // Name: /public/js/game/components/terrain/abyss.js
 // Author: Adam Barreiro
 // Description: Abyss component.
-// Updated: 25-02-2014
 // -----------------------------------------------------------------------------
 
 /**

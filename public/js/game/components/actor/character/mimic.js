@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
 // Name: /public/js/game/components/actor/character/mimic.js
 // Author: Adam Barreiro
-// Description: Multiplayer character component
-// Updated: 25-02-2014
+// Description: Multiplayer events handler
 // -----------------------------------------------------------------------------
 
 /**
@@ -22,10 +21,6 @@ var X,Y;
 var FIRSTMOVEMENT = true;
 
 function movement(data) {
-    if (FIRSTMOVEMENT) {
-        Crafty("Character").multiplayerUpdateHealth();
-        FIRSTMOVEMENT = false;
-    }
     if (data.x === 666 && data.y === 666) {
         Crafty("Multiplayer").pauseAnimation();
         Crafty("Multiplayer").sprite(0,0);
@@ -142,31 +137,32 @@ function onReceiveDamage() {
  * Function fired when we receive the healths of the other player's enemies.
  */
 function onReceiveUpdateHealths() {
-    console.log(TYPE);
     switch(TYPE) {
         case "connector":
             Connector.onReceiveUpdateHealth(function(data) {
-                console.log(data);
                 if (data !== undefined) {
-                   Crafty("Enemy").each(function() {
-                        this._enemyHealth = data.healths[this._id];
-                        if (this._enemyHealth <= 0) {
-                            this.destroy();
+                   var enemyArray = Crafty("Enemy");
+                   for (var i=0; i<enemyArray.length; i++) {
+                        if (data.healths[i] !== null) {
+                            Crafty(enemyArray[i])._enemyHealth = data.healths[i];
+                        } else {
+                            Crafty(enemyArray[i]).destroy();
                         }
-                    });
+                    }
                 }
             });
             break;
         case "creator":
             Creator.onReceiveUpdateHealth(function(data) {
-                console.log(data);
                 if (data !== undefined) {
-                    Crafty("Enemy").each(function() {
-                        this._enemyHealth = data.healths[this._id];
-                        if (this._enemyHealth <= 0) {
-                            this.destroy();
+                   var enemyArray = Crafty("Enemy");
+                   for (var i=0; i<enemyArray.length; i++) {
+                        if (data.healths[i] !== null) {
+                            Crafty(enemyArray[i])._enemyHealth = data.healths[i];
+                        } else {
+                            Crafty(enemyArray[i]).destroy();
                         }
-                    });
+                    }
                 }
             });
             break;
@@ -208,10 +204,10 @@ return {
             /**
              * Function called to ask for the enemy healths of the other player
              */
-            multiplayerUpdateHealth: function() {
+            multiplayerUpdateHealth: function(total) {
                 switch(TYPE) {
-                    case "connector": Connector.sendUpdateHealth(); break;
-                    case "creator": Creator.sendUpdateHealth(); break;
+                    case "connector": Connector.sendUpdateHealth(total); break;
+                    case "creator": Creator.sendUpdateHealth(total); break;
                     default: break;
                 }
             },
@@ -299,6 +295,9 @@ return {
             },
             init: function() {
                 this.requires('Character');
+            },
+            restartMimic: function() {
+                this.multiplayerMove();
             },
             getMultiPosition: function() {
                 if (X !== undefined && Y !== undefined) {

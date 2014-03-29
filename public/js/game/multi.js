@@ -1,8 +1,8 @@
 // -----------------------------------------------------------------------------
-// Name: /public/js/game/editor/engine.js
+// Name: /public/js/game/multi.js
 // Author: Adam Barreiro
-// Description: 
-// Updated: 28-10-2013
+// Description: Multiplayer ID generator for the enemies to solve a CraftyJS
+// identifier issue.
 // -----------------------------------------------------------------------------
 
 /**
@@ -24,6 +24,9 @@ var ENEMYTOTAL = 0;
 return {
     getMultiplayer: function() {
         return MULTIPLAYER;
+    },
+    getEnemyTotal: function(n) {
+        return ENEMYTOTAL;
     },
     setEnemyTotal: function(n) {
         ENEMYTOTAL = n;

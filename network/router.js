@@ -1,8 +1,8 @@
 // -----------------------------------------------------------------------------
 // Name: /network/router.js
 // Author: Adam Barreiro Costa
-// Description: 
-// Updated: 03-03-2014
+// Description: Module to handle all the online mode, with message managment 
+// between clients.
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
@@ -120,11 +120,11 @@ function responseSender(socket) {
     // Health update response
     socket.on("updateHealthCreatorToConnector", function (data) {
         if (checkFriend(data))
-            io.sockets.socket(connections[data.friend].id).emit("updateHealthCreatorToConnector");
+            io.sockets.socket(connections[data.friend].id).emit("updateHealthCreatorToConnector", {total: data.total});
     });
     socket.on("updateHealthConnectorToCreator", function (data) {
         if (checkFriend(data))
-            io.sockets.socket(connections[data.friend].id).emit("updateHealthConnectorToCreator");
+            io.sockets.socket(connections[data.friend].id).emit("updateHealthConnectorToCreator", {total: data.total});
     });
     socket.on("updateHealthCreatorToConnectorACK", function (data) {
         if (checkFriend(data))
@@ -194,7 +194,11 @@ function createRouter(server) {
     io.configure( function(){
         io.set('log level', 1);
         // heroku labs:enable websockets -a myapp
-        io.set('transports',['websocket','xhr-polling','flashsocket','htmlfile', 'jsonp-polling']);
+        // Local:
+        // io.set('transports',['websocket','xhr-polling','flashsocket','htmlfile', 'jsonp-polling']);
+        // Heroku:
+        // io.set('transports',['xhr-polling','websocket','flashsocket','htmlfile', 'jsonp-polling']);
+        io.set('transports',['xhr-polling','websocket','flashsocket','htmlfile', 'jsonp-polling']);
         io.set('polling duration',10);
     });
     // Connection events

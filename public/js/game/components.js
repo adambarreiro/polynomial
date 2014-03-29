@@ -2,7 +2,6 @@
 // Name: /public/js/game/components.js
 // Author: Adam Barreiro
 // Description: Loads the sprites and starts the god component Grid.
-// Updated: 25-02-2014
 // -----------------------------------------------------------------------------
 
 /**

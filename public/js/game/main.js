@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
 // Name: /public/js/game/main.js
 // Author: Adam Barreiro Costa
-// Description: Main module for the game screen that unites view and controller.
-// Updated: 26-12-2013
+// Description: Main module for the game screen.
 // -----------------------------------------------------------------------------
 
 // Loading...

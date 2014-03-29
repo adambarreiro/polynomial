@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
 // Name: /models/group.js
 // Author: Adam Barreiro
-// Description: Module with functions to manipulate database collections.
-// Updated: 24-09-2013
+// Description: Module with functions to manipulate database groups.
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------

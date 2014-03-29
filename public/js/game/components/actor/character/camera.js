@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
 // Name: /public/js/game/components/actor/character/camera.js
 // Author: Adam Barreiro
-// Description: 
-// Updated: 01-03-2014
+// Description: Manages the camera.
 // -----------------------------------------------------------------------------
 
 /**

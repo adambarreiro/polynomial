@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
 // Name: /public/js/game/editor/engine.js
 // Author: Adam Barreiro
-// Description: 
-// Updated: 28-10-2013
+// Description: Generates and handles all the game scenes.
 // -----------------------------------------------------------------------------
 
 /**
@@ -17,6 +16,7 @@ define (["./constants", "./audio" ,"./components", "./multi"], function(Constant
 var CHARACTER;
 var LEVEL;
 var STUDENT;
+var MULTI_INIT = false;
 var SIZE = Constants.getViewportSize('px');
 
 function setCharacter(entity) {
@@ -114,13 +114,26 @@ function drawLevel(data) {
     }
     var pos;
     if (multi === "connector") {
-        Crafty("Character").addComponent("Mimic").connectorMode();
+        if (!MULTI_INIT) {
+            MULTI_INIT = true;
+            Crafty("Character").addComponent("Mimic").connectorMode();
+        } else {
+            Crafty("Character").addComponent("Mimic").restartMimic();
+        }
         pos = Crafty("Character").getMultiPosition();
         Crafty.e("Multiplayer").at(pos[0],pos[1]);
     } else if (multi === "creator"){
-        Crafty("Character").addComponent("Mimic").creatorMode();
+        if (!MULTI_INIT) {
+            MULTI_INIT = true;
+            Crafty("Character").addComponent("Mimic").creatorMode();
+        } else {
+            Crafty("Character").addComponent("Mimic").restartMimic();
+        }
         pos = Crafty("Character").getMultiPosition();
         Crafty.e("Multiplayer").at(pos[0],pos[1]);
+    }
+    if (Crafty("Multiplayer").length > 0) {
+        Crafty("Character").multiplayerUpdateHealth(Multi.getEnemyTotal());
     }
     Crafty.viewport.centerOn(getCharacter(),0);
     Crafty.viewport.follow(getCharacter(), 0, 0);
