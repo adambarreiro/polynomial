@@ -248,7 +248,7 @@ function setLevelStudent(e, l, callback) {
     console.log("$ Asignarle el nivel " + l + " al estudiante " + e + ".");
     var stud = unescape(e);
     var dateUnformatted = new Date();
-    var date = ("0" + (+dateUnformatted.getDate()+1)).slice(-2) + "/" + ("0"+(+dateUnformatted.getMonth()+1)).slice(-2) + "/" + dateUnformatted.getFullYear() + " a las " +
+    var date = ("0"+dateUnformatted.getDate()).slice(-2) + "/" + ("0"+(+dateUnformatted.getMonth()+1)).slice(-2) + "/" + dateUnformatted.getFullYear() + " a las " +
                ("0"+dateUnformatted.getHours()).slice(-2) + ":" + ("0"+dateUnformatted.getMinutes()).slice(-2);
     if (l == 1) {
         Student.update({email: stud}, { $set: {savegame: l, stats: [{level: l, date: date}] } }, function(error) {
