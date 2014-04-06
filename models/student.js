@@ -256,9 +256,15 @@ function setLevelStudent(e, l, callback) {
             else callback({ok: false});
         });
     } else {
-        Student.update({email: stud}, { $set: {savegame: l}, $push: {stats: {level: l, date: date}}}, function(error) {
-            if (!error) callback({ok: true});
-            else callback({ok: false});
+        Student.findOne({email: stud}, function(error, student){
+            if (student.savegame != l) {
+                Student.update({email: stud}, { $set: {savegame: l}, $push: {stats: {level: l, date: date}}}, function(error) {
+                    if (!error) callback({ok: true});
+                    else callback({ok: false});
+                });
+            } else {
+                callback({ok: true});
+            }
         });
     }
 
