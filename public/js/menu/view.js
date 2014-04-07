@@ -194,19 +194,21 @@ return {
      * @return String - HTML code of the viewStudent option menu.
      */
     adminViewStudent: function() {
-        return ['<form class="menu">',
+        return ['<form method="POST" class="menu" action="eraseHistory">',
                     csrf(),
                     '<div class="separator">Ver los datos de un alumno</div>',
                     '<select class="field" name="name" id="student"><option value=" ">Selecciona el alumno</option></select>',
                     '<div class="separator">Datos personales</div>',
+                    '<input name="email" hidden/>',
                     '<input class="field" type="text" name="name" placeholder="Nombre" disabled/>',
                     '<input class="field" type="text" name="surname1" placeholder="Primer apellido" disabled/>',
                     '<input class="field" type="text" name="surname2" placeholder="Segundo apellido" disabled/>',
                     '<input class="field" type="text" name="group" placeholder="Grupo" disabled/>',
                     '<div class="separator">Progreso en el juego</div>',
                     '<input class="field" type="text" name="level" placeholder="Nivel actual" disabled/>',
-                    '<select class="field" type="text" name="stats"><option value="">Estadísticas</option></select>',
+                    '<select class="field" type="text" name="stats"><option value="">Historial</option></select>',
                     '<input class="button" type="button" value="Atr&aacute;s"/>',
+                    '<input class="button" type="submit" value="Borrar historial" hidden/>',
                 '</form>'].join('\n');
     },
     /**
@@ -321,16 +323,18 @@ return {
      * @param data - The students data
      */
     setViewStudent: function(data) {
+        $('input[name=email]').val(unescape(data.email));
         $('input[name=name]').val(unescape(data.name));
         $('input[name=surname1]').val(unescape(data.surname1));
         $('input[name=surname2]').val(unescape(data.surname2));
         $('input[name=group]').val(unescape(data.group));
         $('input[name=level]').val("Nivel " + unescape(data.savegame));
-        $('select[name=stats]').html('<option value="">Estadísticas</option>');
+        $('select[name=stats]').html('<option value="">Historial</option>');
         $('select[name=stats]').val("");
         for (i = 0; i< data.stats.length; i++) {
             $('select[name=stats]').append('<option disabled value="'+data.stats[i].level+'">Nivel '+data.stats[i].level+": "+data.stats[i].date+'</option>');
         }
+        $('input[type=submit]').show();
     },
     /**
      * Draws a loading window

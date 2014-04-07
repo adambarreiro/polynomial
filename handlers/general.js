@@ -40,6 +40,7 @@ function setPostHandlers(){
     post.postAdminDeleteGroup();
     post.postAdminAssignGroup();
     post.postAdminDisposeGroup();
+    post.postAdminEraseHistory();
     post.postAdminDeleteStudent();
     post.postAdminEditAdmin();
 }

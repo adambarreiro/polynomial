@@ -250,26 +250,35 @@ function setLevelStudent(e, l, callback) {
     var dateUnformatted = new Date();
     var date = ("0"+dateUnformatted.getDate()).slice(-2) + "/" + ("0"+(+dateUnformatted.getMonth()+1)).slice(-2) + "/" + dateUnformatted.getFullYear() + " a las " +
                ("0"+dateUnformatted.getHours()).slice(-2) + ":" + ("0"+dateUnformatted.getMinutes()).slice(-2);
-    if (l == 1) {
-        Student.update({email: stud}, { $set: {savegame: l, stats: [{level: l, date: date}] } }, function(error) {
-            if (!error) callback({ok: true});
-            else callback({ok: false});
-        });
-    } else {
-        Student.findOne({email: stud}, function(error, student){
-            if (student.savegame != l) {
-                Student.update({email: stud}, { $set: {savegame: l}, $push: {stats: {level: l, date: date}}}, function(error) {
-                    if (!error) callback({ok: true});
-                    else callback({ok: false});
-                });
-            } else {
-                callback({ok: true});
-            }
-        });
-    }
+    Student.findOne({email: stud}, function(error, student){
+        if (student.stats.length === 0 || student.savegame != l) {
+            Student.update({email: stud}, { $set: {savegame: l}, $push: {stats: {level: l, date: date}}}, function(error) {
+                if (!error) callback({ok: true});
+                else callback({ok: false});
+            });
+        } else {
+            callback({ok: true});
+        }
+    });
 
 }
 exports.setLevelStudent = setLevelStudent;
+
+/**
+ * Given an mail of a student, erases its history of game data
+ * @param e - Email of the student
+
+ * @param callback(students) - Function to call when the query finishes
+ */
+function eraseHistory(e, callback) {
+    console.log("$ Borrar el historial del estudiante " + e + ".");
+    var stud = unescape(e);
+    Student.update({email: stud}, { $set: {stats: []} }, function(error) {
+        if (!error) callback({ok: true});
+        else callback({ok: false});
+    });
+}
+exports.eraseHistory = eraseHistory;
 
 /**
  * Given an mail of a student, returns his actual level

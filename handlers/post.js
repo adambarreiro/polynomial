@@ -156,6 +156,19 @@ function postAdminDeleteStudent(){
 exports.postAdminDeleteStudent = postAdminDeleteStudent;
 
 /**
+ * Responds to the POST petition which asks for the erase of the student's history
+ */
+function postAdminEraseHistory() {
+    app.post('/eraseHistory', function (req, res) {
+        studentModel.eraseHistory(unescape(req.body.email), function(ok) {
+            if (ok) res.redirect('/admin?aok');
+            else res.redirect('/admin?error');
+        });
+    });
+}
+exports.postAdminEraseHistory = postAdminEraseHistory;
+
+/**
  * Sets the response to the editAdmin request.
  */
 function postAdminEditAdmin(){
