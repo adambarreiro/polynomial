@@ -33,7 +33,12 @@ return {
              * objects in between in order to cover the character.
              */
             detection: function() {
-                var detectionRange = Crafty.map.search({_x: this.x-320, _y: this.y, _w: 640, _h: 32}, true);
+                var detectionRange;
+                if (this._up) {
+                    detectionRange = Crafty.map.search({_x: this.x-320, _y: this.y, _w: 640, _h: 64}, true);
+                } else {
+                    detectionRange = Crafty.map.search({_x: this.x-320, _y: this.y, _w: 640, _h: 32}, true);  
+                }
                 // If the character is hidden
                 if (this.hit("Hide")) {
                     this._detectionHidden = true;

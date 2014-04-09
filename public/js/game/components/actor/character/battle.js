@@ -32,8 +32,8 @@ var BONUS_TIMEOUT = 3000;
 
 // Result screen time
 var RESULT_SCREEN = 100;
-var CORRECT_SCREEN = "rgba(0,255,0,0.8)";
-var WRONG_SCREEN = "rgba(255,0,0,0.8)";
+var CORRECT_SCREEN = "rgba(0,255,50,0.8)";
+var WRONG_SCREEN = "rgba(255,0,50,0.8)";
 var NORMAL_SCREEN = "rgba(200,200,200,0.8)";
 
 function getTimeouts(callback) {
