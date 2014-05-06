@@ -240,25 +240,31 @@ function endScene() {
                 '<p>Ahora eres un experto resolviendo polinomios :)</p>',
                 '<input class="button" type="button" value="Volver al menu"/></div>',
                 ].join('\n');
-        $('body').append(html);
-        $('h1').css({
-            "text-align" : "center",
-            "color" : "white",
-            "border-bottom" : "solid 1px #999999",
-            "line-height" : "150%",
-            "padding" : "10px"
-        });
-        $('.button').css({
-            "clear" : "both",
-            "float" : "left",
-            "margin-top": "50px",
-            "margin-left" : "45%"});
-        $('.button').on('click', function() {
-            $('#exp').remove();
-            Crafty.stop();
-            $('#cr-stage').remove();
-            window.location="/";
-        });
+        Audio.stopLevel();
+        $('.bottom').remove();
+        $('#back').remove();
+        $('#music').remove();
+        $('#cr-stage').fadeOut(1000, function() {
+            $('body').append(html);
+            $('h1').css({
+                "text-align" : "center",
+                "color" : "white",
+                "border-bottom" : "solid 1px #999999",
+                "line-height" : "150%",
+                "padding" : "10px"
+            });
+            $('.button').css({
+                "clear" : "both",
+                "float" : "left",
+                "margin-top": "50px",
+                "margin-left" : "45%"});
+            $('.button').on('click', function() {
+                $('#exp').remove();
+                Crafty.stop();
+                $('#cr-stage').remove();
+                window.location="/";
+            });
+        }); 
     });
 }
 
