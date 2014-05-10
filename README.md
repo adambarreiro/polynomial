@@ -41,7 +41,9 @@ Manuals are only in Spanish at the moment.
 
 Download & play
 -------------------------
-* As a teacher, you can download the game to deploy it at your school by clicking [here](https://github.com/adambarreiro/Polynomial/releases).
+Polynomial works great on Google Chrome and Mozilla Firefox. Other browsers are not well supported.
+
+* As a teacher, you can download the game to deploy it at your school by clicking [here](https://github.com/adambarreiro/Polynomial/releases). (Also read the manual to install).
 * As a player, you can try it [here](http://poly-deploy.herokuapp.com). This is the [heroku branch](https://github.com/adambarreiro/Polynomial/tree/heroku) deployed at Heroku. Note it's quite slow as it's uploaded in a basic free node.
 
 Special thanks to
