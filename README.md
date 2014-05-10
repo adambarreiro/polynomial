@@ -35,7 +35,7 @@ Manuals
 
 Manuals are only in Spanish at the moment.
 
-* As an user you can find the user manual [here](https://github.com/adambarreiro/Polynomial/blob/master/manuals/es_ES/alumno.pdf?raw=true)
+* As an player you can find the user manual [here](https://github.com/adambarreiro/Polynomial/blob/master/manuals/es_ES/alumno.pdf?raw=true)
 * As a teacher you cand find the admin manual [here](https://github.com/adambarreiro/Polynomial/blob/master/manuals/es_ES/profesor.pdf?raw=true).
 * As a developer you cand find a small guide [here](https://github.com/adambarreiro/Polynomial/blob/master/manuals/es_ES/desarrollador.pdf?raw=true).
 
