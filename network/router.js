@@ -198,7 +198,7 @@ function createRouter(server) {
         // io.set('transports',['websocket','xhr-polling','flashsocket','htmlfile', 'jsonp-polling']);
         // Heroku:
         // io.set('transports',['xhr-polling','websocket','flashsocket','htmlfile', 'jsonp-polling']);
-        io.set('transports',['websocket','xhr-polling','flashsocket','htmlfile', 'jsonp-polling']);
+        io.set('transports',['xhr-polling','websocket','flashsocket','htmlfile', 'jsonp-polling']);
         io.set('polling duration',10);
     });
     // Connection events
