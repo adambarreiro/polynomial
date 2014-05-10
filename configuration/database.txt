@@ -1,1 +1,1 @@
-mongodb://pepperonni:cacadevaca@ds061188.mongolab.com:61188/poly
+mongodb://localhost/polynomial
