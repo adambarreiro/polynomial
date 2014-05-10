@@ -49,6 +49,8 @@ Polynomial works great on Google Chrome and Mozilla Firefox. Other browsers are 
 Special thanks to
 -------------------------
 - My mates for supporting me, testing the game and giving advices about it.
+- My tutor and teachers.
+- My family.
 - Maxstack for "The Client", "Bazaarnet" and "Restoration Completed" tracks used as level music: http://opengameart.org/content/freelance
 - Zander Noriega for "Perpetual Tension": https://soundcloud.com/zander-noriega
 - Matthew Pablo for "Thrust Sequence": http://www.matthewpablo.com
