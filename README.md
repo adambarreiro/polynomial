@@ -41,6 +41,11 @@ Manuals are only in Spanish at the moment.
 * As a teacher you cand find the admin manual [here](https://github.com/adambarreiro/Polynomial/blob/master/manuals/es_ES/profesor.pdf?raw=true).
 * As a developer you cand find a small guide [here](https://github.com/adambarreiro/Polynomial/blob/master/manuals/es_ES/desarrollador.pdf?raw=true).
 
+Download & play
+-------------------------
+* As a teacher, you can download the game to deploy it at your school by clicking [here](https://github.com/adambarreiro/Polynomial/releases).
+* As a player, you can try it here: http://poly-deploy.herokuapp.com
+
 Special thanks to
 -------------------------
 - My mates for supporting me, testing the game and giving advices about it.
