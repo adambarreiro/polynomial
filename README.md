@@ -1,6 +1,8 @@
 ![alt text](https://raw.githubusercontent.com/adambarreiro/Polynomial/master/public/assets/img/logo.png "Polynomial")
 
-Educational video game for the teaching of polynomials to secondary school students who are on their third year. 
+Educational video game for the teaching of polynomials to secondary school students who are on their third year.
+
+Visit http://poly-deploy.herokuapp.com to play.
 
 _Trailer coming soon_
 
