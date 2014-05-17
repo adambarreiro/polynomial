@@ -5,7 +5,7 @@ Educational video game for the teaching of polynomials to secondary school stude
 Overview
 -------------------------
 
-Polynomial is my Final Year Project in order to graduate in Computer Science Engineering. It's a 2D educational game made with a JavaScript engine called CraftyJS, node.js for the backend and MongoDB for all the storage stuff.
+Polynomial is my Final Year Project in order to graduate in Computer Science Engineering, which scored 9 out of 10. It's a 2D educational game made with a JavaScript engine called CraftyJS, node.js for the backend and MongoDB for all the storage stuff.
 
 The story introduces you as a soldier who is trapped in an unknown planet fullfilled with monsters which you need to defeat by resolving operations with polynomials (hence the name). Also you'll find treasures that you'll open by answering questions related to polynomials theory.
 
