@@ -9,7 +9,7 @@ Polynomial is my Final Year Project in order to graduate in Computer Science Eng
 
 The story introduces you as a soldier who is trapped in an unknown moon fullfilled with monsters which you need to defeat by resolving operations with polynomials (hence the name). Also you'll find treasures that you'll open by answering questions related to polynomials theory.
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=p7DAqio6_jY" target="_blank"><img src="http://img.youtube.com/vi/p7DAqio6_jY/0.jpg" alt="Polynomial Trailer" width="240" height="180" border="10" /></a>
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=sVaUWOTfE7o" target="_blank"><img src="http://img.youtube.com/vi/sVaUWOTfE7o/0.jpg" alt="Polynomial Trailer" width="240" height="180" border="10" /></a>
 
 Game mechanics
 -------------------------
