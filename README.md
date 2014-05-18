@@ -7,9 +7,9 @@ Overview
 
 Polynomial is my Final Year Project in order to graduate in Computer Science Engineering, which scored 9 out of 10. It's a 2D educational game made with a JavaScript engine called CraftyJS, node.js for the backend and MongoDB for all the storage stuff.
 
-The story introduces you as a soldier who is trapped in an unknown planet fullfilled with monsters which you need to defeat by resolving operations with polynomials (hence the name). Also you'll find treasures that you'll open by answering questions related to polynomials theory.
+The story introduces you as a soldier who is trapped in an unknown moon fullfilled with monsters which you need to defeat by resolving operations with polynomials (hence the name). Also you'll find treasures that you'll open by answering questions related to polynomials theory.
 
-_Trailer coming soon_
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=p7DAqio6_jY" target="_blank"><img src="http://img.youtube.com/vi/p7DAqio6_jY/0.jpg" alt="Polynomial Trailer" width="240" height="180" border="10" /></a>
 
 Game mechanics
 -------------------------
